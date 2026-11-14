@@ -1,14 +1,18 @@
 import { useMemo } from 'react'
 import type { Domain, Measurement, Scenario, Status } from '../data/types'
+import type { LoadedData } from '../data/sample'
+import { dayRange } from '../data/validate'
 import { INDICATORS } from '../data/indicators'
 import { useI18n } from '../i18n/context'
 import { MISSION_DAYS } from '../data/sample'
 import { computeBaseline, evaluate } from '../lib/status'
 import { IndicatorCard } from '../components/IndicatorCard'
 import { EscalationPanel } from '../components/EscalationPanel'
+import { SpaceWeatherPanel } from '../components/SpaceWeatherPanel'
+import { escalationPlan } from '../lib/escalation'
 
 interface Props {
-  measurements: Measurement[]
+  data: LoadedData
   day: number
   onDayChange: (d: number) => void
   scenario: Scenario
@@ -16,8 +20,10 @@ interface Props {
 
 const DOMAINS: Domain[] = ['biological', 'cognitive-emotional', 'social', 'protective']
 
-export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
+export function Dashboard({ data, day, onDayChange, scenario }: Props) {
   const { t, tr } = useI18n()
+  const measurements = data.rows
+  const range = dayRange(measurements) ?? MISSION_DAYS
   const byIndicator = useMemo(() => {
     const map = new Map<string, Measurement[]>()
     for (const m of measurements) {
@@ -33,17 +39,19 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
   const flagged = useMemo(() => {
     const domains = new Set<Domain>()
     const ids: string[] = []
+    const statuses: Status[] = []
     for (const def of INDICATORS) {
       const rows = byIndicator.get(def.id) ?? []
       const v = rows.find((r) => r.day === day)?.value
       const prev = rows.find((r) => r.day === day - 1)?.value
       const s: Status = evaluate(def, v, computeBaseline(rows), prev)
+      statuses.push(s)
       if (s === 'watch' || s === 'act') {
         domains.add(def.domain)
         ids.push(def.id)
       }
     }
-    return { domains, ids }
+    return { domains, ids, statuses }
   }, [byIndicator, day])
 
   return (
@@ -55,13 +63,24 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
         <input
           id="day"
           type="range"
-          min={MISSION_DAYS.first}
-          max={MISSION_DAYS.last}
+          min={range.first}
+          max={range.last}
           value={day}
           onChange={(e) => onDayChange(Number(e.target.value))}
         />
-        <span className="hint">{t('day.hint')}</span>
+        <span className="hint">{data.origin === 'file' ? t('day.hintFile') : t('day.hint')}</span>
       </div>
+
+      {data.errors.length > 0 && (
+        <details className="data-issues">
+          <summary>{t('data.issues', { n: data.errors.length })}</summary>
+          <ul>
+            {data.errors.map((e) => (
+              <li key={e}>{e}</li>
+            ))}
+          </ul>
+        </details>
+      )}
 
       {flagged.domains.size >= 2 && (
         <section className="signal" role="status">
@@ -75,6 +94,8 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
           </p>
         </section>
       )}
+
+      <SpaceWeatherPanel />
 
       {DOMAINS.map((domain) => {
         const defs = INDICATORS.filter((d) => d.domain === domain)
@@ -91,7 +112,7 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
         )
       })}
 
-      <EscalationPanel scenario={scenario} />
+      <EscalationPanel plan={escalationPlan(flagged.statuses, scenario)} />
     </div>
   )
 }

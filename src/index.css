@@ -71,12 +71,27 @@ h3 { margin: 0; font-size: 0.95rem; }
 .day-control input { flex: 1; min-width: 160px; accent-color: var(--accent); }
 .hint { color: var(--muted); font-size: 0.78rem; }
 
+.data-issues {
+  background: var(--panel); border: 1px dashed var(--watch); border-radius: var(--radius);
+  padding: 0.5rem 0.9rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--muted);
+}
+.data-issues summary { cursor: pointer; color: var(--watch); font-weight: 600; }
+
 .signal {
   border: 1px solid var(--watch); background: color-mix(in srgb, var(--watch) 12%, var(--panel));
   border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem;
 }
 .signal h2 { color: var(--watch); margin-bottom: 0.25rem; }
 .signal p { margin: 0; }
+
+.space-weather {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0.8rem 1rem; margin-bottom: 1.25rem; font-size: 0.88rem;
+}
+.space-weather p { margin: 0.3rem 0; }
+.sw-stats { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; }
+.sw-stats strong { font-size: 1.15rem; color: var(--text); }
+.space-weather .source { color: var(--muted); font-size: 0.8rem; }
 
 .domain { margin-bottom: 1.25rem; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.75rem; }
@@ -109,6 +124,12 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .escalation { background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.9rem 1rem; }
 .escalation ol { margin: 0; padding-left: 1.2rem; }
 .escalation li { margin: 0.25rem 0; }
+.escalation li.current { color: var(--text); }
+.escalation li:not(.current) { color: var(--muted); }
+.now {
+  display: inline-block; margin-left: 0.35rem; padding: 0.05rem 0.45rem; border-radius: 999px;
+  background: var(--accent); color: var(--bg); font-size: 0.72rem; font-weight: 700;
+}
 .disclaimer { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.8rem; }
 
 .placeholder { background: var(--panel); border: 1px dashed var(--line); border-radius: var(--radius); padding: 1.2rem; }

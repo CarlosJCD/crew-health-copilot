@@ -23,6 +23,8 @@ const en = {
   'day.pre': 'Pre-flight day {n}',
   'day.mission': 'Mission day {n}',
   'day.hint': 'Demo replay with synthetic data',
+  'day.hintFile': 'Demo replay with the team dataset (synthetic)',
+  'data.issues': 'Dataset check for the data team: {n}',
 
   'signal.title': 'Early signal across {n} areas',
   'signal.body':
@@ -40,7 +42,7 @@ const en = {
   'status.aria': 'Status: {status}',
   'action.nominal': 'Keep your routine.',
   'action.watch': 'Try a self-care step and re-check tomorrow.',
-  'action.act': 'Follow the escalation steps below.',
+  'action.act': 'Follow the escalation path below.',
   'action.no-data': 'Log a measurement to see your status.',
 
   'card.vsBaseline': '{delta} vs your pre-flight normal ({mean})',
@@ -52,7 +54,8 @@ const en = {
   'card.unverified': '(unverified)',
   'card.trend': '{label} trend',
 
-  'esc.title': 'If something is red',
+  'esc.title': 'Escalation path',
+  'esc.now': 'Recommended now',
   'esc.self': 'Self-care.',
   'esc.selfBody': 'Follow the suggested step and re-measure.',
   'esc.cmo': 'Crew Medical Officer.',
@@ -61,6 +64,19 @@ const en = {
   'esc.groundDelayed': 'A reply can take {n}+ min round trip. Act on board first; the summary is queued for the ground.',
   'esc.groundLive': 'Near real-time contact is available.',
   'esc.disclaimer': 'Decision support only. This tool does not diagnose.',
+
+  'sw.title': 'Space weather (radiation context)',
+  'sw.flares': 'solar flares',
+  'sw.strong': 'M-class or stronger',
+  'sw.sep': 'solar energetic particle events',
+  'sw.window': 'In the {days} days up to {end}.',
+  'sw.strongest': 'Strongest flare: {cls} on {date}.',
+  'sw.source': 'Source:',
+  'sw.updated': 'updated {date}',
+  'sw.partial': 'partial download',
+  'sw.missing': 'No space-weather snapshot yet. It is downloaded from NASA DONKI each time the app is published.',
+  'sw.context': 'Context only: this app does not measure radiation dose. Follow your mission radiation procedures.',
+  'sw.hazardLink': 'NASA HRP: spaceflight hazards',
 
   'placeholder.next': 'Coming next',
   'placeholder.owner': 'Owner: {owner}',
@@ -83,6 +99,8 @@ const es: Record<StringKey, string> = {
   'day.pre': 'Día previo al vuelo {n}',
   'day.mission': 'Día de misión {n}',
   'day.hint': 'Recorrido de demostración con datos sintéticos',
+  'day.hintFile': 'Recorrido de demostración con el dataset del equipo (sintético)',
+  'data.issues': 'Revisión del dataset para el equipo de datos: {n}',
 
   'signal.title': 'Señal temprana en {n} áreas',
   'signal.body':
@@ -100,7 +118,7 @@ const es: Record<StringKey, string> = {
   'status.aria': 'Estado: {status}',
   'action.nominal': 'Mantén tu rutina.',
   'action.watch': 'Prueba un paso de autocuidado y vuelve a medir mañana.',
-  'action.act': 'Sigue los pasos de escalamiento de abajo.',
+  'action.act': 'Sigue la ruta de escalamiento de abajo.',
   'action.no-data': 'Registra una medición para ver tu estado.',
 
   'card.vsBaseline': '{delta} frente a tu normal previo al vuelo ({mean})',
@@ -112,7 +130,8 @@ const es: Record<StringKey, string> = {
   'card.unverified': '(sin verificar)',
   'card.trend': 'Tendencia de {label}',
 
-  'esc.title': 'Si algo está en rojo',
+  'esc.title': 'Ruta de escalamiento',
+  'esc.now': 'Recomendado ahora',
   'esc.self': 'Autocuidado.',
   'esc.selfBody': 'Sigue el paso sugerido y vuelve a medir.',
   'esc.cmo': 'Oficial médico de la tripulación.',
@@ -122,6 +141,19 @@ const es: Record<StringKey, string> = {
     'Una respuesta puede tardar {n} min o más, ida y vuelta. Actúa primero a bordo; el resumen queda en cola para Tierra.',
   'esc.groundLive': 'Hay contacto casi en tiempo real.',
   'esc.disclaimer': 'Solo apoyo a decisiones. Esta herramienta no diagnostica.',
+
+  'sw.title': 'Clima espacial (contexto de radiación)',
+  'sw.flares': 'fulguraciones solares',
+  'sw.strong': 'de clase M o mayor',
+  'sw.sep': 'eventos de partículas solares energéticas',
+  'sw.window': 'En los {days} días hasta el {end}.',
+  'sw.strongest': 'Fulguración más intensa: {cls} el {date}.',
+  'sw.source': 'Fuente:',
+  'sw.updated': 'actualizado el {date}',
+  'sw.partial': 'descarga parcial',
+  'sw.missing': 'Aún no hay datos de clima espacial. Se descargan de NASA DONKI cada vez que se publica la app.',
+  'sw.context': 'Solo contexto: esta app no mide la dosis de radiación. Sigue los procedimientos de radiación de tu misión.',
+  'sw.hazardLink': 'NASA HRP: peligros del vuelo espacial',
 
   'placeholder.next': 'Lo que sigue',
   'placeholder.owner': 'Responsable: {owner}',

@@ -1,11 +1,15 @@
-# Builds the app and publishes it to GitHub Pages on every push to main.
+# Tests, builds and publishes the app to GitHub Pages on every push to main,
+# and once a day so the NASA DONKI space-weather snapshot stays fresh.
 # One-time setup: repo Settings > Pages > Source: "GitHub Actions".
+# Optional: add a free api.nasa.gov key as the repo secret NASA_API_KEY (DEMO_KEY is heavily rate-limited).
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * *' # daily, 12:00 UTC
 
 permissions:
   contents: read
@@ -26,6 +30,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - name: Fetch NASA DONKI space-weather snapshot
+        run: node scripts/fetch-space-weather.mjs
+        env:
+          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import type { Measurement } from './data/types'
 import { DEFAULT_SCENARIO_ID, SCENARIOS } from './data/scenarios'
-import { loadMeasurements, MISSION_DAYS } from './data/sample'
+import { loadMeasurements, MISSION_DAYS, type LoadedData } from './data/sample'
+import { dayRange } from './data/validate'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { useI18n } from './i18n/context'
@@ -27,7 +27,7 @@ export default function App() {
   const { t, tr } = useI18n()
   const [moduleId, setModuleId] = useState(readHash)
   const [scenarioId, setScenarioId] = usePersistentState('scenario', DEFAULT_SCENARIO_ID)
-  const [measurements, setMeasurements] = useState<Measurement[]>([])
+  const [data, setData] = useState<LoadedData>({ rows: [], origin: 'generated', errors: [] })
   const [day, setDay] = useState(MISSION_DAYS.last)
   const [online, setOnline] = useState(navigator.onLine)
 
@@ -38,7 +38,11 @@ export default function App() {
     window.addEventListener('hashchange', onHash)
     window.addEventListener('online', onOnline)
     window.addEventListener('offline', onOffline)
-    loadMeasurements().then(setMeasurements)
+    loadMeasurements().then((loaded) => {
+      setData(loaded)
+      setDay(dayRange(loaded.rows)?.last ?? MISSION_DAYS.last)
+      if (loaded.errors.length) console.warn('Dataset problems:', loaded.errors)
+    })
     return () => {
       window.removeEventListener('hashchange', onHash)
       window.removeEventListener('online', onOnline)
@@ -73,7 +77,7 @@ export default function App() {
 
       <main>
         {active.id === 'today' ? (
-          <Dashboard measurements={measurements} day={day} onDayChange={setDay} scenario={scenario} />
+          <Dashboard data={data} day={day} onDayChange={setDay} scenario={scenario} />
         ) : (
           <Placeholder module={active} />
         )}

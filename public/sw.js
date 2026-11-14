@@ -2,9 +2,11 @@
 // - Pages (navigations): network first, fall back to the cached shell when offline.
 //   This avoids serving a stale index.html that points at assets from an older build.
 // - Hashed build assets (/assets/*): cache first; their names change on every build.
+// - Data files (/data/*.json): network first so a new dataset or space-weather snapshot shows up at once;
+//   the cached copy is used offline, and dropped when the server says the file no longer exists.
 // - Other same-origin GETs: cache first, refreshed in the background.
 // The page posts the URLs it already loaded (see main.tsx) so the first visit is cached too.
-const CACHE = 'crew-health-v3'
+const CACHE = 'crew-health-v4'
 const SHELL = ['./', './index.html', './manifest.webmanifest', './favicon.svg']
 
 self.addEventListener('install', (event) => {
@@ -38,6 +40,19 @@ async function networkFirst(req) {
   }
 }
 
+async function networkFirstData(req) {
+  const cache = await caches.open(CACHE)
+  try {
+    const res = await fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
+    const isHtml = (res.headers.get('content-type') ?? '').includes('text/html')
+    if (res.ok && !isHtml) await cache.put(req, res.clone())
+    else await cache.delete(req) // gone (404) or a dev-server HTML fallback
+    return res
+  } catch {
+    return (await cache.match(req)) ?? Response.error()
+  }
+}
+
 async function cacheFirst(req) {
   const cache = await caches.open(CACHE)
   const cached = await cache.match(req)
@@ -55,5 +70,7 @@ async function cacheFirst(req) {
 self.addEventListener('fetch', (event) => {
   const req = event.request
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return
-  event.respondWith(req.mode === 'navigate' ? networkFirst(req) : cacheFirst(req))
+  if (req.mode === 'navigate') event.respondWith(networkFirst(req))
+  else if (new URL(req.url).pathname.includes('/data/')) event.respondWith(networkFirstData(req))
+  else event.respondWith(cacheFirst(req))
 })

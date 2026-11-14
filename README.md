@@ -12,6 +12,8 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # production build in dist/ (includes the offline service worker)
 npm run preview  # serve the production build locally
+npm test         # unit tests (Vitest): alert logic, escalation, data validation, translations
+node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (NASA_API_KEY optional)
 ```
 
 ## Structure
@@ -26,7 +28,17 @@ npm run preview  # serve the production build locally
 | `src/modules/registry.ts` | Module list and owners (drives navigation) | Engineering |
 | `src/modules/*.tsx` | One file per module | See registry |
 | `public/sw.js` | Offline service worker | Engineering |
+| `src/data/validate.ts` | Checks `public/data/synthetic.json` row by row; problems appear in a notice on Today | Engineering |
+| `src/lib/escalation.ts` | Maps today's statuses + mission delay to the recommended escalation step | Engineering (mapping pending Phase 2 model) |
+| `scripts/fetch-space-weather.mjs` | Downloads NASA DONKI flares and SEP events to `public/data/space-weather.json` | Engineering |
 | `src/i18n/strings.ts` | UI text in English and Spanish (EN/ES toggle in the header). Data files use `{ en, es }` values | Everyone who adds text |
+
+## NASA data
+
+The Today tab shows recent solar flares and solar energetic particle events from
+[NASA DONKI](https://kauai.ccmc.gsfc.nasa.gov/DONKI/) as context for the space-radiation hazard.
+CI downloads a fresh snapshot on every deploy and once a day. Add a free key from https://api.nasa.gov/
+as the repository secret `NASA_API_KEY`; without it the shared `DEMO_KEY` is used and is often rate-limited.
 
 ## Synthetic data format
 
@@ -37,6 +49,9 @@ One row per astronaut, mission day and indicator. Negative days are the pre-flig
 ```
 
 Indicator ids: `sleep, hr, sbp, glucose, temp, mood, stress, rt, contact, exercise`.
+
+Save it as `public/data/synthetic.json`. If the file is missing the app uses its built-in placeholder;
+if some rows are invalid they are skipped and listed in a notice on the Today tab.
 
 ## Rules for thresholds
 

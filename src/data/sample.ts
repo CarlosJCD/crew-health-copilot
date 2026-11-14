@@ -1,8 +1,9 @@
 import type { Measurement } from './types'
 import { INDICATORS } from './indicators'
+import { validateMeasurements } from './validate'
 
 // PLACEHOLDER synthetic data so the UI works before the data-science dataset lands.
-// Replace by loading the team's JSON (same `Measurement` shape) in `loadMeasurements`.
+// When public/data/synthetic.json exists, `loadMeasurements` uses it instead (see validate.ts).
 // Story baked in: 7 pre-flight baseline days, then from mission day 8 a slow,
 // cross-domain drift (less sleep, lower mood, higher stress, slower reactions, less contact).
 
@@ -59,7 +60,42 @@ export function generateSample(astronautId = 'demo-astronaut'): Measurement[] {
 
 export const MISSION_DAYS = { first: FIRST_DAY, last: LAST_DAY }
 
-export async function loadMeasurements(): Promise<Measurement[]> {
-  // TODO(data-science): fetch('./data/synthetic.json') once the dataset exists.
-  return generateSample()
+export const DATASET_URL = './data/synthetic.json'
+
+export interface LoadedData {
+  rows: Measurement[]
+  /** 'file' = public/data/synthetic.json; 'generated' = built-in placeholder. */
+  origin: 'file' | 'generated'
+  errors: string[]
+}
+
+/**
+ * Loads the data-science dataset if it exists and is valid, otherwise the built-in placeholder.
+ * A missing file is normal until the dataset is delivered; dev servers answer it with HTML, so
+ * anything that is not JSON counts as missing.
+ */
+export async function loadMeasurements(fetchImpl: typeof fetch = fetch): Promise<LoadedData> {
+  let res: Response
+  try {
+    res = await fetchImpl(DATASET_URL, { cache: 'no-cache' })
+  } catch {
+    return { rows: generateSample(), origin: 'generated', errors: [] }
+  }
+  const type = res.headers.get('content-type') ?? ''
+  if (!res.ok || !type.includes('json')) return { rows: generateSample(), origin: 'generated', errors: [] }
+
+  let json: unknown
+  try {
+    json = await res.json()
+  } catch {
+    return { rows: generateSample(), origin: 'generated', errors: [`${DATASET_URL} is not valid JSON.`] }
+  }
+  const { rows, errors } = validateMeasurements(json)
+  if (!rows.length) {
+    return { rows: generateSample(), origin: 'generated', errors: [`${DATASET_URL} has no valid rows.`, ...errors] }
+  }
+  // The app follows one astronaut for now; extra astronauts are ignored but reported.
+  const ids = [...new Set(rows.map((r) => r.astronautId))]
+  const notes = ids.length > 1 ? [`Found ${ids.length} astronauts; showing "${ids[0]}".`] : []
+  return { rows: rows.filter((r) => r.astronautId === ids[0]), origin: 'file', errors: [...notes, ...errors] }
 }
