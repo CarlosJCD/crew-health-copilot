@@ -22,15 +22,17 @@ export interface SpaceWeatherSnapshot {
   startDate: string
   endDate: string
   source: { name: string; url: string; api?: string }
-  flares: Flare[]
-  sep: SepEvent[]
+  /** null = that list could not be downloaded (not the same as zero events). */
+  flares: Flare[] | null
+  sep: SepEvent[] | null
 }
 
 export interface SpaceWeatherSummary {
-  flares: number
+  /** null = not downloaded. */
+  flares: number | null
   /** M-class or stronger. */
-  strongFlares: number
-  sep: number
+  strongFlares: number | null
+  sep: number | null
   strongest?: Flare
   latestSep?: SepEvent
 }
@@ -45,15 +47,17 @@ export function flareRank(classType: string | null | undefined): number {
 }
 
 export function summarize(s: SpaceWeatherSnapshot): SpaceWeatherSummary {
-  const strongest = s.flares.reduce<Flare | undefined>(
+  const flares = s.flares ?? []
+  const sep = s.sep ?? []
+  const strongest = flares.reduce<Flare | undefined>(
     (best, f) => (flareRank(f.classType) > flareRank(best?.classType) ? f : best),
     undefined,
   )
-  const latestSep = s.sep.reduce<SepEvent | undefined>((last, e) => (!last || e.time > last.time ? e : last), undefined)
+  const latestSep = sep.reduce<SepEvent | undefined>((last, e) => (!last || e.time > last.time ? e : last), undefined)
   return {
-    flares: s.flares.length,
-    strongFlares: s.flares.filter((f) => flareRank(f.classType) >= CLASS_RANK.M * 100).length,
-    sep: s.sep.length,
+    flares: s.flares ? flares.length : null,
+    strongFlares: s.flares ? flares.filter((f) => flareRank(f.classType) >= CLASS_RANK.M * 100).length : null,
+    sep: s.sep ? sep.length : null,
     strongest,
     latestSep,
   }
@@ -67,7 +71,9 @@ export async function loadSpaceWeather(fetchImpl: typeof fetch = fetch): Promise
     const res = await fetchImpl(SPACE_WEATHER_URL)
     if (!res.ok || !(res.headers.get('content-type') ?? '').includes('json')) return undefined
     const json = (await res.json()) as SpaceWeatherSnapshot
-    return Array.isArray(json.flares) && Array.isArray(json.sep) ? json : undefined
+    const list = (x: unknown) => Array.isArray(x) || x === null
+    const some = Array.isArray(json.flares) || Array.isArray(json.sep)
+    return list(json.flares) && list(json.sep) && some ? json : undefined
   } catch {
     return undefined
   }

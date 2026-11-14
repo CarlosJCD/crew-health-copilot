@@ -36,6 +36,11 @@ describe('summarize', () => {
     expect(s.latestSep?.id).toBe('s2')
   })
 
+  it('keeps "not downloaded" (null) apart from zero events', () => {
+    const s = summarize({ ...snapshot, flares: null, sep: [] })
+    expect(s).toMatchObject({ flares: null, strongFlares: null, sep: 0, strongest: undefined })
+  })
+
   it('handles an empty snapshot', () => {
     expect(summarize({ ...snapshot, flares: [], sep: [] })).toEqual({ flares: 0, strongFlares: 0, sep: 0, strongest: undefined, latestSep: undefined })
   })
@@ -49,9 +54,15 @@ describe('loadSpaceWeather', () => {
     expect((await loadSpaceWeather(respond(JSON.stringify(snapshot))))?.flares).toHaveLength(5)
   })
 
+  it('accepts a snapshot with one list not downloaded', async () => {
+    const partial = { ...snapshot, complete: false, flares: null }
+    expect((await loadSpaceWeather(respond(JSON.stringify(partial))))?.flares).toBeNull()
+  })
+
   it('returns undefined when missing, HTML or malformed', async () => {
     expect(await loadSpaceWeather(respond('nope', 404, 'text/plain'))).toBeUndefined()
     expect(await loadSpaceWeather(respond('<!doctype html>', 200, 'text/html'))).toBeUndefined()
     expect(await loadSpaceWeather(respond('{"flares": 3}'))).toBeUndefined()
+    expect(await loadSpaceWeather(respond('{"flares": null, "sep": null}'))).toBeUndefined()
   })
 })

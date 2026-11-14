@@ -32,6 +32,12 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+      # Kept if NASA does not answer at all, so the daily rebuild never drops the last good data.
+      - name: Restore last published space-weather snapshot
+        run: >
+          curl -sfL --create-dirs -o public/data/space-weather.json
+          "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/data/space-weather.json"
+          || echo "no published snapshot yet"
       - name: Fetch NASA DONKI space-weather snapshot
         run: node scripts/fetch-space-weather.mjs
         env:

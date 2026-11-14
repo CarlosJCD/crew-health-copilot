@@ -46,11 +46,16 @@ const en = {
   'action.no-data': 'Log a measurement to see your status.',
 
   'card.vsBaseline': '{delta} vs your pre-flight normal ({mean})',
+  'card.vsExpected': '{delta} vs your expected in-flight normal ({mean})',
+  'card.avg': 'Average of the last {n} readings: {value}',
+  'card.change': '{pct}% vs pre-flight',
+  'card.category': 'Reference range: {label}',
+  'card.cutoff': 'Cut-off:',
   'card.sd': '{z} SD',
   'card.why': 'Why this matters',
   'card.hide': 'Hide details',
   'card.how': 'How to measure:',
-  'card.source': 'Source:',
+  'card.sources': 'Sources:',
   'card.unverified': '(unverified)',
   'card.trend': '{label} trend',
 
@@ -74,6 +79,7 @@ const en = {
   'sw.source': 'Source:',
   'sw.updated': 'updated {date}',
   'sw.partial': 'partial download',
+  'sw.unavailable': 'not downloaded',
   'sw.missing': 'No space-weather snapshot yet. It is downloaded from NASA DONKI each time the app is published.',
   'sw.context': 'Context only: this app does not measure radiation dose. Follow your mission radiation procedures.',
   'sw.hazardLink': 'NASA HRP: spaceflight hazards',
@@ -122,11 +128,16 @@ const es: Record<StringKey, string> = {
   'action.no-data': 'Registra una medición para ver tu estado.',
 
   'card.vsBaseline': '{delta} frente a tu normal previo al vuelo ({mean})',
+  'card.vsExpected': '{delta} frente a tu normal esperado en vuelo ({mean})',
+  'card.avg': 'Promedio de las últimas {n} lecturas: {value}',
+  'card.change': '{pct} % frente a antes del vuelo',
+  'card.category': 'Rango de referencia: {label}',
+  'card.cutoff': 'Corte:',
   'card.sd': '{z} DE',
   'card.why': 'Por qué importa',
   'card.hide': 'Ocultar detalles',
   'card.how': 'Cómo medir:',
-  'card.source': 'Fuente:',
+  'card.sources': 'Fuentes:',
   'card.unverified': '(sin verificar)',
   'card.trend': 'Tendencia de {label}',
 
@@ -151,6 +162,7 @@ const es: Record<StringKey, string> = {
   'sw.source': 'Fuente:',
   'sw.updated': 'actualizado el {date}',
   'sw.partial': 'descarga parcial',
+  'sw.unavailable': 'sin descargar',
   'sw.missing': 'Aún no hay datos de clima espacial. Se descargan de NASA DONKI cada vez que se publica la app.',
   'sw.context': 'Solo contexto: esta app no mide la dosis de radiación. Sigue los procedimientos de radiación de tu misión.',
   'sw.hazardLink': 'NASA HRP: peligros del vuelo espacial',
@@ -161,10 +173,10 @@ const es: Record<StringKey, string> = {
 
 export const DICTIONARIES: Record<Lang, Record<StringKey, string>> = { en, es }
 
-/** Units that read differently per language; anything not listed is shown as is. */
+/** Units (as written in the data team's catalog) that read differently per language; anything not listed is shown as is. */
 export const UNITS: Record<Lang, Record<string, string>> = {
-  en: {},
-  es: { 'msgs/wk': 'msjs/sem' },
+  en: { '0-10': '/10', lapsos: 'lapses', 'mensajes/semana': 'msgs/wk', 'min/día': 'min/day' },
+  es: { '0-10': '/10', 'mensajes/semana': 'msjs/sem' },
 }
 
 export function format(template: string, vars?: Record<string, string | number>): string {

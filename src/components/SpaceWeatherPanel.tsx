@@ -41,21 +41,28 @@ export function SpaceWeatherPanel() {
   )
 }
 
+function Stat({ value, label }: { value: number | null; label: string }) {
+  const { t } = useI18n()
+  return value === null ? (
+    <span className="na">
+      <strong aria-hidden="true">–</strong> {label} ({t('sw.unavailable')})
+    </span>
+  ) : (
+    <span>
+      <strong>{value}</strong> {label}
+    </span>
+  )
+}
+
 function SnapshotBody({ snapshot, date }: { snapshot: SpaceWeatherSnapshot; date: (iso: string) => string }) {
   const { t } = useI18n()
   const s = summarize(snapshot)
   return (
     <>
       <p className="sw-stats">
-        <span>
-          <strong>{s.flares}</strong> {t('sw.flares')}
-        </span>
-        <span>
-          <strong>{s.strongFlares}</strong> {t('sw.strong')}
-        </span>
-        <span>
-          <strong>{s.sep}</strong> {t('sw.sep')}
-        </span>
+        <Stat value={s.flares} label={t('sw.flares')} />
+        <Stat value={s.strongFlares} label={t('sw.strong')} />
+        <Stat value={s.sep} label={t('sw.sep')} />
       </p>
       <p>
         {t('sw.window', { days: snapshot.windowDays, end: date(snapshot.endDate) })}

@@ -7,7 +7,9 @@
 //
 // Usage: NASA_API_KEY=your_key node scripts/fetch-space-weather.mjs   (falls back to DEMO_KEY)
 // Get a free key at https://api.nasa.gov/. Never commit a key; in CI it comes from a repo secret.
-// On any failure the previous snapshot is kept, so a NASA outage never breaks the deploy.
+// A NASA outage never breaks the deploy: if both lists fail, the previous snapshot is kept (CI
+// restores the last published one first); if only one fails, it is written as null so the app
+// says "not downloaded" instead of showing a misleading zero.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
@@ -21,40 +23,54 @@ const day = (d) => d.toISOString().slice(0, 10)
 
 const end = new Date()
 const start = new Date(end.getTime() - WINDOW_DAYS * 86_400_000)
-const previous = existsSync(OUT) ? JSON.parse(readFileSync(OUT, 'utf8')) : undefined
+const hasPrevious = existsSync(OUT) && readFileSync(OUT, 'utf8').trim().startsWith('{')
 
-async function get(type) {
-  const url = `https://api.nasa.gov/DONKI/${type}?startDate=${day(start)}&endDate=${day(end)}&api_key=${KEY}`
+const query = `startDate=${day(start)}&endDate=${day(end)}`
+// api.nasa.gov first; the CCMC host is the same DONKI service without a key. On 2026-11-14 the
+// api.nasa.gov FLR request answered HTTP 404 in CI and CCMC timed out from a local machine.
+const endpoints = (type) => [
+  { name: 'api.nasa.gov', url: `https://api.nasa.gov/DONKI/${type}?${query}&api_key=${KEY}` },
+  { name: 'CCMC', url: `https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/${type}?${query}` },
+]
+
+async function get(url) {
   const res = await fetch(url, { signal: AbortSignal.timeout(30_000) })
   const body = await res.text()
-  if (!res.ok) throw new Error(`${type}: HTTP ${res.status} ${body.replace(/\s+/g, ' ').slice(0, 160)}`)
-  return body.trim() ? JSON.parse(body) : []
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${body.replace(/\s+/g, ' ').slice(0, 160)}`)
+  const json = body.trim() ? JSON.parse(body) : []
+  if (!Array.isArray(json)) throw new Error(`unexpected answer ${body.slice(0, 160)}`)
+  return json
 }
 
-/** Fetch one event type; on failure keep that type from the previous snapshot. */
-async function fetchType(type, map, prevKey) {
-  try {
-    return { items: (await get(type)).map(map), fresh: true }
-  } catch (err) {
-    console.warn(`space-weather: ${err.message}`)
-    return { items: previous?.[prevKey] ?? [], fresh: false }
+/** Items of one event type, or null if no endpoint answered. Messages never include the key. */
+async function fetchType(type, map) {
+  for (const { name, url } of endpoints(type)) {
+    try {
+      const items = (await get(url)).map(map)
+      console.log(`space-weather: ${type} from ${name}`)
+      return items
+    } catch (err) {
+      console.warn(`space-weather: ${type} via ${name} failed: ${err.message}`)
+    }
   }
+  return null
 }
 
 // Sequential on purpose: the shared DEMO_KEY rejects bursts.
-const flares = await fetchType(
-  'FLR',
-  (f) => ({ id: f.flrID, time: f.peakTime ?? f.beginTime, classType: f.classType, link: f.link }),
-  'flares',
-)
-const sep = await fetchType('SEP', (s) => ({ id: s.sepID, time: s.eventTime, link: s.link }), 'sep')
+const flares = await fetchType('FLR', (f) => ({
+  id: f.flrID,
+  time: f.peakTime ?? f.beginTime,
+  classType: f.classType,
+  link: f.link,
+}))
+const sep = await fetchType('SEP', (s) => ({ id: s.sepID, time: s.eventTime, link: s.link }))
 
-if (!flares.fresh && !sep.fresh) {
-  console.warn(`space-weather: nothing fetched; ${previous ? 'keeping previous snapshot' : 'no snapshot written'}`)
+if (!flares && !sep) {
+  console.warn(`space-weather: nothing fetched; ${hasPrevious ? 'keeping previous snapshot' : 'no snapshot written'}`)
 } else {
   const snapshot = {
     fetchedAt: new Date().toISOString(),
-    complete: flares.fresh && sep.fresh,
+    complete: Boolean(flares && sep),
     windowDays: WINDOW_DAYS,
     startDate: day(start),
     endDate: day(end),
@@ -63,10 +79,11 @@ if (!flares.fresh && !sep.fresh) {
       url: 'https://kauai.ccmc.gsfc.nasa.gov/DONKI/',
       api: 'https://api.nasa.gov/',
     },
-    flares: flares.items,
-    sep: sep.items,
+    flares, // null = not downloaded
+    sep,
   }
   mkdirSync(dirname(OUT), { recursive: true })
   writeFileSync(OUT, JSON.stringify(snapshot, null, 2) + '\n')
-  console.log(`space-weather: ${snapshot.flares.length} flares, ${snapshot.sep.length} SEP events (${snapshot.startDate} to ${snapshot.endDate})`)
+  const n = (list) => (list ? list.length : 'not downloaded')
+  console.log(`space-weather: flares ${n(flares)}, SEP ${n(sep)} (${snapshot.startDate} to ${snapshot.endDate})`)
 }
