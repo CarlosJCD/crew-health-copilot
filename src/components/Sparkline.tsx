@@ -1,8 +1,7 @@
-import type { Baseline } from '../lib/status'
-
 interface Props {
   values: { day: number; value: number }[]
-  baseline?: Baseline
+  /** Personal baseline band: mean ± spread. */
+  band?: { mean: number; spread: number }
   currentDay: number
   ariaLabel: string
 }
@@ -11,12 +10,12 @@ const W = 160
 const H = 40
 const PAD = 3
 
-/** Tiny dependency-free trend line with the personal baseline band (mean ± 1 SD) shaded. */
-export function Sparkline({ values, baseline, currentDay, ariaLabel }: Props) {
+/** Tiny dependency-free trend line with the personal baseline band shaded. */
+export function Sparkline({ values, band, currentDay, ariaLabel }: Props) {
   if (values.length < 2) return null
   const days = values.map((p) => p.day)
   const nums = values.map((p) => p.value)
-  if (baseline) nums.push(baseline.mean + baseline.sd, baseline.mean - baseline.sd)
+  if (band) nums.push(band.mean + band.spread, band.mean - band.spread)
   const minX = Math.min(...days)
   const maxX = Math.max(...days)
   const minY = Math.min(...nums)
@@ -28,16 +27,15 @@ export function Sparkline({ values, baseline, currentDay, ariaLabel }: Props) {
 
   return (
     <svg className="sparkline" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel}>
-      {baseline && (
+      {band && (
         <rect
           className="sparkline-band"
           x={PAD}
           width={W - 2 * PAD}
-          y={y(baseline.mean + baseline.sd)}
-          height={Math.max(1, y(baseline.mean - baseline.sd) - y(baseline.mean + baseline.sd))}
+          y={y(band.mean + band.spread)}
+          height={Math.max(1, y(band.mean - band.spread) - y(band.mean + band.spread))}
         />
       )}
-      <line className="sparkline-launch" x1={x(0)} x2={x(0)} y1={0} y2={H} />
       <path className="sparkline-line" d={path} />
       {current && <circle className="sparkline-dot" cx={x(current.day)} cy={y(current.value)} r={3} />}
     </svg>

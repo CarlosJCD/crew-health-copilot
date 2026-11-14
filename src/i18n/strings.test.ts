@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { DICTIONARIES, format, LANGS, type Localized } from './strings'
-import { INDICATORS } from '../data/indicators'
-import { SCENARIOS } from '../data/scenarios'
 import { MODULES } from '../modules/registry'
+import { SCENARIOS } from '../orbit/config'
+import { scenarioName } from '../orbit/display'
 
 const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort()
 
@@ -27,23 +27,13 @@ describe('UI dictionaries', () => {
 
 describe('data-file texts', () => {
   const all: [string, Localized][] = [
-    ...INDICATORS.flatMap((d) => [
-      [`${d.id}.label`, d.label],
-      [`${d.id}.method`, d.method],
-      [`${d.id}.explainer`, d.explainer],
-      ...d.sources.map((s, i) => [`${d.id}.source.${i}`, s.label]),
-      ...d.categories.map((c) => [`${d.id}.category.${c.label.es}`, c.label]),
-    ] as [string, Localized][]),
-    ...SCENARIOS.flatMap((s) => [
-      [`${s.id}.name`, s.name],
-      [`${s.id}.delay`, s.oneWayDelay],
-      [`${s.id}.notes`, s.notes],
-    ] as [string, Localized][]),
     ...MODULES.flatMap((m) => [
       [`${m.id}.label`, m.label],
       [`${m.id}.summary`, m.summary],
+      [`${m.id}.owner`, m.owner],
       ...m.planned.map((p, i) => [`${m.id}.planned.${i}`, p] as [string, Localized]),
     ] as [string, Localized][]),
+    ...SCENARIOS.map((s) => [`scenario.${s.id}`, scenarioName(s)] as [string, Localized]),
   ]
 
   it('are translated into every language', () => {

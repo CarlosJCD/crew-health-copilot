@@ -1,0 +1,483 @@
+{
+  "version": "0.1",
+  "date": "2026-11-14",
+  "disclaimer_en": "Orbit supports decisions; it does not diagnose. Values marked team_criterion are design choices pending validation.",
+  "baseline": {
+    "days": 14,
+    "note": "Pre-flight baseline, recalculated once stable in flight (team criterion). For the demo, read persona.baseline."
+  },
+  "domains": {
+    "body": [
+      "sleep",
+      "bp",
+      "hr",
+      "temp",
+      "glucose",
+      "exercise",
+      "symptoms"
+    ],
+    "mind": [
+      "checkin",
+      "screen",
+      "pulse"
+    ],
+    "crew": [
+      "crew_climate",
+      "contact"
+    ]
+  },
+  "convergence": {
+    "min_yellow_domains": 2,
+    "consecutive_days": 2,
+    "label_en": "Early cross-domain signal",
+    "prevention_level": "secondary",
+    "team_criterion": true
+  },
+  "escalation": {
+    "green": {
+      "en": "Keep going. Your protective factors are working.",
+      "to": "none"
+    },
+    "yellow": {
+      "en": "Self-care suggestion. Orbit checks again in 24 h.",
+      "to": "self"
+    },
+    "early_signal": {
+      "en": "Early signal across body, mind or crew. Choose up to two actions.",
+      "to": "self",
+      "offer_share_with": "crew_medical_officer"
+    },
+    "red_physical": {
+      "en": "This needs a person. Your crew medical officer has been notified.",
+      "to": "crew_medical_officer",
+      "ground_packet": true
+    },
+    "red_psych": {
+      "en": "You asked to talk to someone today. Who would you like?",
+      "to": "astronaut_choice"
+    }
+  },
+  "indicators": [
+    {
+      "id": "sleep",
+      "label_en": "Sleep",
+      "domain": "body",
+      "unit": "h",
+      "input": "actigraphy or self-report",
+      "frequency": "daily",
+      "params": {
+        "population_min_h": 7,
+        "yellow_below_baseline_gt_h": 1.0,
+        "red_lte_h": 5,
+        "red_consecutive_nights": 3
+      },
+      "team_criterion": [
+        "yellow_below_baseline_gt_h",
+        "red_lte_h",
+        "red_consecutive_nights"
+      ],
+      "rule_en": "Yellow: under 7 h and more than 1 h below baseline. Red: 5 h or less for 3 nights in a row.",
+      "action_en": "Protect tonight's sleep window and light schedule. Red: crew medical officer.",
+      "hrp_risk": "Risk of Inadequate Sleep and Irregular Schedules",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Watson et al., 2015",
+          "url": "https://doi.org/10.5665/sleep.4716"
+        },
+        {
+          "cite": "Barger et al., 2014",
+          "url": "https://doi.org/10.1016/S1474-4422(14)70122-X"
+        }
+      ],
+      "why_en": "Sleep is the lever that touches mood, reaction time and immunity. Orbit compares each night with your own usual range, not with Earth averages."
+    },
+    {
+      "id": "checkin",
+      "label_en": "Mood, stress and fatigue",
+      "domain": "mind",
+      "unit": "0-10 sliders",
+      "input": "self-report check-in (60 s or less)",
+      "frequency": "daily",
+      "params": {
+        "yellow_worse_than_baseline_points": 2,
+        "items": [
+          "mood",
+          "stress",
+          "fatigue"
+        ],
+        "worse_direction": {
+          "mood": "down",
+          "stress": "up",
+          "fatigue": "up"
+        }
+      },
+      "team_criterion": [
+        "yellow_worse_than_baseline_points"
+      ],
+      "red": "self_triggered: astronaut taps 'I want to talk to someone today' and chooses who",
+      "rule_en": "Yellow: any item 2 points or more worse than baseline. Red: only when she asks to talk to someone today.",
+      "action_en": "Boost options she chooses. Red: she picks the crew medical officer or an earlier private psychological conference.",
+      "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Sandal et al., 2018",
+          "url": "https://doi.org/10.3389/fpsyg.2018.02235"
+        }
+      ],
+      "why_en": "A dip can be a normal reaction to a hard week. Orbit only flags it when it lasts and shows up together with other signals."
+    },
+    {
+      "id": "crew_climate",
+      "label_en": "Crew climate",
+      "domain": "crew",
+      "unit": "0-10 slider",
+      "input": "self-report check-in",
+      "frequency": "daily",
+      "params": {
+        "yellow_worse_than_baseline_points": 2
+      },
+      "team_criterion": [
+        "yellow_worse_than_baseline_points"
+      ],
+      "rule_en": "Yellow: 2 points or more below baseline.",
+      "action_en": "Suggest a crew activity or a private note; nothing is shared by default.",
+      "hrp_risk": "Risk of Inadequate Teamwork",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [],
+      "why_en": "How the crew feels together matters on long missions. Only you see this rating unless you choose to share it."
+    },
+    {
+      "id": "screen",
+      "label_en": "Weekly check (PHQ-2 and GAD-2)",
+      "domain": "mind",
+      "unit": "score 0-6 each",
+      "input": "4 items, free to use",
+      "frequency": "weekly",
+      "params": {
+        "yellow_gte": 3,
+        "offer_conference_if_weeks_gte": 2
+      },
+      "team_criterion": [
+        "offer_conference_if_weeks_gte"
+      ],
+      "rule_en": "Yellow: 3 or more on either scale (positive screen, not a diagnosis). No red: after two weeks, Orbit offers an earlier private conference.",
+      "action_en": "Offer a private conversation; share with the medical officer only if she agrees.",
+      "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Kroenke et al., 2003 (PHQ-2)",
+          "url": "https://doi.org/10.1097/01.MLR.0000093487.78664.3C"
+        },
+        {
+          "cite": "Kroenke et al., 2007 (GAD-2)",
+          "url": "https://doi.org/10.7326/0003-4819-146-5-200703060-00004"
+        }
+      ],
+      "why_en": "These are widely used two-question checks. A high score is not a diagnosis; it means it is worth talking to someone."
+    },
+    {
+      "id": "pulse",
+      "label_en": "Pulse mode (reaction speed)",
+      "domain": "mind",
+      "unit": "ms (median reaction time)",
+      "input": "60-90 s task",
+      "frequency": "daily or every other day",
+      "params": {
+        "practice_sessions": 5,
+        "yellow_sd_above_baseline": 2,
+        "yellow_sessions_needed": 2,
+        "yellow_window_sessions": 3,
+        "can_be_red": false
+      },
+      "team_criterion": [
+        "practice_sessions",
+        "yellow_sd_above_baseline",
+        "yellow_sessions_needed",
+        "yellow_window_sessions"
+      ],
+      "rule_en": "Yellow: slower than baseline + 2 SD in 2 of the last 3 sessions. Never red on its own.",
+      "action_en": "Check sleep and workload; counts toward the cross-domain signal.",
+      "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Basner et al., 2015",
+          "url": "https://doi.org/10.3357/AMHP.4343.2015"
+        }
+      ],
+      "why_en": "A quick check of your reaction speed against your own best days. It is not a test of your abilities and never raises an alarm by itself."
+    },
+    {
+      "id": "bp",
+      "label_en": "Blood pressure",
+      "domain": "body",
+      "unit": "mmHg",
+      "input": "cuff, 2 readings on waking",
+      "frequency": "daily or per mission",
+      "params": {
+        "green_sys_lt": 120,
+        "green_dia_lt": 80,
+        "red_sys_gte": 140,
+        "red_dia_gte": 90,
+        "red_needs_confirmation": true
+      },
+      "team_criterion": [],
+      "rule_en": "Green: under 120/80. Yellow: 120-129 systolic, or 130-139 / 80-89. Red: 140 or more, or 90 or more, confirmed on a second reading.",
+      "action_en": "Repeat and review sleep, exercise and salt. Red: crew medical officer.",
+      "hrp_risk": "Risk of Cardiovascular Adaptations",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Jones et al., 2025 (ACC/AHA guideline)",
+          "url": "https://doi.org/10.1016/j.jacc.2025.05.007"
+        }
+      ],
+      "why_en": "One high reading is repeated before it counts. Orbit shows your trend so you and your medical officer see the pattern."
+    },
+    {
+      "id": "hr",
+      "label_en": "Resting heart rate",
+      "domain": "body",
+      "unit": "bpm",
+      "input": "watch or biometric shirt on waking",
+      "frequency": "daily",
+      "params": {
+        "yellow_above_baseline_bpm": 10,
+        "red_gt": 100,
+        "red_low_lt_with_symptoms": 60
+      },
+      "team_criterion": [
+        "yellow_above_baseline_bpm"
+      ],
+      "rule_en": "Yellow: 10 bpm or more above baseline. Red: over 100 at rest repeatedly, or under 60 with dizziness or fainting.",
+      "action_en": "Check sleep, stress and hydration. Red: crew medical officer.",
+      "hrp_risk": "Risk of Cardiovascular Adaptations",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Mayo Clinic, resting heart rate",
+          "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/expert-answers/heart-rate/faq-20057979"
+        }
+      ],
+      "why_en": "Your resting heart rate rises with poor sleep, stress or illness. Orbit compares it with your own normal, which may be lower than average."
+    },
+    {
+      "id": "temp",
+      "label_en": "Body temperature",
+      "domain": "body",
+      "unit": "°C",
+      "input": "same method every day, on waking",
+      "frequency": "daily",
+      "params": {
+        "yellow_above_inflight_baseline_gt": 0.5,
+        "red_gte": 38.0,
+        "red_above_inflight_baseline_gt": 0.5,
+        "red_requires_symptoms": true
+      },
+      "team_criterion": [
+        "yellow_above_inflight_baseline_gt",
+        "red_above_inflight_baseline_gt"
+      ],
+      "rule_en": "Yellow: more than 0.5 °C above in-flight baseline. Red: 38 °C or more, more than 0.5 °C above in-flight baseline, with symptoms.",
+      "action_en": "Fluids, rest and log symptoms. Red: crew medical officer.",
+      "hrp_risk": "Risk of Altered Immune System Responses",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "CDC, fever definition",
+          "url": "https://www.cdc.gov/port-health/php/definitions-symptoms-reportable-illness"
+        },
+        {
+          "cite": "Stahn et al., 2017",
+          "url": "https://doi.org/10.1038/s41598-017-15560-w"
+        }
+      ],
+      "why_en": "On long missions your body runs about 1 °C warmer than on Earth. Orbit uses your in-flight normal so it does not raise false fevers."
+    },
+    {
+      "id": "glucose",
+      "label_en": "Fasting glucose",
+      "domain": "body",
+      "unit": "mg/dL",
+      "input": "glucometer (if available)",
+      "frequency": "weekly or per mission",
+      "params": {
+        "green_min": 70,
+        "green_max": 99,
+        "yellow_high_max": 125,
+        "yellow_low_min": 54,
+        "red_high_gte": 126,
+        "red_high_occasions": 2,
+        "red_low_lt": 54
+      },
+      "team_criterion": [],
+      "rule_en": "Green: 70-99. Yellow: 100-125, or 54-69 (level 1 hypoglycemia). Red: 126 or more on two occasions, or under 54 (level 2).",
+      "action_en": "Review food and exercise. Red: crew medical officer.",
+      "hrp_risk": "Risk of Inadequate Food and Nutrition",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "ADA Standards of Care 2026, section 2",
+          "url": "https://doi.org/10.2337/dc26-S002"
+        },
+        {
+          "cite": "ADA Standards of Care, section 6 (hypoglycemia levels; 2025 version reviewed)",
+          "url": "https://doi.org/10.2337/dc26-S006"
+        },
+        {
+          "cite": "Hughson et al., 2016",
+          "url": "https://doi.org/10.1152/ajpheart.00802.2015"
+        }
+      ],
+      "why_en": "Fasting glucose shows how your body handles energy. Insulin resistance has risen in flight studies, so Orbit tracks your trend."
+    },
+    {
+      "id": "exercise",
+      "label_en": "Exercise",
+      "domain": "body",
+      "unit": "min/day",
+      "input": "log or exercise device",
+      "frequency": "daily",
+      "params": {
+        "prescription_min_iss": 120,
+        "yellow_below_fraction": 0.75,
+        "can_be_red": false
+      },
+      "team_criterion": [
+        "yellow_below_fraction"
+      ],
+      "rule_en": "Yellow: under 75 % of today's prescription. Never red on its own.",
+      "action_en": "Reschedule the session; linked to mood.",
+      "hrp_risk": "Risk of Reduced Cardiorespiratory and Musculoskeletal Fitness",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "NASA, astronaut exercise",
+          "url": "https://www.nasa.gov/general/astronaut-exercise/"
+        },
+        {
+          "cite": "Smith et al., 2012",
+          "url": "https://doi.org/10.1002/jbmr.1647"
+        }
+      ],
+      "why_en": "Exercise protects bone, heart and mood. Orbit counts what you did against your plan and never shames a missed day."
+    },
+    {
+      "id": "contact",
+      "label_en": "Contact with support network",
+      "domain": "crew",
+      "unit": "messages in previous 24 h",
+      "input": "count with consent + 1 item",
+      "frequency": "daily (morning)",
+      "params": {
+        "yellow_days_without_contact": 3,
+        "yellow_drop_fraction_vs_14d": 0.5,
+        "can_be_red": false
+      },
+      "team_criterion": [
+        "yellow_days_without_contact",
+        "yellow_drop_fraction_vs_14d"
+      ],
+      "rule_en": "Yellow: 3 days in a row without contact, or a drop of 50 % or more versus the previous 14 days. Never red on its own.",
+      "action_en": "Suggest an asynchronous message or the family puzzle.",
+      "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Supolkina et al., 2021",
+          "url": "https://doi.org/10.3389/fphys.2021.751170"
+        }
+      ],
+      "why_en": "Talking less with Earth is common on long missions. Orbit notices the trend so you can choose when to reconnect."
+    },
+    {
+      "id": "symptoms",
+      "label_en": "Symptoms (body map)",
+      "domain": "body",
+      "unit": "event",
+      "input": "tap on the human figure",
+      "frequency": "when they occur",
+      "params": {
+        "yellow_duration_days_gt": 2,
+        "red_flags": [
+          "chest pain",
+          "fainting",
+          "vision change",
+          "severe headache"
+        ]
+      },
+      "team_criterion": [
+        "yellow_duration_days_gt",
+        "red_flags"
+      ],
+      "rule_en": "Yellow: a symptom lasting more than 2 days. Red: any red-flag symptom (list pending review by a physician).",
+      "action_en": "Log it. Red: crew medical officer immediately.",
+      "hrp_risk": "Risk of Altered Immune System Responses; Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS); Risk of Cardiovascular Adaptations",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Crucian et al., 2018",
+          "url": "https://doi.org/10.3389/fimmu.2018.01437"
+        }
+      ],
+      "why_en": "Tap where you feel something. Some symptoms go straight to your medical officer because they need a person, not an app."
+    },
+    {
+      "id": "radiation",
+      "label_en": "Mission radiation (context, not personal)",
+      "domain": "environment",
+      "unit": "mSv/day (estimated)",
+      "input": "scenario dose rate + DONKI solar particle events",
+      "frequency": "daily",
+      "params": {
+        "dose_mSv_day": {
+          "mars_transit": 1.84,
+          "mars_surface": 0.64
+        },
+        "yellow_if_sep_event_active": true,
+        "can_be_red": false
+      },
+      "team_criterion": [],
+      "rule_en": "Yellow: a solar particle event is active. No red in the app; shelter is an operational decision.",
+      "action_en": "Follow the vehicle shelter procedure.",
+      "hrp_risk": "Risk of Radiation-Induced Cancers",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [
+        {
+          "cite": "Zeitlin et al., 2013",
+          "url": "https://doi.org/10.1126/science.1235989"
+        },
+        {
+          "cite": "Hassler et al., 2014",
+          "url": "https://doi.org/10.1126/science.1244797"
+        },
+        {
+          "cite": "NASA CCMC DONKI",
+          "url": "https://ccmc.gsfc.nasa.gov/tools/DONKI/"
+        }
+      ],
+      "why_en": "This is your mission's estimated dose and solar activity, from NASA data. Shelter decisions belong to crew procedures, not to Orbit."
+    },
+    {
+      "id": "protective",
+      "label_en": "Protective factors used",
+      "domain": "all",
+      "unit": "count",
+      "input": "log",
+      "frequency": "daily",
+      "params": {
+        "no_color": true
+      },
+      "team_criterion": [],
+      "rule_en": "No color: it is a tank that fills up.",
+      "action_en": "Positive feedback only.",
+      "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
+      "hrp_url": "https://www.nasa.gov/hrp/risks/",
+      "sources": [],
+      "why_en": "These are the things that keep you well. Orbit counts them so you can see what works for you."
+    }
+  ]
+}

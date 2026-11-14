@@ -1,11 +1,12 @@
-// UI strings. English is the default because Space Apps judges review the project in English.
+// UI strings. English is the default: Orbit is presented in English (handoff) and judges review it
+// in English. Rule texts ("Why?", rule, action) come from orbit-indicators.json, in English only.
 // To add a language: add it to LANGS, then add a dictionary with every key of `en`
 // (TypeScript fails the build if a key is missing) and the matching field in every `Localized` value.
 
 export const LANGS = ['en', 'es'] as const
 export type Lang = (typeof LANGS)[number]
 
-/** Text that lives in data files (indicators, scenarios, modules). */
+/** Text that lives in data files (modules, scenario names). */
 export type Localized = Record<Lang, string>
 
 const en = {
@@ -14,61 +15,57 @@ const en = {
   'net.online': 'Online',
   'net.offline': 'Offline mode',
   'nav.label': 'Modules',
-  'footer': 'Prototype for NASA Space Apps Challenge 2026. Synthetic data. Decision support, not a diagnosis.',
+  'footer': 'Prototype for NASA Space Apps Challenge 2026. Synthetic data, not a diagnostic tool. Orbit supports decisions; it does not diagnose.',
 
   'scenario.label': 'Mission',
   'scenario.delay': 'Signal delay to Earth: {delay}',
-  'scenario.unverified': 'Pending verification (science team)',
 
-  'day.pre': 'Pre-flight day {n}',
-  'day.mission': 'Mission day {n}',
-  'day.hint': 'Demo replay with synthetic data',
-  'day.hintFile': 'Demo replay with the team dataset (synthetic)',
+  'persona.line': '{name}, {role} · day {day} of {length} · synthetic data',
+  'day.label': 'Mission day {n}',
+  'day.hint': 'Demo replay: built-in story',
+  'day.hintFile': 'Demo replay: data team file',
+  'day.log': 'Mission log:',
   'data.issues': 'Dataset check for the data team: {n}',
 
-  'signal.title': 'Early signal across {n} areas',
-  'signal.body':
-    'Changes in {list} are showing up together. Patterns like this are easier to turn around early. Open Mind and Recharge for suggested steps.',
+  'domain.body': 'Body',
+  'domain.mind': 'Mind',
+  'domain.crew': 'Crew',
+  'color.green': 'Green',
+  'color.yellow': 'Yellow',
+  'color.red': 'Red',
+  'color.none': 'No data',
+  'color.aria': '{domain}: {color}',
+  'ring.flagged': 'Yellow or red: {list}',
+  'ring.clear': 'All in your range',
 
-  'domain.biological': 'Body',
-  'domain.cognitive-emotional': 'Mind',
-  'domain.social': 'Connection',
-  'domain.protective': 'Protective habits',
+  'state.GREEN': 'Green',
+  'state.YELLOW': 'Yellow: self-care',
+  'state.EARLY_SIGNAL': 'Early cross-domain signal',
+  'state.RED_PHYSICAL': 'Red: needs a person',
+  'state.RED_PSYCH': 'Red: you asked to talk',
+  'state.days': 'Two or more domains in yellow for two days in a row.',
+  'state.to': 'Who sees it:',
+  'who.none': 'only you',
+  'who.self': 'only you (self-care)',
+  'who.crew_medical_officer': 'your crew medical officer',
+  'who.astronaut_choice': 'the person you choose',
+  'state.offer': 'You can choose to share it with your crew medical officer.',
+  'state.ground': 'A packet goes to Earth and arrives in {delay}. A reply takes {reply} or more.',
+  'state.groundLive': 'Ground support is available in near real time.',
+  'state.boost': 'Open Boost',
+  'state.disclaimer': 'Orbit supports decisions; it does not diagnose.',
 
-  'status.nominal': 'Nominal',
-  'status.watch': 'Watch',
-  'status.act': 'Act',
-  'status.no-data': 'No data',
-  'status.aria': 'Status: {status}',
-  'action.nominal': 'Keep your routine.',
-  'action.watch': 'Try a self-care step and re-check tomorrow.',
-  'action.act': 'Follow the escalation path below.',
-  'action.no-data': 'Log a measurement to see your status.',
-
-  'card.vsBaseline': '{delta} vs your pre-flight normal ({mean})',
-  'card.vsExpected': '{delta} vs your expected in-flight normal ({mean})',
-  'card.avg': 'Average of the last {n} readings: {value}',
-  'card.change': '{pct}% vs pre-flight',
-  'card.category': 'Reference range: {label}',
-  'card.cutoff': 'Cut-off:',
-  'card.sd': '{z} SD',
-  'card.why': 'Why this matters',
-  'card.hide': 'Hide details',
-  'card.how': 'How to measure:',
+  'card.why': 'Why?',
+  'card.hide': 'Hide',
+  'card.rule': 'Rule:',
+  'card.action': 'What to do:',
+  'card.risk': 'NASA HRP risk:',
   'card.sources': 'Sources:',
-  'card.unverified': '(unverified)',
+  'card.noSources': 'Source pending (Psychology 1).',
+  'card.team': 'Team criterion, pending validation:',
+  'card.usual': 'your usual {value}',
   'card.trend': '{label} trend',
-
-  'esc.title': 'Escalation path',
-  'esc.now': 'Recommended now',
-  'esc.self': 'Self-care.',
-  'esc.selfBody': 'Follow the suggested step and re-measure.',
-  'esc.cmo': 'Crew Medical Officer.',
-  'esc.cmoBody': 'Share the card on board.',
-  'esc.ground': 'Flight surgeons on Earth.',
-  'esc.groundDelayed': 'A reply can take {n}+ min round trip. Act on board first; the summary is queued for the ground.',
-  'esc.groundLive': 'Near real-time contact is available.',
-  'esc.disclaimer': 'Decision support only. This tool does not diagnose.',
+  'card.englishOnly': 'Rule texts come from orbit-indicators.json.',
 
   'sw.title': 'Space weather (radiation context)',
   'sw.flares': 'solar flares',
@@ -83,6 +80,8 @@ const en = {
   'sw.missing': 'No space-weather snapshot yet. It is downloaded from NASA DONKI each time the app is published.',
   'sw.context': 'Context only: this app does not measure radiation dose. Follow your mission radiation procedures.',
   'sw.hazardLink': 'NASA HRP: spaceflight hazards',
+  'sw.dose': 'Estimated mission dose: {dose} mSv/day. Not a personal dose.',
+  'sw.doseNone': 'Estimated mission dose: not shown for this scenario (not verified).',
 
   'placeholder.next': 'Coming next',
   'placeholder.owner': 'Owner: {owner}',
@@ -96,62 +95,57 @@ const es: Record<StringKey, string> = {
   'net.online': 'En línea',
   'net.offline': 'Sin conexión',
   'nav.label': 'Módulos',
-  'footer': 'Prototipo para el NASA Space Apps Challenge 2026. Datos sintéticos. Apoyo a decisiones, no un diagnóstico.',
+  'footer': 'Prototipo para el NASA Space Apps Challenge 2026. Datos sintéticos, no es una herramienta de diagnóstico. Orbit apoya decisiones; no diagnostica.',
 
   'scenario.label': 'Misión',
   'scenario.delay': 'Retraso de señal a la Tierra: {delay}',
-  'scenario.unverified': 'Pendiente de verificar (equipo científico)',
 
-  'day.pre': 'Día previo al vuelo {n}',
-  'day.mission': 'Día de misión {n}',
-  'day.hint': 'Recorrido de demostración con datos sintéticos',
-  'day.hintFile': 'Recorrido de demostración con el dataset del equipo (sintético)',
+  'persona.line': '{name}, {role} · día {day} de {length} · datos sintéticos',
+  'day.label': 'Día de misión {n}',
+  'day.hint': 'Recorrido de demostración: historia integrada',
+  'day.hintFile': 'Recorrido de demostración: archivo del equipo de datos',
+  'day.log': 'Bitácora:',
   'data.issues': 'Revisión del dataset para el equipo de datos: {n}',
 
-  'signal.title': 'Señal temprana en {n} áreas',
-  'signal.body':
-    'Hay cambios al mismo tiempo en {list}. Estos patrones son más fáciles de revertir si se atienden pronto. Abre Mente y Recarga para ver pasos sugeridos.',
+  'domain.body': 'Cuerpo',
+  'domain.mind': 'Mente',
+  'domain.crew': 'Tripulación',
+  'color.green': 'Verde',
+  'color.yellow': 'Amarillo',
+  'color.red': 'Rojo',
+  'color.none': 'Sin datos',
+  'color.aria': '{domain}: {color}',
+  'ring.flagged': 'En amarillo o rojo: {list}',
+  'ring.clear': 'Todo dentro de tu rango',
 
-  'domain.biological': 'Cuerpo',
-  'domain.cognitive-emotional': 'Mente',
-  'domain.social': 'Conexión',
-  'domain.protective': 'Hábitos protectores',
+  'state.GREEN': 'Verde',
+  'state.YELLOW': 'Amarillo: autocuidado',
+  'state.EARLY_SIGNAL': 'Señal temprana entre dominios',
+  'state.RED_PHYSICAL': 'Rojo: necesita a una persona',
+  'state.RED_PSYCH': 'Rojo: pediste hablar con alguien',
+  'state.days': 'Dos o más dominios en amarillo dos días seguidos.',
+  'state.to': 'Quién lo ve:',
+  'who.none': 'solo tú',
+  'who.self': 'solo tú (autocuidado)',
+  'who.crew_medical_officer': 'tu oficial médico de la tripulación',
+  'who.astronaut_choice': 'la persona que tú elijas',
+  'state.offer': 'Puedes elegir compartirlo con tu oficial médico de la tripulación.',
+  'state.ground': 'Sale un paquete a la Tierra y llega en {delay}. La respuesta tarda {reply} o más.',
+  'state.groundLive': 'Hay apoyo de Tierra casi en tiempo real.',
+  'state.boost': 'Abrir Boost',
+  'state.disclaimer': 'Orbit apoya decisiones; no diagnostica.',
 
-  'status.nominal': 'Normal',
-  'status.watch': 'Vigilar',
-  'status.act': 'Actuar',
-  'status.no-data': 'Sin datos',
-  'status.aria': 'Estado: {status}',
-  'action.nominal': 'Mantén tu rutina.',
-  'action.watch': 'Prueba un paso de autocuidado y vuelve a medir mañana.',
-  'action.act': 'Sigue la ruta de escalamiento de abajo.',
-  'action.no-data': 'Registra una medición para ver tu estado.',
-
-  'card.vsBaseline': '{delta} frente a tu normal previo al vuelo ({mean})',
-  'card.vsExpected': '{delta} frente a tu normal esperado en vuelo ({mean})',
-  'card.avg': 'Promedio de las últimas {n} lecturas: {value}',
-  'card.change': '{pct} % frente a antes del vuelo',
-  'card.category': 'Rango de referencia: {label}',
-  'card.cutoff': 'Corte:',
-  'card.sd': '{z} DE',
-  'card.why': 'Por qué importa',
-  'card.hide': 'Ocultar detalles',
-  'card.how': 'Cómo medir:',
+  'card.why': '¿Por qué?',
+  'card.hide': 'Ocultar',
+  'card.rule': 'Regla:',
+  'card.action': 'Qué hacer:',
+  'card.risk': 'Riesgo HRP de NASA:',
   'card.sources': 'Fuentes:',
-  'card.unverified': '(sin verificar)',
+  'card.noSources': 'Fuente pendiente (Psicología 1).',
+  'card.team': 'Criterio del equipo, pendiente de validar:',
+  'card.usual': 'tu normal {value}',
   'card.trend': 'Tendencia de {label}',
-
-  'esc.title': 'Ruta de escalamiento',
-  'esc.now': 'Recomendado ahora',
-  'esc.self': 'Autocuidado.',
-  'esc.selfBody': 'Sigue el paso sugerido y vuelve a medir.',
-  'esc.cmo': 'Oficial médico de la tripulación.',
-  'esc.cmoBody': 'Comparte la tarjeta a bordo.',
-  'esc.ground': 'Cirujanos de vuelo en Tierra.',
-  'esc.groundDelayed':
-    'Una respuesta puede tardar {n} min o más, ida y vuelta. Actúa primero a bordo; el resumen queda en cola para Tierra.',
-  'esc.groundLive': 'Hay contacto casi en tiempo real.',
-  'esc.disclaimer': 'Solo apoyo a decisiones. Esta herramienta no diagnostica.',
+  'card.englishOnly': 'Los textos de las reglas están en inglés (orbit-indicators.json).',
 
   'sw.title': 'Clima espacial (contexto de radiación)',
   'sw.flares': 'fulguraciones solares',
@@ -166,6 +160,8 @@ const es: Record<StringKey, string> = {
   'sw.missing': 'Aún no hay datos de clima espacial. Se descargan de NASA DONKI cada vez que se publica la app.',
   'sw.context': 'Solo contexto: esta app no mide la dosis de radiación. Sigue los procedimientos de radiación de tu misión.',
   'sw.hazardLink': 'NASA HRP: peligros del vuelo espacial',
+  'sw.dose': 'Dosis estimada de la misión: {dose} mSv/día. No es una dosis personal.',
+  'sw.doseNone': 'Dosis estimada de la misión: no se muestra en este escenario (sin verificar).',
 
   'placeholder.next': 'Lo que sigue',
   'placeholder.owner': 'Responsable: {owner}',
@@ -173,10 +169,10 @@ const es: Record<StringKey, string> = {
 
 export const DICTIONARIES: Record<Lang, Record<StringKey, string>> = { en, es }
 
-/** Units (as written in the data team's catalog) that read differently per language; anything not listed is shown as is. */
+/** Units that read differently per language; anything not listed is shown as is. */
 export const UNITS: Record<Lang, Record<string, string>> = {
-  en: { '0-10': '/10', lapsos: 'lapses', 'mensajes/semana': 'msgs/wk', 'min/día': 'min/day' },
-  es: { '0-10': '/10', 'mensajes/semana': 'msjs/sem' },
+  en: {},
+  es: { msgs: 'msjs' },
 }
 
 export function format(template: string, vars?: Record<string, string | number>): string {

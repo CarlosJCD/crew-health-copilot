@@ -1,20 +1,12 @@
 // Reference catalog from the data-science team: src/data/knowledge.json (their datos_nasav1.json,
-// copied unchanged). It holds the indicators, clinical categories, sources and mission physics
-// the app uses. To update it, replace the JSON file; `npm test` checks it still fits this
-// contract and CI will not publish if it does not.
+// copied unchanged). Orbit's alert colors come from orbit-indicators.json (see src/orbit); this
+// catalog is reference material: plausible ranges used to check demo-data.json, NASA sources and
+// mission physics. To update it, replace the JSON file; `npm test` checks it still fits this contract.
 //
-// Nothing in the file is verified yet ("Extraído (revisar página)"), so every source taken from
-// it is shown as unverified until the team marks it.
+// Nothing in the file is verified yet ("Extraído (revisar página)").
 import { indicators, clinical_categories, sources, physics, generated_at } from './knowledge.json'
-import type { Status } from './types'
 
 export type Traffic = 'verde' | 'amarillo' | 'rojo'
-
-export const TRAFFIC_STATUS: Record<Traffic, Exclude<Status, 'no-data'>> = {
-  verde: 'nominal',
-  amarillo: 'watch',
-  rojo: 'act',
-}
 
 export interface KnowledgeIndicator {
   id: string

@@ -1,9 +1,18 @@
-# Crew Health Copilot (working title)
+# Orbit
 
-Offline-first, preventive health self-assessment for astronauts. NASA Space Apps Challenge 2026,
-challenge "Create Health Monitoring Software for Astronauts on Space Missions".
+**Catch the early signals. Act onboard.**
 
-> Decision support only. This prototype does not diagnose. All data shown is synthetic.
+Orbit is an offline health companion for astronauts on long missions. It reads body, mind and crew life
+against each astronaut's own baseline, flags an early cross-domain signal when two domains stay yellow
+for two days, and helps the astronaut choose a protective action before escalating, at the pace the
+communication delay allows. NASA Space Apps Challenge 2026, challenge "Create Health Monitoring Software
+for Astronauts on Space Missions".
+
+- App: https://carlosjcd.github.io/crew-health-copilot/ (public, no sign-in, works offline after the first visit)
+- Repository: https://github.com/CarlosJCD/crew-health-copilot
+
+> **Synthetic data, not a diagnostic tool.** Orbit supports decisions; it does not diagnose.
+> The demo follows a fictional astronaut, Lena Ortiz, on days 121 to 128 of a Mars transit.
 
 ## Run
 
@@ -12,103 +21,109 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # production build in dist/ (includes the offline service worker)
 npm run preview  # serve the production build locally
-npm test         # unit tests (Vitest): alert logic, escalation, data validation, translations
-node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (NASA_API_KEY optional)
+npm test         # Vitest: ORBIT engine acceptance tests, rules file, data checks, translations
+node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (no key needed)
 ```
 
 ## Structure
 
 | Path | What it is | Owner |
 |---|---|---|
-| `src/data/types.ts` | Data contracts (`Measurement`, `IndicatorDef`, `Scenario`) | Engineering |
-| `src/data/knowledge.json` | **Data team's reference catalog** (their `datos_nasav1.json`, unchanged): indicators, clinical categories, sources, mission physics | Data science |
-| `src/data/knowledge.ts` | Typed reader and checks for `knowledge.json` | Engineering |
-| `src/data/knowledge.en.ts` | English for the Spanish catalog texts the app shows | Engineering |
-| `src/data/indicators.ts` | Builds the indicators from the catalog and adds the app model: domain, HRP hazards, "why it matters" | Engineering + Psychology |
-| `src/data/scenarios.ts` | Mission scenarios; signal delays from the catalog physics | Engineering |
-| `src/data/sample.ts` | Placeholder synthetic data; swap for the data-science JSON | Data science |
-| `src/lib/status.ts` | Traffic-light logic: catalog categories + deviation from the personal pre-flight baseline | Engineering + Data science |
+| `src/orbit/orbit-indicators.json` | **Single source of rules, sources and texts** (Psychology 1 and 2, unchanged). Nobody changes thresholds outside this file; P1 approves changes | Psychology 1 |
+| `src/orbit/scenarios.json` | Four scenarios: one-way delay, estimated dose, first responder, ground contact (handoff 2.2) | Psychology + Data science |
+| `src/orbit/config.ts` | Typed reader for both files; lists every param the engine needs | Engineering |
+| `src/orbit/engine.ts` | ORBIT engine: one rule per indicator, Body / Mind / Crew roll-up, state (GREEN, YELLOW, EARLY_SIGNAL, RED_PHYSICAL, RED_PSYCH) | Data science + Engineering |
+| `src/orbit/engine.test.ts` | Acceptance table of the handoff (days 121 to 128) plus rules the story does not exercise | Data science + Engineering |
+| `src/orbit/demoData.ts` | `demo-data.json` contract, checks, and the built-in copy of the demo story | Data science |
+| `src/modules/Today.tsx` | Rings, state, cards with "Why?", day control, radiation context | Engineering |
 | `src/modules/registry.ts` | Module list and owners (drives navigation) | Engineering |
-| `src/modules/*.tsx` | One file per module | See registry |
+| `src/data/knowledge.json` | Data team's reference catalog (`datos_nasav1.json`): plausible ranges used to check `demo-data.json`, NASA sources, physics | Data science |
+| `src/data/spaceWeather.ts`, `scripts/fetch-space-weather.mjs` | NASA DONKI snapshot (flares and SEP events) | Engineering |
+| `src/i18n/strings.ts` | Interface text in English (default) and Spanish. Rule texts come from the JSON, in English | Everyone who adds text |
 | `public/sw.js` | Offline service worker | Engineering |
-| `src/data/validate.ts` | Checks `public/data/synthetic.json` row by row; problems appear in a notice on Today | Engineering |
-| `src/lib/escalation.ts` | Maps today's statuses + mission delay to the recommended escalation step | Engineering (mapping pending Phase 2 model) |
-| `scripts/fetch-space-weather.mjs` | Downloads NASA DONKI flares and SEP events to `public/data/space-weather.json` | Engineering |
-| `src/i18n/strings.ts` | UI text in English and Spanish (EN/ES toggle in the header). Data files use `{ en, es }` values | Everyone who adds text |
+
+## Rules and the ORBIT engine
+
+`orbit-indicators.json` drives every color. Each indicator is compared with the astronaut's own baseline
+(`persona.baseline` in the demo data); population ranges only act as physical safety rails (blood pressure,
+heart rate, temperature, glucose). The day's state:
+
+| State | When | Who sees it |
+|---|---|---|
+| `RED_PHYSICAL` | Any red in Body | Crew medical officer; packet to Earth with the scenario delay |
+| `RED_PSYCH` | She taps "I want to talk to someone today" | The person she chooses |
+| `EARLY_SIGNAL` | 2 or more domains yellow today and the day before | Her; she can share with the crew medical officer |
+| `YELLOW` | Any yellow | Her (self-care), checked again in 24 h |
+| `GREEN` | Otherwise | Her |
+
+Thresholds marked `team_criterion` in the JSON are design choices pending validation; the "Why?" panel lists them.
+To change a rule, edit the JSON and run `npm test`: the acceptance table must still pass.
+
+Open points for P1:
+- `contact.yellow_drop_fraction_vs_14d` is read as "mean of the last 14 days vs the 14 days before". Comparing
+  shorter windows with the previous 14 days would turn day 122 or 127 yellow, against the acceptance table.
+- `screen.offer_conference_if_weeks_gte` and `pulse.practice_sessions` are not used yet (the demo gives the baseline).
+
+## Demo data (`public/data/demo-data.json`)
+
+Data science generates it (handoff 2.3). If the file is missing, the app uses its built-in copy of the story:
+days 121 to 128 with the exact values of the handoff, days 107 to 120 as seeded noise around the baseline.
+
+```json
+{
+  "synthetic": true,
+  "persona": { "name": "Lena Ortiz", "role": "Mission specialist", "scenario": "mars_transit", "mission_length_days": 180,
+               "baseline": { "sleep_h": [6.5, 0.3], "hr": [58, 2], "sbp": [112, 3], "dbp": [72, 3], "temp": [37.9, 0.1],
+                             "mood": [7, 0.6], "stress": [4, 0.7], "fatigue": [4, 0.7], "crew_climate": [7, 0.5],
+                             "pulse_ms": [320, 12], "contact": [2, 0.6], "exercise_prescription_min": 120 } },
+  "days": [
+    { "day": 121, "sleep_h": 6.6, "hr": 58, "sbp": 114, "dbp": 73, "temp": 38.0, "mood": 7, "stress": 4, "fatigue": 4,
+      "crew_climate": 7, "pulse_ms": 318, "contact": 2, "exercise_min": 120, "glucose": 89,
+      "symptoms": [], "screen": null, "events": [], "talk_request": false }
+  ]
+}
+```
+
+Each baseline is `[mean, sd]`. Numbers may be `null` (no reading). Proposed additions to the handoff example:
+`glucose` (weekly, `null` on other days) and `talk_request` (red psych state). Values outside the plausible
+ranges of the data team's catalog are rejected and listed in a notice on Today.
 
 ## NASA data
 
-The Today tab shows recent solar flares and solar energetic particle events from
-[NASA DONKI](https://kauai.ccmc.gsfc.nasa.gov/DONKI/) as context for the space-radiation hazard.
-CI downloads a fresh snapshot on every deploy and once a day. Add a free key from https://api.nasa.gov/
-as the repository secret `NASA_API_KEY`; without it the shared `DEMO_KEY` is used and is often rate-limited.
-If NASA does not answer, the last published snapshot is kept; a list that could not be downloaded is
-stored as `null` and the app says "not downloaded" instead of showing zero.
+| Resource | Where it appears | Link |
+|---|---|---|
+| Human Research Program risks | "Why?" on every indicator card | https://www.nasa.gov/hrp/risks/ |
+| Human Research Program hazards | Radiation context panel | https://www.nasa.gov/hrp/hazards/ |
+| DONKI space weather (NASA CCMC) | Solar flares and SEP events of the last 30 days, downloaded at build time and daily | https://ccmc.gsfc.nasa.gov/tools/DONKI/ |
+| MSL RAD dose measurements | Estimated mission dose per scenario (1.84 mSv/day cruise, 0.64 mSv/day Mars surface) | https://doi.org/10.1126/science.1235989, https://doi.org/10.1126/science.1244797 |
 
-## Reference catalog (knowledge.json)
+CI reads `https://ccmc.gsfc.nasa.gov/DONKI-API/get/FLR` and `/SEP` (no key). api.nasa.gov is a fallback and
+uses the repository secret `NASA_API_KEY` if present. If NASA does not answer, the last published snapshot is kept.
 
-To update thresholds, sources or delays, replace `src/data/knowledge.json` with the new export and run
-`npm test`. The tests say exactly what to fix: entries that break the contract, overlapping categories,
-indicators without an app model entry (`indicators.ts`) or texts without English (`knowledge.en.ts`).
-CI does not publish if a test fails.
+## Other sources and libraries
 
-How the app uses each indicator setting:
+Clinical and research sources are listed per indicator in `orbit-indicators.json` and shown in "Why?".
 
-| Catalog field | Use in the app |
+| Library | License |
 |---|---|
-| `clinical_categories` (min included, max excluded) | Reference range and traffic light; its `confirm_n` readings must agree |
-| `smooth_n` | The rules look at the average of the last N readings |
-| `sd_floor` | Minimum SD for the personal pre-flight baseline |
-| `confirm_n` | Consecutive readings needed for a personal-baseline alert |
-| `expected_inflight_shift` | Added to the baseline from launch day (e.g. systolic -8 mmHg) |
-| `evaluate_on: cambio_pct` | Categories apply to the % change vs. pre-flight (body mass) |
-| `plausible_min` / `plausible_max` | Dataset rows outside the range are rejected |
-
-Every catalog source is shown as "(unverified)" because the file marks all parameters as
-"Extraído (revisar página)". The personal-baseline cut-offs (1.5 and 2.5 SD; 2 and 3 for temperature)
-are an app design choice, not from the catalog.
-
-## Synthetic data format
-
-One row per astronaut, mission day and indicator. Negative days are the pre-flight baseline.
-
-```json
-{ "astronautId": "demo-astronaut", "day": -3, "indicatorId": "sleep", "value": 7.1, "unit": "h", "source": "synthetic" }
-```
-
-Indicator ids and units (from the catalog; `unit` must match exactly):
-
-| id | unit | id | unit |
-|---|---|---|---|
-| `sleep` | `h` | `mood` | `0-10` |
-| `hr` | `bpm` | `stress` | `0-10` |
-| `sbp` | `mmHg` | `rt` | `ms` |
-| `dbp` | `mmHg` | `pvt_lapses` | `lapsos` |
-| `glucose` | `mg/dL` | `contact` | `mensajes/semana` |
-| `temp` | `°C` | `exercise` | `min/día` |
-| `body_mass` | `kg` | `spo2` | `%` |
-
-Save it as `public/data/synthetic.json`. If the file is missing the app uses its built-in placeholder;
-if some rows are invalid they are skipped and listed in a notice on the Today tab.
-
-## Rules for thresholds
-
-Every threshold needs a source. Leave `verified: false` until someone on the team has opened the source;
-the UI then marks it "(unverified)". Never present a status as a diagnosis.
+| React | MIT |
+| Vite | MIT |
+| TypeScript | Apache-2.0 |
+| Vitest | MIT |
+| oxlint | MIT |
 
 ## Deploy
 
-Push to `main` on GitHub. The workflow in `.github/workflows/deploy.yml` publishes to GitHub Pages
-(Settings > Pages > Source: GitHub Actions).
+Push to `main` on GitHub. `.github/workflows/deploy.yml` runs lint and tests, downloads the DONKI snapshot,
+builds and publishes to GitHub Pages. It also runs daily at 12:00 UTC.
 
 ## Use of Super Intelligence (SI)
 
 Required by the 2026 Project Submission Guide ("Code and data: must acknowledge SI generation in descriptive text and metadata").
 
-- The project concept (biopsychosocial, preventive, protective factors, games) came from the team.
-- Initial code scaffold, the traffic-light logic, the service worker and the placeholder synthetic-data generator
-  were written with assistance from Claude (Anthropic) and reviewed by the team.
-- The reference catalog (`knowledge.json`) was extracted from NASA and clinical documents with assistance from
-  Claude (`captured_by` field); each value stays "unverified" until a team member checks the page and quote.
-- Literature and benchmark searches were assisted by Claude; every source is opened and checked by a team member before use.
-- No SI-generated images, audio or video so far. Any that are added must carry a visible watermark and no NASA branding.
+- The concept (ORBIT model, Orbit product, demo story, games) came from the team.
+- Code in this repository (app, ORBIT engine, tests, service worker, DONKI script, built-in demo data) was written
+  with assistance from Claude (Anthropic) and reviewed by the team.
+- The rules file and the data team's reference catalog were drafted with assistance from Claude; values marked
+  `team_criterion` or "Extraído (revisar página)" stay unverified until a team member checks them.
+- No SI-generated images, audio or video. Any that are added must carry a visible "AI-generated" watermark and no NASA branding.

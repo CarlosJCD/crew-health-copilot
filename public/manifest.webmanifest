@@ -1,7 +1,7 @@
 {
-  "name": "Crew Health Copilot",
-  "short_name": "Crew Health",
-  "description": "Preventive, biopsychosocial health self-assessment for astronauts. Works offline.",
+  "name": "Orbit",
+  "short_name": "Orbit",
+  "description": "Catch the early signals. Act onboard. Offline health companion for astronauts (synthetic data, not a diagnostic tool).",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

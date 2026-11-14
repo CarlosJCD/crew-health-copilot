@@ -1,5 +1,5 @@
-// Module list drives the navigation. Each planned module names its owner so
-// the team can work in parallel without touching the same files.
+// Module list drives the navigation (Orbit product structure, phase 4 and handoff section 1).
+// Each planned module names its owner so the team can work in parallel.
 // Text fields are { en, es }: keep both in sync when editing.
 import type { Localized } from '../i18n/strings'
 
@@ -16,85 +16,73 @@ export const MODULES: ModuleInfo[] = [
     id: 'today',
     label: { en: 'Today', es: 'Hoy' },
     summary: {
-      en: 'Trends and traffic-light status for every indicator, against your own pre-flight normal.',
-      es: 'Tendencias y semáforo de cada indicador, comparados con tu propio normal previo al vuelo.',
+      en: 'Body, Mind and Crew rings, the ORBIT state and every indicator against your own baseline.',
+      es: 'Anillos de Cuerpo, Mente y Tripulación, el estado ORBIT y cada indicador frente a tu propia línea base.',
     },
     owner: { en: 'Engineering', es: 'Ingeniería' },
     planned: [],
   },
   {
-    id: 'body',
-    label: { en: 'Body', es: 'Cuerpo' },
+    id: 'boost',
+    label: { en: 'Boost', es: 'Boost' },
     summary: {
-      en: 'Interactive human figure: tap a body system to see its function, status and why it changes in space.',
-      es: 'Figura humana interactiva: toca un sistema del cuerpo para ver su función, su estado y por qué cambia en el espacio.',
+      en: 'Protective actions: 8 cards with duration, evidence and the domains they touch. You choose up to two.',
+      es: 'Acciones protectoras: 8 tarjetas con duración, evidencia y dominios que tocan. Tú eliges hasta dos.',
     },
-    owner: { en: 'Data science + Engineering', es: 'Ciencia de datos + Ingeniería' },
+    owner: { en: 'Engineering (texts: Psychology 2)', es: 'Ingeniería (textos: Psicología 2)' },
     planned: [
-      { en: 'Clickable SVG body by system', es: 'Cuerpo en SVG con sistemas que se pueden tocar' },
-      {
-        en: 'Hazard links (radiation, gravity, closed environment)',
-        es: 'Vínculos con los peligros (radiación, gravedad, ambiente cerrado)',
-      },
+      { en: '8 Boost cards, choose up to 2', es: '8 tarjetas de Boost, elige hasta 2' },
+      { en: 'Follow-up at 24 h: what helped?', es: 'Seguimiento a las 24 h: ¿qué ayudó?' },
+    ],
+  },
+  {
+    id: 'transmit',
+    label: { en: 'Transmit', es: 'Transmit' },
+    summary: {
+      en: 'Outbox with the signal-delay timer of the mission and switches for what you share.',
+      es: 'Bandeja de salida con el temporizador del retraso de la misión e interruptores de lo que compartes.',
+    },
+    owner: { en: 'Engineering', es: 'Ingeniería' },
+    planned: [
+      { en: 'Outbox with delay countdown', es: 'Bandeja con cuenta regresiva del retraso' },
+      { en: 'Privacy switches: Body by default, Mind and Crew only if you choose', es: 'Interruptores de privacidad: Cuerpo por defecto; Mente y Tripulación solo si tú eliges' },
+    ],
+  },
+  {
+    id: 'body',
+    label: { en: 'Body map', es: 'Figura humana' },
+    summary: {
+      en: 'Human figure with six systems: brain and mood, eyes, heart and vessels, bone and muscle, immune and skin, gut.',
+      es: 'Figura humana con seis sistemas: cerebro y ánimo, ojos, corazón y vasos, hueso y músculo, inmune y piel, intestino.',
+    },
+    owner: { en: 'Engineering', es: 'Ingeniería' },
+    planned: [
+      { en: 'Clickable SVG figure with HRP risks', es: 'Figura SVG que se puede tocar, con riesgos HRP' },
+      { en: 'Tap to log a symptom', es: 'Tocar para registrar un síntoma' },
     ],
   },
   {
     id: 'mind',
     label: { en: 'Mind', es: 'Mente' },
     summary: {
-      en: 'Daily mood, stress and fatigue check-in, plus cognitive signal from mini-games in check mode.',
-      es: 'Registro diario de ánimo, estrés y fatiga, más la señal cognitiva de los minijuegos en modo chequeo.',
+      en: 'Daily check-in with 4 sliders (60 s or less) and pulse mode, a 60 to 90 s reaction task.',
+      es: 'Check-in diario de 4 deslizadores (60 s o menos) y modo pulso, una tarea de reacción de 60 a 90 s.',
     },
-    owner: { en: 'Psychology 1', es: 'Psicología 1' },
+    owner: { en: 'Engineering (spec: Psychology 1)', es: 'Ingeniería (especificación: Psicología 1)' },
     planned: [
-      { en: 'One-tap evening check-in', es: 'Registro nocturno de un toque' },
-      {
-        en: 'Reaction-time trend vs personal baseline',
-        es: 'Tendencia del tiempo de reacción frente a la línea base personal',
-      },
+      { en: 'Check-in: mood, stress, fatigue, crew climate', es: 'Check-in: ánimo, estrés, fatiga y clima de tripulación' },
+      { en: 'Pulse mode with 5 practice sessions', es: 'Modo pulso con 5 sesiones de práctica' },
     ],
   },
   {
-    id: 'crew',
-    label: { en: 'Crew & Family', es: 'Tripulación y familia' },
+    id: 'play',
+    label: { en: 'Constellations', es: 'Constellations' },
     summary: {
-      en: 'Asynchronous messages and recorded check-ins with the support network, showing the real signal delay.',
-      es: 'Mensajes asíncronos y mensajes grabados con la red de apoyo, mostrando el retraso real de la señal.',
+      en: 'Free mode: group 16 tiles into 4 sets with NASA Planetary Fact Sheet data. Never scores.',
+      es: 'Modo libre: agrupar 16 fichas en 4 grupos con datos del Planetary Fact Sheet de NASA. Nunca puntúa.',
     },
-    owner: { en: 'Psychology 2', es: 'Psicología 2' },
-    planned: [
-      { en: 'Message queue with delay countdown', es: 'Cola de mensajes con cuenta regresiva del retraso' },
-      { en: 'Crew cohesion pulse', es: 'Pulso de cohesión de la tripulación' },
-    ],
-  },
-  {
-    id: 'recharge',
-    label: { en: 'Recharge', es: 'Recarga' },
-    summary: {
-      en: 'Leisure and coping: original mini-games (free play), breathing, music, plants, journaling.',
-      es: 'Ocio y afrontamiento: minijuegos originales (juego libre), respiración, música, plantas y diario.',
-    },
-    owner: { en: 'Psychology 1 + 2', es: 'Psicología 1 + 2' },
-    planned: [
-      {
-        en: 'Two original mini-games (free play vs check mode)',
-        es: 'Dos minijuegos originales (juego libre y modo chequeo)',
-      },
-      { en: 'Coping menu feasible on board', es: 'Menú de afrontamiento viable a bordo' },
-    ],
-  },
-  {
-    id: 'routine',
-    label: { en: 'Routine', es: 'Rutina' },
-    summary: {
-      en: 'Measurement reminders and small health quests that fit the mission timeline.',
-      es: 'Recordatorios de medición y pequeños retos de salud que encajan en el horario de la misión.',
-    },
-    owner: { en: 'Engineering', es: 'Ingeniería' },
-    planned: [
-      { en: 'Daily schedule of prompts', es: 'Agenda diaria de recordatorios' },
-      { en: 'Streaks without punishing missed days', es: 'Rachas que no castigan los días perdidos' },
-    ],
+    owner: { en: 'Engineering (content: Psychology 1)', es: 'Ingeniería (contenido: Psicología 1)' },
+    planned: [{ en: 'Two boards of 16 tiles', es: 'Dos tableros de 16 fichas' }],
   },
 ]
 

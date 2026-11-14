@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react'
-import { DEFAULT_SCENARIO_ID, SCENARIOS } from './data/scenarios'
-import { loadMeasurements, MISSION_DAYS, type LoadedData } from './data/sample'
-import { dayRange } from './data/validate'
+import { DEFAULT_SCENARIO_ID, SCENARIOS } from './orbit/config'
+import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { useI18n } from './i18n/context'
-import { Dashboard } from './modules/Dashboard'
+import { Today } from './modules/Today'
 import { Placeholder } from './modules/Placeholder'
 import { DEFAULT_MODULE, MODULES } from './modules/registry'
 
-// Working title. Final name is decided in Phase 4; change it here only.
-export const APP_NAME = 'Crew Health Copilot'
+export const APP_NAME = 'Orbit'
 
 function readHash(): string {
   const id = window.location.hash.replace(/^#\/?/, '')
@@ -26,9 +24,9 @@ function usePersistentState(key: string, initial: string) {
 export default function App() {
   const { t, tr } = useI18n()
   const [moduleId, setModuleId] = useState(readHash)
-  const [scenarioId, setScenarioId] = usePersistentState('scenario', DEFAULT_SCENARIO_ID)
-  const [data, setData] = useState<LoadedData>({ rows: [], origin: 'generated', errors: [] })
-  const [day, setDay] = useState(MISSION_DAYS.last)
+  const [scenarioId, setScenarioId] = usePersistentState('orbit.scenario', DEFAULT_SCENARIO_ID)
+  const [demo, setDemo] = useState<LoadedDemo>({ data: BUILT_IN_DEMO, origin: 'built-in', errors: [] })
+  const [day, setDay] = useState(STORY_DAYS.first)
   const [online, setOnline] = useState(navigator.onLine)
 
   useEffect(() => {
@@ -38,10 +36,9 @@ export default function App() {
     window.addEventListener('hashchange', onHash)
     window.addEventListener('online', onOnline)
     window.addEventListener('offline', onOffline)
-    loadMeasurements().then((loaded) => {
-      setData(loaded)
-      setDay(dayRange(loaded.rows)?.last ?? MISSION_DAYS.last)
-      if (loaded.errors.length) console.warn('Dataset problems:', loaded.errors)
+    loadDemoData().then((loaded) => {
+      setDemo(loaded)
+      if (loaded.errors.length) console.warn('demo-data.json problems:', loaded.errors)
     })
     return () => {
       window.removeEventListener('hashchange', onHash)
@@ -50,14 +47,14 @@ export default function App() {
     }
   }, [])
 
-  const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0]
+  const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS.find((s) => s.id === DEFAULT_SCENARIO_ID)!
   const active = MODULES.find((m) => m.id === moduleId) ?? MODULES[0]
 
   return (
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="logo" aria-hidden="true">◐</span>
+          <span className="logo" aria-hidden="true">◎</span>
           <span>{APP_NAME}</span>
           <span className={`net ${online ? 'on' : 'off'}`}>{online ? t('net.online') : t('net.offline')}</span>
         </div>
@@ -77,15 +74,13 @@ export default function App() {
 
       <main>
         {active.id === 'today' ? (
-          <Dashboard data={data} day={day} onDayChange={setDay} scenario={scenario} />
+          <Today demo={demo} day={day} onDayChange={setDay} scenario={scenario} />
         ) : (
           <Placeholder module={active} />
         )}
       </main>
 
-      <footer className="footer">
-        {t('footer')}
-      </footer>
+      <footer className="footer">{t('footer')}</footer>
     </div>
   )
 }

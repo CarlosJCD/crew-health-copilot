@@ -1,0 +1,10 @@
+[
+  {"id": "iss", "label_en": "Space station", "one_way_delay_s": 0, "dose_mSv_day": null,
+   "first_responder": "ground_and_cmo", "ground_contact": "weekly private medical conference; private psychological conference every 2 weeks"},
+  {"id": "lunar_orbit", "label_en": "Lunar orbit", "one_way_delay_s": 1.3, "dose_mSv_day": null,
+   "first_responder": "cmo", "ground_contact": "near real time, with pauses"},
+  {"id": "mars_transit", "label_en": "Mars transit", "one_way_delay_s": 720, "dose_mSv_day": 1.84,
+   "first_responder": "cmo", "ground_contact": "asynchronous packets; reply in 24 min or more"},
+  {"id": "mars_base", "label_en": "Mars base", "one_way_delay_s": 1200, "dose_mSv_day": 0.64,
+   "first_responder": "cmo", "ground_contact": "asynchronous packets; preloaded 'while you wait' protocols"}
+]

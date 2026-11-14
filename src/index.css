@@ -77,12 +77,6 @@ h3 { margin: 0; font-size: 0.95rem; }
 }
 .data-issues summary { cursor: pointer; color: var(--watch); font-weight: 600; }
 
-.signal {
-  border: 1px solid var(--watch); background: color-mix(in srgb, var(--watch) 12%, var(--panel));
-  border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem;
-}
-.signal h2 { color: var(--watch); margin-bottom: 0.25rem; }
-.signal p { margin: 0; }
 
 .space-weather {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
@@ -102,37 +96,26 @@ h3 { margin: 0; font-size: 0.95rem; }
   background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--status);
   border-radius: var(--radius); padding: 0.8rem 0.9rem; display: flex; flex-direction: column; gap: 0.35rem;
 }
-.card.status-nominal { --status: var(--nominal); }
-.card.status-watch { --status: var(--watch); }
-.card.status-act { --status: var(--act); }
+.color-green { --status: var(--nominal); }
+.color-yellow { --status: var(--watch); }
+.color-red { --status: var(--act); }
+.color-none { --status: var(--nodata); }
 .card-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
 .badge { color: var(--status); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
 .value { font-size: 1.7rem; font-weight: 700; margin: 0; }
+.value.small { font-size: 1.05rem; }
+.reason { margin: 0; font-size: 0.85rem; }
 .unit { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
 .delta { margin: 0; font-size: 0.8rem; color: var(--muted); }
-.category { margin: 0; font-size: 0.8rem; color: var(--text); }
-.details q { font-style: italic; }
-.next-step { margin: 0; font-size: 0.85rem; }
 .sparkline { width: 100%; height: 40px; }
 .sparkline-band { fill: color-mix(in srgb, var(--accent) 14%, transparent); }
-.sparkline-launch { stroke: var(--line); stroke-dasharray: 2 3; }
 .sparkline-line { fill: none; stroke: var(--accent); stroke-width: 1.6; }
 .sparkline-dot { fill: var(--status); stroke: var(--bg); stroke-width: 1.5; }
 
 button.link { align-self: flex-start; background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; font: inherit; font-size: 0.82rem; }
 .details { font-size: 0.82rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 0.4rem; }
 .details p { margin: 0.25rem 0; }
-.source.pending { color: var(--watch); }
 
-.escalation { background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.9rem 1rem; }
-.escalation ol { margin: 0; padding-left: 1.2rem; }
-.escalation li { margin: 0.25rem 0; }
-.escalation li.current { color: var(--text); }
-.escalation li:not(.current) { color: var(--muted); }
-.now {
-  display: inline-block; margin-left: 0.35rem; padding: 0.05rem 0.45rem; border-radius: 999px;
-  background: var(--accent); color: var(--bg); font-size: 0.72rem; font-weight: 700;
-}
 .disclaimer { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.8rem; }
 
 .placeholder { background: var(--panel); border: 1px dashed var(--line); border-radius: var(--radius); padding: 1.2rem; }
@@ -143,4 +126,48 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 
 @media (prefers-reduced-motion: no-preference) {
   .card { transition: border-color 200ms ease; }
+}
+
+/* Orbit: Today */
+.persona { margin: 0 0 0.5rem; color: var(--muted); font-size: 0.85rem; }
+.log { flex-basis: 100%; margin: 0.2rem 0 0; font-size: 0.85rem; }
+.rings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+.ring {
+  margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0.6rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; text-align: center;
+}
+.ring svg { width: 96px; height: 96px; }
+.ring-track { fill: none; stroke: var(--line); stroke-width: 8; }
+.ring-value { fill: none; stroke: var(--status); stroke-width: 8; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 45px 45px; }
+.color-none .ring-value { stroke-dasharray: 4 6; }
+.ring-symbol { fill: var(--status); font-size: 18px; text-anchor: middle; }
+.ring-word { fill: var(--text); font-size: 11px; font-weight: 700; text-anchor: middle; }
+.ring figcaption { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--muted); }
+.ring figcaption strong { color: var(--text); font-size: 0.95rem; }
+
+.state {
+  --status: var(--nominal);
+  border: 1px solid var(--status); background: color-mix(in srgb, var(--status) 12%, var(--panel));
+  border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1.25rem;
+}
+.state-YELLOW, .state-EARLY_SIGNAL { --status: var(--watch); }
+.state-RED_PHYSICAL, .state-RED_PSYCH { --status: var(--act); }
+.state h2 { color: var(--status); margin-bottom: 0.25rem; }
+.state p { margin: 0.25rem 0; }
+.state-text { font-size: 1rem; }
+.state-why, .state-who { font-size: 0.85rem; color: var(--muted); }
+a.button {
+  display: inline-block; margin: 0.35rem 0; padding: 0.35rem 0.8rem; border-radius: 8px;
+  background: var(--accent); color: var(--bg); font-weight: 700; text-decoration: none;
+}
+.details .why { color: var(--text); }
+.details .team { color: var(--watch); }
+.details .note { font-style: italic; }
+.dose { color: var(--text); }
+
+@media (max-width: 520px) {
+  .rings { gap: 0.4rem; }
+  .ring { padding: 0.4rem 0.2rem; }
+  .ring svg { width: 72px; height: 72px; }
+  .ring figcaption span { display: none; }
 }

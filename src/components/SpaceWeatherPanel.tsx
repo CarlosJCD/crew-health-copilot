@@ -4,9 +4,9 @@ import { useI18n } from '../i18n/context'
 
 const HRP_HAZARDS_URL = 'https://www.nasa.gov/hrp/hazards/'
 
-/** Context panel for the space-radiation hazard, fed by the NASA DONKI snapshot. */
-export function SpaceWeatherPanel() {
-  const { t, lang } = useI18n()
+/** Radiation context: NASA DONKI snapshot plus the scenario's estimated mission dose (RAD, scenarios.json). */
+export function SpaceWeatherPanel({ doseMSvDay }: { doseMSvDay?: number | null }) {
+  const { t, lang, num } = useI18n()
   const [snapshot, setSnapshot] = useState<SpaceWeatherSnapshot | undefined | null>(null)
 
   useEffect(() => {
@@ -21,16 +21,13 @@ export function SpaceWeatherPanel() {
       timeZone: 'UTC',
     })
 
-  if (snapshot === null) return null // still loading
-
   return (
     <section className="space-weather" aria-labelledby="sw-title">
       <h2 id="sw-title">{t('sw.title')}</h2>
-      {snapshot ? (
-        <SnapshotBody snapshot={snapshot} date={date} />
-      ) : (
-        <p>{t('sw.missing')}</p>
-      )}
+      {snapshot ? <SnapshotBody snapshot={snapshot} date={date} /> : snapshot === undefined && <p>{t('sw.missing')}</p>}
+      <p className="dose">
+        {typeof doseMSvDay === 'number' ? t('sw.dose', { dose: num(doseMSvDay, 2) }) : t('sw.doseNone')}
+      </p>
       <p className="disclaimer">
         {t('sw.context')}{' '}
         <a href={HRP_HAZARDS_URL} target="_blank" rel="noreferrer">
