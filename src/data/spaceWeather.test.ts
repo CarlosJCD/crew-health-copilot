@@ -6,7 +6,7 @@ const snapshot: SpaceWeatherSnapshot = {
   windowDays: 30,
   startDate: '2026-10-15',
   endDate: '2026-11-14',
-  source: { name: 'NASA DONKI', url: 'https://kauai.ccmc.gsfc.nasa.gov/DONKI/' },
+  source: { name: 'NASA DONKI', url: 'https://ccmc.gsfc.nasa.gov/tools/DONKI/' },
   flares: [
     { id: 'f1', time: '2026-10-20T01:00Z', classType: 'C3.1' },
     { id: 'f2', time: '2026-11-02T05:00Z', classType: 'M1.4' },
