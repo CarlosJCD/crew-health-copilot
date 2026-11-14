@@ -26,6 +26,7 @@ npm run preview  # serve the production build locally
 | `src/modules/registry.ts` | Module list and owners (drives navigation) | Engineering |
 | `src/modules/*.tsx` | One file per module | See registry |
 | `public/sw.js` | Offline service worker | Engineering |
+| `src/i18n/strings.ts` | UI text in English and Spanish (EN/ES toggle in the header). Data files use `{ en, es }` values | Everyone who adds text |
 
 ## Synthetic data format
 

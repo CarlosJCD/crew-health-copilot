@@ -4,7 +4,7 @@ interface Props {
   values: { day: number; value: number }[]
   baseline?: Baseline
   currentDay: number
-  label: string
+  ariaLabel: string
 }
 
 const W = 160
@@ -12,7 +12,7 @@ const H = 40
 const PAD = 3
 
 /** Tiny dependency-free trend line with the personal baseline band (mean ± 1 SD) shaded. */
-export function Sparkline({ values, baseline, currentDay, label }: Props) {
+export function Sparkline({ values, baseline, currentDay, ariaLabel }: Props) {
   if (values.length < 2) return null
   const days = values.map((p) => p.day)
   const nums = values.map((p) => p.value)
@@ -27,7 +27,7 @@ export function Sparkline({ values, baseline, currentDay, label }: Props) {
   const current = values.find((p) => p.day === currentDay)
 
   return (
-    <svg className="sparkline" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${label} trend`}>
+    <svg className="sparkline" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel}>
       {baseline && (
         <rect
           className="sparkline-band"

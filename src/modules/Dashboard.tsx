@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { Domain, Measurement, Scenario, Status } from '../data/types'
-import { DOMAIN_LABELS, INDICATORS } from '../data/indicators'
+import { INDICATORS } from '../data/indicators'
+import { useI18n } from '../i18n/context'
 import { MISSION_DAYS } from '../data/sample'
 import { computeBaseline, evaluate } from '../lib/status'
 import { IndicatorCard } from '../components/IndicatorCard'
@@ -16,6 +17,7 @@ interface Props {
 const DOMAINS: Domain[] = ['biological', 'cognitive-emotional', 'social', 'protective']
 
 export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
+  const { t, tr } = useI18n()
   const byIndicator = useMemo(() => {
     const map = new Map<string, Measurement[]>()
     for (const m of measurements) {
@@ -30,7 +32,7 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
   // Cross-domain early signal: how many domains have at least one indicator off-nominal today.
   const flagged = useMemo(() => {
     const domains = new Set<Domain>()
-    const names: string[] = []
+    const ids: string[] = []
     for (const def of INDICATORS) {
       const rows = byIndicator.get(def.id) ?? []
       const v = rows.find((r) => r.day === day)?.value
@@ -38,17 +40,17 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
       const s: Status = evaluate(def, v, computeBaseline(rows), prev)
       if (s === 'watch' || s === 'act') {
         domains.add(def.domain)
-        names.push(def.label.toLowerCase())
+        ids.push(def.id)
       }
     }
-    return { domains, names }
+    return { domains, ids }
   }, [byIndicator, day])
 
   return (
     <div className="dashboard">
       <div className="day-control">
         <label htmlFor="day">
-          {day < 0 ? `Pre-flight day ${day}` : `Mission day ${day}`}
+          {day < 0 ? t('day.pre', { n: day }) : t('day.mission', { n: day })}
         </label>
         <input
           id="day"
@@ -58,15 +60,18 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
           value={day}
           onChange={(e) => onDayChange(Number(e.target.value))}
         />
-        <span className="hint">Demo replay with synthetic data</span>
+        <span className="hint">{t('day.hint')}</span>
       </div>
 
       {flagged.domains.size >= 2 && (
         <section className="signal" role="status">
-          <h2>Early signal across {flagged.domains.size} areas</h2>
+          <h2>{t('signal.title', { n: flagged.domains.size })}</h2>
           <p>
-            Changes in {flagged.names.join(', ')} are showing up together. Patterns like this are easier to
-            turn around early. Open Mind and Recharge for suggested steps.
+            {t('signal.body', {
+              list: INDICATORS.filter((d) => flagged.ids.includes(d.id))
+                .map((d) => tr(d.label).toLowerCase())
+                .join(', '),
+            })}
           </p>
         </section>
       )}
@@ -76,7 +81,7 @@ export function Dashboard({ measurements, day, onDayChange, scenario }: Props) {
         if (!defs.length) return null
         return (
           <section key={domain} className="domain">
-            <h2>{DOMAIN_LABELS[domain]}</h2>
+            <h2>{t(`domain.${domain}`)}</h2>
             <div className="grid">
               {defs.map((def) => (
                 <IndicatorCard key={def.id} def={def} rows={byIndicator.get(def.id) ?? []} day={day} />

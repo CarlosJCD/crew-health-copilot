@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import type { Measurement } from './data/types'
 import { DEFAULT_SCENARIO_ID, SCENARIOS } from './data/scenarios'
 import { loadMeasurements, MISSION_DAYS } from './data/sample'
+import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
+import { useI18n } from './i18n/context'
 import { Dashboard } from './modules/Dashboard'
 import { Placeholder } from './modules/Placeholder'
 import { DEFAULT_MODULE, MODULES } from './modules/registry'
@@ -22,6 +24,7 @@ function usePersistentState(key: string, initial: string) {
 }
 
 export default function App() {
+  const { t, tr } = useI18n()
   const [moduleId, setModuleId] = useState(readHash)
   const [scenarioId, setScenarioId] = usePersistentState('scenario', DEFAULT_SCENARIO_ID)
   const [measurements, setMeasurements] = useState<Measurement[]>([])
@@ -52,15 +55,18 @@ export default function App() {
         <div className="brand">
           <span className="logo" aria-hidden="true">◐</span>
           <span>{APP_NAME}</span>
-          <span className={`net ${online ? 'on' : 'off'}`}>{online ? 'Online' : 'Offline mode'}</span>
+          <span className={`net ${online ? 'on' : 'off'}`}>{online ? t('net.online') : t('net.offline')}</span>
         </div>
-        <ScenarioSelector scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} />
+        <div className="topbar-controls">
+          <ScenarioSelector scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} />
+          <LanguageToggle />
+        </div>
       </header>
 
-      <nav className="tabs" aria-label="Modules">
+      <nav className="tabs" aria-label={t('nav.label')}>
         {MODULES.map((m) => (
           <a key={m.id} href={`#/${m.id}`} aria-current={m.id === active.id ? 'page' : undefined}>
-            {m.label}
+            {tr(m.label)}
           </a>
         ))}
       </nav>
@@ -74,7 +80,7 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        Prototype for NASA Space Apps Challenge 2026. Synthetic data. Decision support, not a diagnosis.
+        {t('footer')}
       </footer>
     </div>
   )

@@ -60,9 +60,10 @@ export function evaluate(def: IndicatorDef, v: number | undefined, baseline?: Ba
   return worst(fromBands(def, v), personal)
 }
 
-export const STATUS_TEXT: Record<Status, { label: string; symbol: string; action: string }> = {
-  nominal: { label: 'Nominal', symbol: '●', action: 'Keep your routine.' },
-  watch: { label: 'Watch', symbol: '▲', action: 'Try a self-care step and re-check tomorrow.' },
-  act: { label: 'Act', symbol: '■', action: 'Follow the escalation steps below.' },
-  'no-data': { label: 'No data', symbol: '○', action: 'Log a measurement to see your status.' },
+/** Shape that goes with each status so it can be read without color. Words come from i18n (`status.*`). */
+export const STATUS_SYMBOL: Record<Status, string> = {
+  nominal: '●',
+  watch: '▲',
+  act: '■',
+  'no-data': '○',
 }

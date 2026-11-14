@@ -1,4 +1,6 @@
 // Shared data contracts. The data-science teammate's synthetic JSON must match `Measurement`.
+// Human-readable text is `Localized` ({ en, es }); ids, units and numbers are language-neutral.
+import type { Localized } from '../i18n/strings'
 
 export type Domain = 'biological' | 'cognitive-emotional' | 'social' | 'protective'
 
@@ -9,7 +11,7 @@ export type Status = 'nominal' | 'watch' | 'act' | 'no-data'
 
 /** Where a number in the app comes from. `verified: false` is shown in the UI as "source pending". */
 export interface SourceRef {
-  label: string
+  label: Localized
   url?: string
   verified: boolean
 }
@@ -27,14 +29,14 @@ export interface Bands {
 
 export interface IndicatorDef {
   id: string
-  label: string
+  label: Localized
   unit: string
   domain: Domain
   hazards: Hazard[]
   /** How it is measured in space: device, self-report or task. */
-  method: string
+  method: Localized
   /** Two-line explanation for the astronaut. */
-  explainer: string
+  explainer: Localized
   /** Absolute bands (population or operational). Optional when only the personal baseline is used. */
   bands?: Bands
   bandsSource: SourceRef
@@ -58,12 +60,12 @@ export interface Measurement {
 
 export interface Scenario {
   id: string
-  name: string
-  short: string
+  name: Localized
+  short: Localized
   /** One-way signal delay to Earth, human readable. */
-  oneWayDelay: string
+  oneWayDelay: Localized
   /** Worst-case round trip in minutes, used to tell the crew how long a ground answer may take. */
   worstRoundTripMin: number
-  notes: string
+  notes: Localized
   delaySource: SourceRef
 }

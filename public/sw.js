@@ -4,7 +4,7 @@
 // - Hashed build assets (/assets/*): cache first; their names change on every build.
 // - Other same-origin GETs: cache first, refreshed in the background.
 // The page posts the URLs it already loaded (see main.tsx) so the first visit is cached too.
-const CACHE = 'crew-health-v2'
+const CACHE = 'crew-health-v3'
 const SHELL = ['./', './index.html', './manifest.webmanifest', './favicon.svg']
 
 self.addEventListener('install', (event) => {
@@ -29,7 +29,8 @@ self.addEventListener('message', (event) => {
 async function networkFirst(req) {
   const cache = await caches.open(CACHE)
   try {
-    const res = await fetch(req)
+    // 'no-cache' revalidates with the server so a new deploy is not hidden by the HTTP cache.
+    const res = await fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
     if (res.ok) cache.put('./index.html', res.clone())
     return res
   } catch {
@@ -42,7 +43,9 @@ async function cacheFirst(req) {
   const cached = await cache.match(req)
   const network = fetch(req)
     .then((res) => {
-      if (res.ok) cache.put(req, res.clone())
+      // Never store an HTML fallback page under a script/style URL (dev servers answer 404s with index.html).
+      const isHtml = (res.headers.get('content-type') ?? '').includes('text/html')
+      if (res.ok && !isHtml) cache.put(req, res.clone())
       return res
     })
     .catch(() => undefined)
