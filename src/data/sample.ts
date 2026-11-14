@@ -6,6 +6,8 @@ import { validateMeasurements } from './validate'
 // When public/data/synthetic.json exists, `loadMeasurements` uses it instead (see validate.ts).
 // Story baked in: 7 pre-flight baseline days, then from mission day 8 a slow,
 // cross-domain drift (less sleep, lower mood, higher stress, slower reactions, less contact).
+// Values follow the catalog: its units, plausible ranges and expected in-flight shifts
+// (e.g. systolic -8 mmHg from launch, Norsk 2015).
 
 function mulberry32(seed: number) {
   return () => {
@@ -28,17 +30,21 @@ const DRIFT_START = 8
 const FIRST_DAY = -7
 const LAST_DAY = 14
 
-const PROFILES: Record<string, Profile> = {
-  sleep: { base: 7.0, noise: 0.35, drift: -0.15 },
-  hr: { base: 58, noise: 2, drift: 0.5 },
+const PROFILES: Record<string, Profile & { integer?: boolean }> = {
+  sleep: { base: 7.6, noise: 0.3, drift: -0.2 },
+  hr: { base: 58, noise: 2, drift: 1 },
   sbp: { base: 116, noise: 3.5, drift: 0 },
+  dbp: { base: 75, noise: 3, drift: 0 },
   glucose: { base: 88, noise: 4, drift: 0 },
   temp: { base: 36.6, noise: 0.12, drift: 0 },
-  mood: { base: 7.5, noise: 0.7, drift: -0.2 },
-  stress: { base: 3.5, noise: 0.7, drift: 0.2 },
-  rt: { base: 265, noise: 12, drift: 5 },
-  contact: { base: 12, noise: 2, drift: -0.8 },
-  exercise: { base: 120, noise: 10, drift: -6 },
+  body_mass: { base: 70, noise: 0.25, drift: -0.15 },
+  spo2: { base: 98, noise: 0.6, drift: 0 },
+  mood: { base: 7.5, noise: 0.6, drift: -0.35 },
+  stress: { base: 3.5, noise: 0.6, drift: 0.35 },
+  rt: { base: 265, noise: 12, drift: 6 },
+  pvt_lapses: { base: 2, noise: 1, drift: 0.6, integer: true },
+  contact: { base: 12, noise: 2, drift: -0.9, integer: true },
+  exercise: { base: 90, noise: 10, drift: -6 },
 }
 
 export function generateSample(astronautId = 'demo-astronaut'): Measurement[] {
@@ -50,8 +56,10 @@ export function generateSample(astronautId = 'demo-astronaut'): Measurement[] {
       if (!p) continue
       const driftDays = Math.max(0, day - DRIFT_START + 1)
       const noise = (rand() * 2 - 1) * p.noise
-      const raw = p.base + p.drift * driftDays + noise
-      const value = def.unit === '/10' ? Math.min(10, Math.max(0, raw)) : raw
+      const shift = day >= 0 ? def.inflightShift : 0
+      const raw = p.base + shift + p.drift * driftDays + noise
+      const clamped = Math.min(def.plausible.max, Math.max(def.plausible.min, raw))
+      const value = p.integer ? Math.round(clamped) : clamped
       rows.push({ astronautId, day, indicatorId: def.id, value, unit: def.unit, source: 'synthetic' })
     }
   }

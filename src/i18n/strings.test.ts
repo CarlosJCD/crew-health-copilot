@@ -31,7 +31,8 @@ describe('data-file texts', () => {
       [`${d.id}.label`, d.label],
       [`${d.id}.method`, d.method],
       [`${d.id}.explainer`, d.explainer],
-      [`${d.id}.source`, d.bandsSource.label],
+      ...d.sources.map((s, i) => [`${d.id}.source.${i}`, s.label]),
+      ...d.categories.map((c) => [`${d.id}.category.${c.label.es}`, c.label]),
     ] as [string, Localized][]),
     ...SCENARIOS.flatMap((s) => [
       [`${s.id}.name`, s.name],

@@ -5,7 +5,7 @@ import { dayRange } from '../data/validate'
 import { INDICATORS } from '../data/indicators'
 import { useI18n } from '../i18n/context'
 import { MISSION_DAYS } from '../data/sample'
-import { computeBaseline, evaluate } from '../lib/status'
+import { evaluateDay } from '../lib/status'
 import { IndicatorCard } from '../components/IndicatorCard'
 import { EscalationPanel } from '../components/EscalationPanel'
 import { SpaceWeatherPanel } from '../components/SpaceWeatherPanel'
@@ -19,6 +19,9 @@ interface Props {
 }
 
 const DOMAINS: Domain[] = ['biological', 'cognitive-emotional', 'social', 'protective']
+
+/** "Mean reaction time (PVT-B)" → "mean reaction time (PVT-B)": keeps acronyms intact. */
+const lowerFirst = (s: string) => (/^[A-Z]{2}/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1))
 
 export function Dashboard({ data, day, onDayChange, scenario }: Props) {
   const { t, tr } = useI18n()
@@ -41,10 +44,7 @@ export function Dashboard({ data, day, onDayChange, scenario }: Props) {
     const ids: string[] = []
     const statuses: Status[] = []
     for (const def of INDICATORS) {
-      const rows = byIndicator.get(def.id) ?? []
-      const v = rows.find((r) => r.day === day)?.value
-      const prev = rows.find((r) => r.day === day - 1)?.value
-      const s: Status = evaluate(def, v, computeBaseline(rows), prev)
+      const s: Status = evaluateDay(def, byIndicator.get(def.id) ?? [], day).status
       statuses.push(s)
       if (s === 'watch' || s === 'act') {
         domains.add(def.domain)
@@ -88,7 +88,7 @@ export function Dashboard({ data, day, onDayChange, scenario }: Props) {
           <p>
             {t('signal.body', {
               list: INDICATORS.filter((d) => flagged.ids.includes(d.id))
-                .map((d) => tr(d.label).toLowerCase())
+                .map((d) => lowerFirst(tr(d.label)))
                 .join(', '),
             })}
           </p>

@@ -29,6 +29,7 @@ export function validateMeasurements(input: unknown): ValidationResult {
   }
 
   const units = new Map(INDICATORS.map((d) => [d.id, d.unit]))
+  const ranges = new Map(INDICATORS.map((d) => [d.id, d.plausible]))
   const seen = new Set<string>()
 
   input.forEach((raw: unknown, i) => {
@@ -44,6 +45,10 @@ export function validateMeasurements(input: unknown): ValidationResult {
     if (typeof r.value !== 'number' || !Number.isFinite(r.value)) return report(`${where}: "value" must be a finite number.`)
     const expectedUnit = units.get(r.indicatorId)
     if (r.unit !== expectedUnit) return report(`${where}: "unit" for ${r.indicatorId} must be "${expectedUnit}", got ${JSON.stringify(r.unit)}.`)
+    const range = ranges.get(r.indicatorId)
+    if (range && (r.value < range.min || r.value > range.max)) {
+      return report(`${where}: ${r.indicatorId} value ${r.value} is outside the plausible range ${range.min} to ${range.max} ${expectedUnit}.`)
+    }
     if (!SOURCES.includes(r.source as Measurement['source'])) {
       return report(`${where}: "source" must be one of ${SOURCES.join(', ')}.`)
     }

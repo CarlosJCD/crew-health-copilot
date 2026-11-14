@@ -22,10 +22,12 @@ describe('validateMeasurements', () => {
       { ...good, day: 3, value: 'high' },
       { ...good, day: 4, unit: 'hours' },
       { ...good, day: 5, source: 'guess' },
+      { ...good, day: 6, value: 30 }, // 30 h of sleep: outside the catalog's plausible range
       { ...good }, // duplicate of the first row
     ])
     expect(r.rows).toHaveLength(1)
-    expect(r.rejected).toBe(6)
+    expect(r.rejected).toBe(7)
+    expect(r.errors.join('\n')).toMatch(/plausible range 0 to 14 h/)
     expect(r.errors.join('\n')).toMatch(/integer/)
     expect(r.errors.join('\n')).toMatch(/unknown "indicatorId"/)
     expect(r.errors.join('\n')).toMatch(/finite number/)

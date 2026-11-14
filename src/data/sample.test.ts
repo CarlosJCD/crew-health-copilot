@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { INDICATORS } from './indicators'
 import { generateSample, loadMeasurements } from './sample'
-import { computeBaseline, evaluate } from '../lib/status'
-import type { Measurement } from './types'
+import { evaluateDay } from '../lib/status'
 
 const respond = (body: string, init: ResponseInit & { type?: string } = {}) =>
   (async () =>
@@ -47,17 +46,20 @@ describe('loadMeasurements', () => {
 describe('placeholder demo story', () => {
   const data = generateSample()
   const statusOn = (day: number) =>
-    INDICATORS.map((def) => {
-      const rows = data.filter((r: Measurement) => r.indicatorId === def.id)
-      const v = rows.find((r) => r.day === day)?.value
-      const prev = rows.find((r) => r.day === day - 1)?.value
-      return { def, s: evaluate(def, v, computeBaseline(rows), prev) }
-    })
+    INDICATORS.map((def) => ({ def, s: evaluateDay(def, data.filter((r) => r.indicatorId === def.id), day).status }))
   const flaggedDomains = (day: number) =>
     new Set(statusOn(day).filter((x) => x.s === 'watch' || x.s === 'act').map((x) => x.def.domain)).size
 
   it('is deterministic', () => {
     expect(generateSample()).toEqual(data)
+  })
+
+  it('covers every indicator and stays inside the plausible ranges', () => {
+    for (const def of INDICATORS) {
+      const values = data.filter((r) => r.indicatorId === def.id).map((r) => r.value)
+      expect(values.length, def.id).toBeGreaterThan(0)
+      for (const v of values) expect(v >= def.plausible.min && v <= def.plausible.max, `${def.id} ${v}`).toBe(true)
+    }
   })
 
   it('raises no alert before mission day 9', () => {
