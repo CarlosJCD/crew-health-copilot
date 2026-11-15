@@ -744,3 +744,5 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .pain-other input::placeholder { color: var(--muted); }
 .pain-other input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .pain-other .button { margin: 0; }
+
+.scale-all { margin: 0.4rem 0 0.2rem; font-size: 0.85rem; }
