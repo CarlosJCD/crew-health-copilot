@@ -7,13 +7,18 @@ import { CONTEXTS, QUALITIES, region, zoneOf, type Slug } from './pain'
 export const partKey = (slug: Slug) => `part.${zoneOf(slug)}` as StringKey
 
 /**
- * Colors of the body figure (the figure library takes plain colors, not CSS variables). `fill` is the
- * gray of the library's female model, so a zone we restyle keeps the same base color as the rest.
+ * Colors of the body figure (the figure library takes plain colors, not CSS variables). Neutral carbon
+ * grays from the NASA Horizon Design System tokens (CC0), so the state colors are the only color on it.
  */
-export const FIGURE = { fill: '#454545', border: '#9aa6c3', outline: '#e8ecf6' }
+export const FIGURE = { fill: '#3a3a42', border: '#77777a', outline: '#ffffff' }
+export const FIGURE_LIGHT = { fill: '#d9d9dc', border: '#8e8e93', outline: '#17171b' }
 
-/** Fill of a system's zones on the figure: green is muted so yellow and red stand out. */
-export const STATUS_FILL: Record<Color, string> = { green: '#2f7d62', yellow: '#f2b84b', red: '#ef5a5a', none: FIGURE.fill }
+/**
+ * Fill of a system's zones, from the proposal palette: green is the darker Active Green (#137A3F) so
+ * Caution Amber and NASA Red stand out; no data keeps the figure's own gray.
+ */
+export const STATUS_FILL: Record<Color, string> = { green: '#137a3f', yellow: '#ffc24b', red: '#f64137', none: FIGURE.fill }
+export const STATUS_FILL_LIGHT: Record<Color, string> = { green: '#137a3f', yellow: '#ffc24b', red: '#f64137', none: FIGURE_LIGHT.fill }
 
 /** Shape that goes with each color so the traffic light reads without color. */
 export const COLOR_SYMBOL: Record<Color, string> = { green: '●', yellow: '▲', red: '■', none: '○' }

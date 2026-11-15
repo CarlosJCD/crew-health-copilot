@@ -87,7 +87,12 @@ export type Worse = (typeof WORSE)[number]
 /** Brush diameter as a fraction of the figure's width. */
 export const BRUSH: Record<BrushSize, number> = { s: 0.09, m: 0.15, l: 0.23 }
 export const MAX_STROKES = 20
-export const MAX_DOTS = 80
+export const MAX_DOTS = 400
+/** Space between brush dabs, as a share of the brush size (smaller = smoother line). */
+export const DAB_SPACING = 0.18
+
+/** Body figure she draws on (the library has a female and a male model). */
+export type FigureKind = 'female' | 'male'
 
 /** Intensity 1 to 10, light amber to deep red (display only). */
 export const INTENSITY_COLORS = [
@@ -186,6 +191,10 @@ export interface PaintStroke {
   dots: [x: number, y: number][]
   /** Zones under the paint. A stroke with no dots fills these zones whole (keyboard path). */
   zones: Slug[]
+  /** Zones under the paint with her side, when the zone has a left and a right half (only the painted half counts). */
+  parts?: { zone: Slug; side?: BodySide }[]
+  /** Figure it was painted on: the dots only line up on the same figure. */
+  figure?: FigureKind
 }
 
 /** One pain report: the six steps of the spec's report_flow, plus the alarm signs she confirmed. */
@@ -253,6 +262,10 @@ export function muscleHighlights(marks: MuscleMark[], view: BodyView, color: str
 /** Her side of a painted stroke, from where the dots fall (the figure's midline is at 0.5). */
 function strokeSide(s: PaintStroke): BodySide | 'both' | undefined {
   if (!s.dots.length) return undefined
+  if (s.parts?.length) {
+    const sides = new Set(s.parts.flatMap((p) => (p.side ? [p.side] : [])))
+    return sides.size === 0 ? undefined : sides.size === 1 ? [...sides][0] : 'both'
+  }
   const left = s.dots.every(([x]) => x < 0.47)
   const right = s.dots.every(([x]) => x > 0.53)
   return left ? toHerSide('left', s.view) : right ? toHerSide('right', s.view) : 'both'

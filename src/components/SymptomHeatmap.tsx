@@ -5,6 +5,7 @@ import { FIGURE, partKey } from '../orbit/display'
 import { HEAT, heatColor, heatOn, type ZoneHeat } from '../orbit/heat'
 import { BRUSH, INTENSITY_COLORS, toViewerSide, type BodyView, type PainLog } from '../orbit/pain'
 import { useI18n } from '../i18n/context'
+import { useFigure } from '../lib/figure'
 
 interface Props {
   day: number
@@ -18,6 +19,7 @@ interface Props {
  */
 export function SymptomHeatmap({ day, painLog, symptomLog }: Props) {
   const { t } = useI18n()
+  const [figure] = useFigure()
   const [view, setView] = useState<BodyView>('front')
   const other: BodyView = view === 'front' ? 'back' : 'front'
   const heat = heatOn(day, view, painLog, symptomLog)
@@ -38,7 +40,7 @@ export function SymptomHeatmap({ day, painLog, symptomLog }: Props) {
 
       <div className="pain-figure heat-figure" role="img" aria-label={t('heat.figure', { view: sideName(view) })}>
         <Body
-          gender="female"
+          gender={figure}
           side={view}
           scale={1.4}
           data={heat.zones.map((z) => ({ slug: z.zone, color: heatColor(z.warmth), ...(z.side ? { side: toViewerSide(z.side, view) } : {}) }))}
@@ -46,7 +48,7 @@ export function SymptomHeatmap({ day, painLog, symptomLog }: Props) {
           border={FIGURE.border}
         />
         <div className="paint-layer" aria-hidden="true">
-          {heat.dots.map((d) => (
+          {heat.dots.filter((d) => (d.figure ?? 'female') === figure).map((d) => (
             <span
               key={d.key}
               className="paint-dot"

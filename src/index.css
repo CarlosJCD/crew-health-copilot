@@ -1,21 +1,53 @@
+/* Palette of the ORBIT design proposal, from the public (CC0) tokens of the NASA Horizon Design System.
+   Blue = you can act here. Red = red states only (and the logo pulse). Orange = radiation context only.
+   Status is always color + shape + word. No NASA insignia or HDS components are used. */
 :root {
-  --bg: #0b1020;
-  --panel: #131a2e;
-  --panel-2: #1a2340;
-  --text: #e8ecf6;
-  --muted: #9aa6c3;
-  --line: #2a355a;
-  --accent: #7cc4ff;
-  --nominal: #3fb68b;
-  --watch: #f2b84b;
-  --act: #ef5a5a;
-  --nodata: #6b7694;
-  --radius: 12px;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.45;
+  --bg: #0a0a0d;            /* Carbon 90 background */
+  --head: #000000;
+  --panel: #17171b;         /* Carbon 90 */
+  --panel-2: #202026;
+  --line: #2e2e32;
+  --text: #ffffff;          /* Spacesuit White */
+  --muted: #8e8e93;         /* Carbon 40: secondary text, no data */
+  --accent: #288bff;        /* NASA Blue tint: blue text on dark (5.3:1) */
+  --accent-strong: #1c67e3; /* NASA Blue: filled controls */
+  --accent-hover: #0b3d91;  /* NASA Blue shade */
+  --nominal: #47da84;       /* Active Green */
+  --watch: #ffc24b;         /* Caution Amber */
+  --act: #ff5c52;           /* NASA Red tint */
+  --brand-red: #f64137;     /* NASA Red: logo pulse */
+  --nodata: #77777a;        /* Carbon 50 */
+  --orange: #ea6f24;        /* International Orange: radiation context, never a state */
+  --radius: 16px;
+  --font-title: 'Inter', system-ui, sans-serif;
+  --font-body: 'Public Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --nav-h: 68px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--text);
   background: var(--bg);
   color-scheme: dark;
+}
+/* Light "Day" theme for projectors and bright rooms. */
+:root[data-theme='light'] {
+  --bg: #ffffff;
+  --head: #ffffff;
+  --panel: #f6f6f6;         /* Carbon 05 */
+  --panel-2: #ececee;
+  --line: #d9d9dc;
+  --text: #17171b;          /* Carbon 90 */
+  --muted: #58585b;
+  --accent: #0b3d91;        /* NASA Blue shade */
+  --accent-strong: #1c67e3;
+  --accent-hover: #0b3d91;
+  --nominal: #137a3f;       /* Active Green, light */
+  --watch: #8a5a00;         /* Caution Amber, light */
+  --act: #b60109;           /* NASA Red shade (7.0:1) */
+  --nodata: #77777a;
+  --orange: #c2410c;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -310,7 +342,7 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .pain-mode { min-width: 0; }
 .pain-figure { position: relative; width: min(100%, 260px); margin: 0.4rem auto; }
 .pain-figure svg { width: 100%; height: auto; display: block; }
-.pain-figure.paintable { touch-action: none; cursor: crosshair; }
+.pain-figure.paintable { cursor: crosshair; }
 .pain-figure.paintable svg path { cursor: crosshair !important; }
 .paint-layer { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; }
 .paint-dot { position: absolute; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); opacity: 0.85; }
@@ -361,3 +393,362 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
   background: var(--panel-2); color: var(--text); font-size: 0.82rem; font-weight: 400; line-height: 1.4;
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.35);
 }
+
+/* ===================================================================================================
+   Redesign: the body is the home screen. Short texts, one action, everything else one tap away.
+   =================================================================================================== */
+h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.app { max-width: 1100px; padding: 0 1rem calc(var(--nav-h) + 1.5rem); }
+
+.topbar { position: sticky; top: 0; z-index: 20; background: color-mix(in oklab, var(--head) 92%, transparent);
+  backdrop-filter: blur(8px); display: flex; align-items: center; gap: 0.75rem; justify-content: space-between;
+  flex-wrap: nowrap; padding: 0.7rem 0; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+.wordmark { display: inline-flex; align-items: center; color: var(--text); text-decoration: none; line-height: 1;
+  font-weight: 700; font-size: 1.45rem; letter-spacing: 0.12em; }
+.wordmark .logo { width: 0.95em; height: 0.95em; flex: none; margin-right: 0.08em; position: relative; top: -0.02em; }
+.logo-arc { stroke: currentColor; }
+.logo-pulse { stroke: var(--brand-red); }
+.day-stepper { display: inline-flex; align-items: center; gap: 0.15rem; background: var(--panel); border: 1px dashed var(--line);
+  border-radius: 999px; padding: 0.15rem 0.35rem 0.15rem 0.7rem; }
+.demo-tag { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-right: 0.25rem; }
+.day-num { font-family: var(--font-mono); font-size: 0.95rem; min-width: 4.6rem; text-align: center; font-variant-numeric: tabular-nums; }
+.icon-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 999px; border: 0;
+  background: transparent; color: var(--text); cursor: pointer; transition: background 0.15s; }
+.icon-btn:hover:not(:disabled) { background: var(--panel-2); }
+.icon-btn:disabled { opacity: 0.3; cursor: default; }
+.net { width: 10px; height: 10px; border-radius: 50%; padding: 0; border: 0; flex: none; }
+.net.on { background: var(--nominal); }
+.net.off { background: var(--watch); }
+
+/* Buttons */
+.button, a.button { border-radius: 999px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center;
+  justify-content: center; gap: 0.4rem; min-height: 44px; padding: 0.55rem 1.2rem; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.button.primary { background: var(--accent-strong); color: #fff; border: 0; }
+.button.primary:hover { background: var(--accent-hover); }
+.button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.button.ghost:hover { border-color: var(--accent); }
+.button.big { min-height: 52px; font-size: 1.02rem; padding: 0.7rem 1.6rem; }
+.button.wide { width: 100%; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Home */
+.home { display: grid; justify-items: center; text-align: center; gap: 0.4rem; }
+.home.state-GREEN { --status: var(--nominal); }
+.home.state-YELLOW, .home.state-EARLY_SIGNAL { --status: var(--watch); }
+.home.state-RED_PHYSICAL, .home.state-RED_PSYCH { --status: var(--act); }
+.hero { margin-top: 0.25rem; }
+.hero-state { margin: 0; font-size: clamp(1.6rem, 4.5vw, 2.3rem); font-weight: 700; letter-spacing: -0.01em; color: var(--status);
+  display: inline-flex; align-items: center; gap: 0.55rem; }
+.hero-state .shape { font-size: 0.7em; }
+.hero-sub { margin: 0.15rem 0 0; color: var(--muted); font-size: 1rem; }
+.domain-row { list-style: none; padding: 0; margin: 0.6rem 0 0; display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; }
+.domain-row .pill { font-family: var(--font-title); }
+.alarm-banner { margin: 0.4rem 0 0; padding: 0.55rem 1rem; border-radius: 999px; border: 1px solid var(--act);
+  background: color-mix(in oklab, var(--act) 14%, transparent); font-weight: 600; }
+
+.figure-stage { position: relative; width: 100%; display: grid; justify-items: center; margin-top: 0.4rem; }
+.figure-stage::before { content: ''; position: absolute; z-index: 0; top: 8%; width: min(78vw, 460px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--status) 16%, transparent) 0%, transparent 68%); pointer-events: none; }
+.segmented { position: relative; z-index: 1; display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.segmented button { border: 0; background: transparent; color: var(--muted); font: inherit; font-family: var(--font-title); font-weight: 600;
+  font-size: 0.88rem; min-height: 36px; min-width: 88px; padding: 0 0.9rem; border-radius: 999px; cursor: pointer; }
+.segmented button[aria-pressed='true'] { background: var(--panel-2); color: var(--text); }
+.figure { position: relative; z-index: 1; height: clamp(420px, calc(100dvh - 240px), 940px); aspect-ratio: 0.5; max-width: 92vw; margin-top: 0.4rem; }
+.figure svg { width: 100%; height: 100%; display: block; cursor: pointer; }
+.figure svg path { transition: fill 0.4s ease; }
+.figure .spot-layer { position: absolute; inset: 0; pointer-events: none; }
+.figure .spot { position: absolute; transform: translate(-50%, -50%); pointer-events: auto; width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--bg); background: var(--status); color: #17171b; font-size: 0.62rem; line-height: 1; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.figure .spot::after { content: ''; position: absolute; inset: -11px; border-radius: 50%; }  /* 44 px touch target */
+.figure .spot.color-yellow, .figure .spot.color-red { width: 28px; height: 28px; font-size: 0.75rem;
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--status) 30%, transparent); animation: beacon 2.4s ease-in-out infinite; }
+@keyframes beacon { 50% { box-shadow: 0 0 0 10px color-mix(in oklab, var(--status) 8%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .figure .spot { animation: none !important; } }
+.figure .spot.color-green { --status: var(--nominal); }
+.figure .spot.color-yellow { --status: var(--watch); }
+.figure .spot.color-red { --status: var(--act); }
+.figure .spot.color-none { --status: var(--nodata); }
+.figure .spot.selected { border-color: #fff; }
+
+.home-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 0.8rem; }
+.hero + .figure-stage, .alarm-banner + .figure-stage { margin-top: 0.2rem; }
+.fineprint { margin: 0.3rem 0 0; font-size: 0.78rem; color: var(--muted); }
+.fineprint.left { text-align: left; }
+
+/* Sheet: from the bottom on phones, from the right on wide screens */
+.sheet-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.55); display: flex; align-items: flex-end; justify-content: center;
+  animation: fade 0.18s ease-out; }
+.sheet { width: min(100%, 560px); max-height: 86vh; overflow: auto; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 22px 22px 0 0; padding: 0.4rem 1.1rem 1.4rem; text-align: left; animation: rise 0.22s ease-out; }
+.sheet:focus { outline: none; }
+.sheet-head { position: sticky; top: 0; background: var(--panel); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.6rem 0; }
+.sheet-head h2 { margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.sheet-sub { margin: 1rem 0 0.5rem; font-size: 0.95rem; }
+.sheet .reason { font-size: 1rem; }
+@media (min-width: 900px) {
+  .sheet-backdrop { align-items: stretch; justify-content: flex-end; }
+  .sheet { border-radius: 22px 0 0 22px; max-height: none; height: 100%; width: 460px; animation: slide 0.22s ease-out; }
+}
+@keyframes fade { from { opacity: 0; } }
+@keyframes rise { from { transform: translateY(24px); opacity: 0; } }
+@keyframes slide { from { transform: translateX(24px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sheet, .sheet-backdrop { animation: none; } .figure svg path { transition: none; } }
+
+.pill { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.65rem; border-radius: 999px;
+  color: var(--status); border: 1px solid color-mix(in oklab, var(--status) 55%, transparent); }
+.pill.color-green { --status: var(--nominal); } .pill.color-yellow { --status: var(--watch); }
+.pill.color-red { --status: var(--act); } .pill.color-none { --status: var(--nodata); }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem; }
+.sheet .chip { margin: 0; min-height: 44px; padding: 0.4rem 1rem; font-size: 0.95rem; border-radius: 999px; }
+.sheet .chip[aria-pressed='true'] { background: color-mix(in oklab, var(--accent) 22%, var(--panel-2)); border-color: var(--accent); }
+.sheet .chip.alarm { border-color: color-mix(in oklab, var(--act) 70%, transparent); }
+.sheet .chip.alarm[aria-pressed='true'] { background: color-mix(in oklab, var(--act) 22%, var(--panel-2)); border-color: var(--act); }
+.sheet .button.wide { margin-top: 0.8rem; }
+.more-links { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
+.more-row { display: flex; align-items: center; gap: 0.6rem; margin: 0.7rem 0; flex-wrap: wrap; }
+.small { font-size: 0.85rem; }
+.warn { color: var(--watch); }
+
+/* Bottom navigation (≤ 5 places, always visible) */
+.bottom-nav { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom); display: flex; justify-content: center; gap: 0.25rem;
+  background: color-mix(in oklab, var(--panel) 94%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+.bottom-nav a, .bottom-nav button { flex: 0 1 108px; display: grid; justify-items: center; align-content: center; gap: 0.15rem;
+  color: var(--muted); text-decoration: none; border: 0; background: transparent; font: inherit; font-family: var(--font-title);
+  font-size: 0.74rem; font-weight: 600; cursor: pointer; border-radius: 14px; margin: 6px 0; }
+.bottom-nav a:hover, .bottom-nav button:hover { color: var(--text); }
+.bottom-nav [aria-current='page'] { color: var(--accent); }
+.bottom-nav [aria-current='page'] svg { stroke-width: 2.2; }
+
+/* Other modules keep their content; quieter frame */
+.app:not(.route-body) main { padding-top: 0.25rem; }
+.card { border-radius: var(--radius); }
+@media (max-width: 520px) {
+  .home-actions { flex-wrap: nowrap; width: 100%; }
+  .home-actions .button.big { flex: 1; padding: 0.6rem 0.7rem; font-size: 0.95rem; }
+  .figure { height: clamp(420px, calc(100dvh - 240px), 720px); }
+  .topbar { gap: 0.4rem; }
+  .demo-tag { display: none; }
+}
+/* The pain flow lives inside its sheet: no second frame, no repeated title or long notes. */
+.sheet .pain.card { background: transparent; border: 0; padding: 0; box-shadow: none; }
+.sheet .pain.card::before { display: none; }
+.sheet .pain > h2#pain-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.sheet .pain > p.muted { font-size: 0.8rem; }
+
+:root[data-theme='light'] .sheet-backdrop { background: rgba(23, 23, 27, 0.35); }
+.figure-history { position: relative; z-index: 1; width: min(100%, 460px); margin-top: 0.4rem; text-align: left; }
+.segmented button { min-width: 76px; }
+
+/* Home heat map: she draws on the figure itself. */
+.figure.paintable svg { cursor: crosshair; }
+.paint-dot.new { opacity: 0.9; }
+:root[data-theme='light'] .paint-layer { mix-blend-mode: multiply; }
+.paint-hint { position: relative; z-index: 1; margin: 0.5rem 0 0; color: var(--muted); font-size: 0.92rem; }
+.heat-key { position: relative; z-index: 1; display: flex; align-items: center; gap: 0.5rem; color: var(--muted); font-size: 0.78rem; margin-top: 0.3rem; }
+.heat-key .heat-bar { width: 120px; height: 8px; border-radius: 999px; display: inline-block; }
+.segmented .warm-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 0.4rem; vertical-align: middle; background: var(--orange); }
+.paint-tools { display: flex; gap: 0.5rem; }
+.paint-tools .button { flex: 1; }
+.paintable { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.figure-controls { position: relative; z-index: 1; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+@media (max-width: 520px) { .figure-controls .segmented button { min-width: 0; padding: 0 0.75rem; } }
+/* Woman / man: a quiet text switch in the corner, not a second big control. */
+.figure-controls { width: min(100%, 460px); justify-content: center; }
+.figure-kind { position: absolute; z-index: 2; right: 0; top: 50%; transform: translateY(-50%); display: flex; }
+.figure-kind button { border: 0; background: none; color: var(--muted); opacity: 0.7; font: inherit; font-size: 0.74rem; font-family: var(--font-title);
+  min-height: 36px; padding: 0 0.35rem; cursor: pointer; border-radius: 6px; }
+.figure-kind button[aria-pressed='true'] { color: var(--text); opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+.figure-kind button:focus-visible { outline: 2px solid var(--accent); }
+
+/* ---- Review fixes (Javier, Nov 15) ---- */
+.hero-state { margin: 0; }
+.hero-who { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+.hero-who a { color: var(--accent); }
+.cmo-card { width: min(100%, 560px); text-align: left; border: 1px solid var(--act); border-radius: var(--radius);
+  background: color-mix(in oklab, var(--act) 12%, var(--panel)); padding: 0.8rem 1rem; margin-top: 0.4rem; }
+.cmo-card h2 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--act); }
+.cmo-card p { margin: 0; }
+.today-strip { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem; }
+.strip-btn { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 44px; padding: 0 0.95rem; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-size: 0.9rem; cursor: pointer; text-decoration: none; }
+.strip-btn:hover { border-color: var(--accent); }
+.tank-mini svg { width: 12px; height: 20px; }
+.tank-mini .tank-shell { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+.tank-mini .tank-fill { fill: var(--accent); }
+.heat-note { margin: 0.2rem 0 0; color: var(--muted); font-size: 0.78rem; max-width: 34ch; }
+.heat-rows { list-style: none; margin: 0.25rem 0 0; padding: 0; font-size: 0.85rem; display: grid; gap: 0.1rem; }
+.button.primary.done { background: var(--panel-2); color: var(--muted); cursor: default; }
+
+/* The main buttons stay just above the bottom bar while the figure scrolls. */
+.home-actions { position: sticky; z-index: 5; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 0.5rem); padding: 0.4rem 0;
+  border-radius: 999px; background: color-mix(in oklab, var(--bg) 82%, transparent); backdrop-filter: blur(6px); }
+
+/* Header: icon for the connection, a visible line when offline; the day's log while the demo plays. */
+.net { width: auto; height: auto; border-radius: 0; background: none !important; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; }
+.net.on { color: var(--nominal); }
+.net.off { color: var(--watch); }
+.net .net-text { display: none; }
+.offline-bar { margin: -0.5rem 0 0.8rem; padding: 0.45rem 0.9rem; border-radius: 999px; border: 1px solid var(--watch); color: var(--watch); text-align: center; font-size: 0.85rem; }
+.story-log { margin: -0.4rem 0 0.8rem; padding: 0.45rem 0.9rem; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); font-size: 0.85rem; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) { .figure-stage::before { transition: none; } .paint-dot { transition: none; } }
+
+@media (max-width: 520px) {
+  .segmented button, .figure-controls .segmented button { min-height: 44px; }
+  .demo-tag { display: inline; font-size: 0.58rem; letter-spacing: 0.02em; margin-right: 0; }
+  .day-stepper { padding-left: 0.45rem; }
+  .day-num { min-width: 3.8rem; font-size: 0.88rem; }
+  .icon-btn { width: 40px; height: 44px; }
+  .wordmark { font-size: 1.2rem; letter-spacing: 0.08em; }
+  .home-actions .paint-tools { flex: 1; }
+}
+
+/* Wide screens: the navigation is a floating island on the left instead of the bottom bar. */
+@media (min-width: 1024px) {
+  .app { max-width: 1100px; padding: 0 calc(168px + 2rem) 1.5rem; }
+  .bottom-nav { top: 50%; bottom: auto; left: 1rem; right: auto; transform: translateY(-50%); width: 60px; height: auto;
+    flex-direction: column; justify-content: center; gap: 0.25rem; padding: 0.45rem 0; border: 1px solid var(--line);
+    border-radius: 999px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+  .bottom-nav { align-items: center; }
+  .bottom-nav a, .bottom-nav button { flex: 0 0 auto; width: 50px; height: 50px; margin: 0; padding: 0; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 0.1rem; font-size: 0.56rem; }
+  .bottom-nav a span, .bottom-nav button span { display: block; width: 100%; text-align: center; line-height: 1; }
+  .bottom-nav svg { width: 20px; height: 20px; }
+  .bottom-nav [aria-current='page'] { background: color-mix(in oklab, var(--accent) 14%, transparent); }
+  .home-actions { bottom: 1rem; }
+}
+:root[data-theme='light'] .bottom-nav { box-shadow: 0 10px 30px rgba(23, 23, 27, 0.12); }
+.home-main { width: 100%; display: grid; justify-items: center; gap: 0.4rem; }
+
+/* "For today" and the tank: a small column on the right of the main view on wider screens. */
+@media (min-width: 720px) {
+  .today-strip { position: fixed; z-index: 25; right: 1rem; top: 50%; transform: translateY(-50%); flex-direction: column; align-items: stretch;
+    gap: 0.5rem; margin: 0; width: 168px; }
+  .today-strip .strip-btn { flex-direction: column; align-items: flex-start; gap: 0.15rem; border-radius: 20px; padding: 0.7rem 0.95rem;
+    text-align: left; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+  .today-strip .tank-mini { flex-direction: row; align-items: center; gap: 0.5rem; }
+  :root[data-theme='light'] .today-strip .strip-btn { box-shadow: 0 10px 30px rgba(23, 23, 27, 0.1); }
+}
+@media (min-width: 720px) and (max-width: 1023px) { .app { padding-left: calc(168px + 2rem); padding-right: calc(168px + 2rem); } }
+
+/* Top bar: just the logo, centered and a little bigger; the connection icon on the right. */
+.topbar { display: grid; grid-template-columns: 1fr auto 1fr; justify-content: initial; }
+.topbar .wordmark { justify-self: center; font-size: 1.85rem; }
+.topbar .topbar-side.net { justify-self: end; }
+@media (max-width: 520px) { .topbar .wordmark { font-size: 1.6rem; } }
+.sheet .day-stepper { padding-left: 0.35rem; }
+
+/* ---- Glass cards (team design, Nov 15): every card, the tank, the medical-officer card and the
+   "For today" / tank buttons. The two reflections are layered into the background (no pseudo-elements,
+   so tooltips inside cards are not clipped). ---- */
+:root {
+  --glass-bg: rgba(253, 244, 227, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-sheen: linear-gradient(to left top, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 100%);
+  --glass-shadow: 4px 4px 20px 0 rgba(120, 53, 15, 0.1), inset 0 0 150px rgba(245, 158, 11, 0.05),
+    inset 0 0 4px 2px rgba(255, 255, 255, 0.15);
+  --glass-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --glass-btn-bg: rgba(255, 255, 255, 0.1);
+  --glass-btn-hover: rgba(255, 255, 255, 0.2);
+}
+:root[data-theme='light'] {
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(23, 23, 27, 0.1);
+  --glass-sheen: linear-gradient(to left top, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+  --glass-shadow: 4px 4px 20px 0 rgba(120, 53, 15, 0.08), inset 0 0 150px rgba(245, 158, 11, 0.04),
+    inset 0 0 4px 2px rgba(255, 255, 255, 0.7);
+  --glass-text-shadow: none;
+  --glass-btn-bg: rgba(23, 23, 27, 0.04);
+  --glass-btn-hover: rgba(23, 23, 27, 0.08);
+}
+.card, .care, .cmo-card, .today-strip .strip-btn {
+  border-radius: 24px;
+  background: var(--glass-sheen), var(--glass-bg);
+  -webkit-backdrop-filter: blur(8px) saturate(100%);
+  backdrop-filter: blur(8px) saturate(100%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  text-shadow: var(--glass-text-shadow);
+}
+.card { padding: 1.1rem 1.2rem; }
+/* State cards keep their color as a thin bar on the left (the shape symbol still carries it too). */
+.card.color-green, .card.color-yellow, .card.color-red, .card.color-none {
+  box-shadow: inset 3px 0 0 var(--status), var(--glass-shadow);
+}
+.card.chosen, .card.suggested, .boost-card.chosen { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), var(--glass-shadow); }
+.cmo-card { border-color: var(--act); background: var(--glass-sheen), color-mix(in oklab, var(--act) 14%, transparent); }
+.sheet .pain.card { background: transparent; border: 0; padding: 0; box-shadow: none; text-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* Buttons inside cards: glass buttons. */
+.card .button.secondary, .care .button.secondary, .card .chip {
+  background: var(--glass-btn-bg); border: 1px solid var(--glass-border); color: var(--text); border-radius: 8px;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all 0.2s ease;
+}
+.card .button.secondary:hover, .card .chip:hover { background: var(--glass-btn-hover); }
+.card .button.secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
+.card .actions .button.secondary[aria-pressed='true'] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.today-strip .strip-btn:hover { border-color: var(--glass-border); background: var(--glass-sheen), var(--glass-btn-hover); }
+
+/* Home has no scroll: the body fills whatever space is left between the state line and the buttons. */
+html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height: 100%; overscroll-behavior: none; }
+.app.route-body { height: 100dvh; display: flex; flex-direction: column; padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 0.4rem); }
+.app.route-body > main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.app.route-body .topbar { margin-bottom: 0.4rem; }
+.app.route-body .home { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+.app.route-body .home-main { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+.app.route-body .figure-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; margin-top: 0.1rem; }
+.app.route-body .figure { flex: 1 1 0; min-height: 120px; height: auto; width: auto; max-width: none; max-height: calc(92vw / var(--ar, 0.5)); margin-top: 0.2rem; }
+.app.route-body .home-actions { position: static; margin-top: 0.3rem; background: none; backdrop-filter: none; }
+.app.route-body .fineprint { margin: 0.1rem 0 0; }
+.app.route-body .paint-hint { margin-top: 0.3rem; }
+@media (min-width: 1024px) { .app.route-body { padding-bottom: 0.8rem; } }
+.sr-only-focusable { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.sr-only-focusable:focus-visible { position: static; width: auto; height: auto; clip: auto; overflow: visible; white-space: normal;
+  border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 999px; padding: 0.5rem 1rem; font: inherit; }
+
+/* Phones: Front / Back on the left of the body and For today / tank on the right, so the body keeps the
+   height of the screen. */
+@media (max-width: 719px) {
+  .app.route-body .figure-stage { position: relative; width: 100%; }
+  .app.route-body .figure-stage > .segmented { position: absolute; z-index: 3; left: 0; top: 1.7rem; flex-direction: column; border-radius: 22px; }
+  .app.route-body .figure-stage > .segmented button { min-width: 0; width: 76px; padding: 0 0.4rem; font-size: 0.8rem; }
+  .app.route-body .today-strip { position: absolute; z-index: 3; right: 0; top: 1.7rem; margin: 0; flex-direction: column; align-items: stretch; gap: 0.4rem; width: 84px; }
+  .app.route-body .today-strip .strip-btn { flex-direction: column; align-items: flex-start; gap: 0.05rem; padding: 0.45rem 0.6rem; border-radius: 18px;
+    font-size: 0.72rem; min-height: 44px; text-align: left; }
+  .app.route-body .today-strip .tank-mini { flex-direction: row; align-items: center; gap: 0.3rem; }
+  .app.route-body .figure { max-width: none; max-height: calc((100vw - 2 * 92px) / var(--ar, 0.5)); }
+  .app.route-body .paint-hint { font-size: 0.85rem; margin: 0.1rem 0 0; }
+}
+.today-strip .short { display: none; }
+@media (max-width: 719px) {
+  .app.route-body .today-strip .long { display: none; }
+  .app.route-body .today-strip .short { display: inline; }
+  .app.route-body .today-strip { width: 64px; }
+  .app.route-body .today-strip .strip-btn { align-items: center; text-align: center; padding: 0.4rem 0.3rem; }
+  .app.route-body .today-strip .tank-mini { flex-direction: column; gap: 0.15rem; }
+  .app.route-body .figure-stage > .segmented button { width: 64px; padding: 0 0.2rem; font-size: 0.74rem; }
+  .app.route-body .figure { max-height: calc((100vw - 2 * 76px) / var(--ar, 0.5)); }
+}
+.app.route-body .figure { margin-block: auto; }
+
+/* "Something else? Write it": a free-text symptom next to the fixed options. */
+.pain-other { display: grid; gap: 0.35rem; margin: 0.6rem 0 0.2rem; }
+.pain-other label { font-size: 0.9rem; color: var(--muted); }
+.pain-other-row { display: flex; gap: 0.5rem; }
+.pain-other input { flex: 1; min-width: 0; min-height: 44px; padding: 0 0.9rem; border-radius: 12px; border: 1px solid var(--glass-border, var(--line));
+  background: var(--glass-btn-bg, var(--panel-2)); color: var(--text); font: inherit; }
+.pain-other input::placeholder { color: var(--muted); }
+.pain-other input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pain-other .button { margin: 0; }
+
+.scale-all { margin: 0.4rem 0 0.2rem; font-size: 0.85rem; }
+/* The logo ring is the O: a little bigger than the letters. */
+.topbar .wordmark .logo { width: 1.18em; height: 1.18em; margin-right: 0.04em; top: 0; }
+
+.button.danger { background: var(--act); color: #fff; border: 0; }
+.button.danger:hover { filter: brightness(1.1); }
+.reset-row { border-top: 1px solid var(--line); padding-top: 0.8rem; }

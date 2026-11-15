@@ -46,7 +46,7 @@ describe('suggestions when she logs a pain', () => {
 
 describe('self-care for today, next to the body', () => {
   it("starts from Boost's plan for the day, with the trigger that offers each card", () => {
-    const s = todaySuggestions(planOf(125), 125, {})
+    const s = todaySuggestions(planOf(27), 27, {})
     expect(s.red).toBe(false)
     expect(s.items.length).toBeGreaterThan(0)
     expect(s.items.length).toBeLessThanOrEqual(4)
@@ -54,16 +54,16 @@ describe('self-care for today, next to the body', () => {
   })
 
   it('adds the cards of a recent pain report, with the pain as the reason', () => {
-    const log: PainLog = { 124: { events: [event({ contexts: ['short_sleep'] })] } }
-    const s = todaySuggestions(empty, 125, log)
+    const log: PainLog = { 26: { events: [event({ contexts: ['short_sleep'] })] } }
+    const s = todaySuggestions(empty, 27, log)
     expect(s.items.map((i) => i.card.id)).toContain('sleep_window')
-    expect(s.items.find((i) => i.card.id === 'sleep_window')!.because).toMatchObject([{ kind: 'pain', day: 124 }])
-    expect(todaySuggestions(empty, 128, log).items).toEqual([]) // more than 2 days ago
+    expect(s.items.find((i) => i.card.id === 'sleep_window')!.because).toMatchObject([{ kind: 'pain', day: 26 }])
+    expect(todaySuggestions(empty, 30, log).items).toEqual([]) // more than 2 days ago
   })
 
   it('shows only the medical officer on a red day or after a confirmed alarm sign today', () => {
-    const log: PainLog = { 125: { events: [event({ regions: ['chest'], alarms: ['chest pain'] })] } }
-    const s = todaySuggestions(planOf(125), 125, log)
+    const log: PainLog = { 27: { events: [event({ regions: ['chest'], alarms: ['chest pain'] })] } }
+    const s = todaySuggestions(planOf(27), 27, log)
     expect(s).toMatchObject({ red: true })
     expect(s.items.map((i) => i.card.id)).toEqual(['cmo_now'])
   })
@@ -76,27 +76,27 @@ describe('self-care for today, next to the body', () => {
 })
 
 describe('reminders', () => {
-  const base = { day: 125, checkins: {}, pulseSessions: [], boostLog: {}, painLog: {}, plan: empty }
+  const base = { day: 27, checkins: {}, pulseSessions: [], boostLog: {}, painLog: {}, plan: empty }
 
   it('reminds the daily check-in and pulse mode until she does them', () => {
     expect(remindersFor(base).map((r) => r.id)).toEqual(['checkin', 'pulse'])
     const done = remindersFor({
       ...base,
-      checkins: { 125: { mood: 7, stress: 4, fatigue: 4, crew_climate: 7 } },
-      pulseSessions: [{ id: 'p', day: 124, at: 0, practice: false, result: {} as never }],
+      checkins: { 27: { mood: 7, stress: 4, fatigue: 4, crew_climate: 7 } },
+      pulseSessions: [{ id: 'p', day: 26, at: 0, practice: false, result: {} as never }],
     })
     expect(done.map((r) => r.id)).toEqual([])
   })
 
   it("asks whether yesterday's choices helped, and for the safety question first", () => {
-    const r = remindersFor({ ...base, plan: { ...empty, safetyQuestion: { id: 'q', text_en: '', if_yes: '', sources: [] } }, boostLog: { 124: { chosen: ['breathe'], helped: {} } } })
+    const r = remindersFor({ ...base, plan: { ...empty, safetyQuestion: { id: 'q', text_en: '', if_yes: '', sources: [] } }, boostLog: { 26: { chosen: ['breathe'], helped: {} } } })
     expect(r.map((x) => x.id)).toEqual(['safety', 'checkin', 'pulse', 'did_it_help'])
   })
 
   it('reminds a pain from the last 2 days that she has not logged again today', () => {
-    const painLog: PainLog = { 123: { events: [event({})] } }
+    const painLog: PainLog = { 25: { events: [event({})] } }
     expect(remindersFor({ ...base, painLog }).some((r) => r.id === 'pain_again')).toBe(true)
-    const again: PainLog = { ...painLog, 125: { events: [event({ id: 'today' })] } }
+    const again: PainLog = { ...painLog, 27: { events: [event({ id: 'today' })] } }
     expect(remindersFor({ ...base, painLog: again }).some((r) => r.id === 'pain_again')).toBe(false)
     expect(CARDS.cmo_now).toBeDefined()
   })
@@ -104,20 +104,20 @@ describe('reminders', () => {
 
 describe('when everything is fine', () => {
   it('suggests nothing on a green day (Psychology 1, Nov 15)', () => {
-    const plan = planOf(121)
+    const plan = planOf(23)
     expect(plan.triggers).toEqual(['green'])
-    expect(todaySuggestions(plan, 121, {}).items).toEqual([])
+    expect(todaySuggestions(plan, 23, {}).items).toEqual([])
   })
 
   it('still suggests the cards of a pain she logged on a green day', () => {
-    const log: PainLog = { 121: { events: [event({ contexts: ['stress'] })] } }
-    expect(todaySuggestions(planOf(121), 121, log).items.map((i) => i.card.id)).toContain('breathe')
+    const log: PainLog = { 23: { events: [event({ contexts: ['stress'] })] } }
+    expect(todaySuggestions(planOf(23), 23, log).items.map((i) => i.card.id)).toContain('breathe')
   })
 })
 
 describe('pulse reminder', () => {
   it('clears with a practice session too, since she did the task', () => {
-    const r = remindersFor({ day: 125, checkins: {}, boostLog: {}, painLog: {}, plan: empty, pulseSessions: [{ id: 'p', day: 125, at: 0, practice: true, result: {} as never }] })
+    const r = remindersFor({ day: 27, checkins: {}, boostLog: {}, painLog: {}, plan: empty, pulseSessions: [{ id: 'p', day: 27, at: 0, practice: true, result: {} as never }] })
     expect(r.some((x) => x.id === 'pulse')).toBe(false)
   })
 })

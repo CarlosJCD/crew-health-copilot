@@ -33,9 +33,9 @@ describe('loadDemoData', () => {
     expect((await loadDemoData(respond(JSON.stringify(BUILT_IN_DEMO)))).origin).toBe('file')
   })
 
-  it('lets the day control reach every day of the file, while the demo story stays 121 to 128', async () => {
+  it('lets the day control reach every day of the file, while the demo story stays 23 to 30', async () => {
     const { dayRange, STORY_DAYS, BUILT_IN_DEMO } = await import('./demoData')
-    expect(dayRange(BUILT_IN_DEMO)).toEqual({ first: 107, last: 128 })
-    expect(STORY_DAYS).toEqual({ first: 121, last: 128 })
+    expect(dayRange(BUILT_IN_DEMO)).toEqual({ first: 1, last: 30 })
+    expect(STORY_DAYS).toEqual({ first: 23, last: 30 })
   })
 })

@@ -69,6 +69,8 @@ export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onP
         <h2 id="checkin-title">{t('mind.title', { day })}</h2>
         <p className="muted">{t('mind.intro')}</p>
         <p className="why" lang="en">{getIndicator('checkin').why_en}</p>
+        {/* One scale line for the four sliders; her usual for each one is in its "?". */}
+        <p id="ci-scale" className="muted scale-all">{t('mind.scaleAll')}</p>
         {CHECKIN_ITEMS.map((item: CheckinItem) => (
           <div key={item} className="slider-row">
             <div className="slider-head">
@@ -85,13 +87,13 @@ export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onP
               min={0}
               max={10}
               step={1}
+              aria-describedby="ci-scale"
               value={draft[item]}
               onChange={(e) => {
                 setDraft({ ...draft, [item]: Number(e.target.value) })
                 setDone(false)
               }}
             />
-            <span className="muted">{t('mind.scale', { usual: base[item][0] })}</span>
           </div>
         ))}
         <div className="actions">

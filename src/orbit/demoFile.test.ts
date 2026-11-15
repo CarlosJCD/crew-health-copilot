@@ -24,6 +24,6 @@ describe.skipIf(!raw)('data team demo-data.json', () => {
   })
 
   it('keeps the days before the story green', () => {
-    for (const d of data!.days.filter((x) => x.day < 121)) expect(evaluateDay(data!, d.day).state, `day ${d.day}`).toBe('GREEN')
+    for (const d of data!.days.filter((x) => x.day < 23)) expect(evaluateDay(data!, d.day).state, `day ${d.day}`).toBe('GREEN')
   })
 })

@@ -3,7 +3,6 @@ import { DOMAIN_IDS, RULES, type Scenario } from '../orbit/config'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay } from '../orbit/engine'
 import { useI18n } from '../i18n/context'
-import { DayControl } from '../components/DayControl'
 import { DomainRing } from '../components/DomainRing'
 import { OrbitCard } from '../components/OrbitCard'
 import { StatePanel } from '../components/StatePanel'
@@ -19,15 +18,13 @@ interface Props {
 }
 
 /** Metrics (route `today`): three rings, the ORBIT state and one card per indicator, replaying the demo story. */
-export function Today({ demo, day, onDayChange, scenario, openWhy }: Props) {
+export function Today({ demo, day, scenario, openWhy }: Props) {
   const { t } = useI18n()
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
 
   return (
     <div className="today">
-      <DayControl demo={demo} day={day} onDayChange={onDayChange} />
-
       <div className="rings">
         {DOMAIN_IDS.map((d) => (
           <DomainRing
