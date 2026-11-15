@@ -63,7 +63,10 @@ export const REQUIRED_PARAMS: Record<string, string[]> = {
   checkin: ['yellow_worse_than_baseline_points', 'items', 'worse_direction'],
   crew_climate: ['yellow_worse_than_baseline_points'],
   screen: ['yellow_gte', 'offer_conference_if_weeks_gte'],
-  pulse: ['practice_sessions', 'yellow_sd_above_baseline', 'yellow_sessions_needed', 'yellow_window_sessions'],
+  pulse: [
+    'practice_sessions', 'yellow_sd_above_baseline', 'yellow_sessions_needed', 'yellow_window_sessions',
+    'duration_s', 'isi_s', 'false_start_lt_ms', 'lapse_gte_ms',
+  ],
   bp: ['green_sys_lt', 'green_dia_lt', 'red_sys_gte', 'red_dia_gte', 'red_needs_confirmation'],
   hr: ['yellow_above_baseline_bpm', 'red_gt', 'red_low_lt_with_symptoms'],
   temp: ['yellow_above_inflight_baseline_gt', 'red_gte', 'red_above_inflight_baseline_gt', 'red_requires_symptoms'],

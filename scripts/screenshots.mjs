@@ -19,7 +19,7 @@ const SHOTS = [
   { name: '03-today-day123-sleep-only', hash: '#/today?day=123' },
   { name: '04-boost-day125-choose-two', hash: '#/boost?day=125' },
   { name: '04b-transmit-day125-delay', hash: '#/transmit?day=125' },
-  { name: '05-mind-day125-checkin', hash: '#/mind?day=125' },
+  { name: '05-mind-day125-checkin-and-pulse', hash: '#/mind?day=125' },
   { name: '06-today-day128-green', hash: '#/today?day=128' },
 ]
 

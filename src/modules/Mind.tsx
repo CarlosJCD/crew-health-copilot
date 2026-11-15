@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { getIndicator } from '../orbit/config'
 import { CHECKIN_ITEMS, type Checkin, type CheckinItem, type Checkins, type TalkTo } from '../orbit/checkin'
 import type { LoadedDemo } from '../orbit/demoData'
+import type { PulseSession } from '../orbit/pulse'
+import { PulseTask } from '../components/PulseTask'
 import { useI18n } from '../i18n/context'
 
 interface Props {
@@ -9,10 +11,12 @@ interface Props {
   day: number
   checkins: Checkins
   onCheckinsChange: (c: Checkins) => void
+  pulseSessions: PulseSession[]
+  onPulseSessionsChange: (s: PulseSession[]) => void
 }
 
 /** Daily check-in: 4 sliders (0 to 10), under a minute, plus "I want to talk to someone today". */
-export function Mind({ demo, day, checkins, onCheckinsChange }: Props) {
+export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onPulseSessionsChange }: Props) {
   const { t } = useI18n()
   const record = demo.data.days.find((d) => d.day === day)
   const base = demo.data.persona.baseline
@@ -118,9 +122,13 @@ export function Mind({ demo, day, checkins, onCheckinsChange }: Props) {
       <section className="pulse-note">
         <h2>{getIndicator('pulse').label_en}</h2>
         <p className="why" lang="en">{getIndicator('pulse').why_en}</p>
-        <p className="muted">
-          {record?.pulse_ms ? t('mind.pulseToday', { ms: record.pulse_ms }) : ''} {t('mind.pulseNext')}
-        </p>
+        {record?.pulse_ms && <p className="muted">{t('mind.pulseToday', { ms: record.pulse_ms })}</p>}
+        <PulseTask
+          day={day}
+          baselineMs={base.pulse_ms[0]}
+          sessions={pulseSessions}
+          onSessionsChange={onPulseSessionsChange}
+        />
       </section>
     </div>
   )

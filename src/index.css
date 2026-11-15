@@ -227,3 +227,21 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .help-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 1rem; border-top: 1px solid var(--line); padding: 0.4rem 0; }
 .actions .button.secondary[aria-pressed='true'] { background: var(--accent); color: var(--bg); }
 .boost-escalate .card { margin-bottom: 0.75rem; }
+
+/* ORBIT: pulse mode */
+.pulse-intro p { margin: 0.3rem 0; }
+.pulse-run { margin-top: 0.5rem; }
+.pulse-area {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem;
+  min-height: 260px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg);
+  cursor: pointer; user-select: none; touch-action: manipulation; padding: 1rem;
+}
+.pulse-area:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pulse-box {
+  width: min(320px, 80%); height: 120px; border: 2px solid var(--line); border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+}
+.pulse-area.stimulus .pulse-box, .pulse-area.feedback .pulse-box { border-color: var(--accent); }
+.pulse-counter { font: 700 3rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text); }
+.pulse-early { color: var(--muted); }
+.pulse-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem; }

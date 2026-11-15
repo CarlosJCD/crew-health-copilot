@@ -37,7 +37,7 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `src/orbit/orbit-indicators.json` | **Single source of rules, sources and texts** (Psychology 1 and 2, unchanged). Nobody changes thresholds outside this file; P1 approves changes | Psychology 1 |
 | `src/orbit/boost/orbit-boost-library.json`, `src/orbit/boost/boost-cards.json` | Boost library (Psychology, unchanged): cards with sources and confidence, triggers per indicator, display rules, safety question | Psychology 2 |
 | `src/orbit/boost.ts`, `src/modules/Boost.tsx` | Boost: safety question, "check first", up to 4 cards, she chooses up to 2, "Did it help?", 24 h follow-up, protective-factor count | Engineering |
-| `src/orbit/pulse-spec.json` | Pulse mode spec (3-minute PVT-B-style task); the task itself is next | Psychology 1 |
+| `src/orbit/pulse-spec.json`, `src/orbit/pulse.ts`, `src/components/PulseTask.tsx` | Pulse mode: 3-minute PVT-B-style task (1 to 4 s waits, false start under 100 ms, lapse at 355 ms, median of valid responses, at least 20). A session replaces that day's value for the engine; a 30 s trial run saves nothing. Not a validated PVT-B | Psychology 1 (spec), Engineering |
 | `public/data/demo-data.json` | Data team's demo data (days 107 to 128), loaded by the app; `src/orbit/demoFile.test.ts` checks it against the acceptance table | Data science |
 | `src/orbit/scenarios.json` | Four scenarios: one-way delay, estimated dose, first responder, ground contact (handoff 2.2) | Psychology + Data science |
 | `src/orbit/config.ts` | Typed reader for both files; lists every param the engine needs | Engineering |

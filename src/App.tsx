@@ -4,6 +4,7 @@ import type { BoostLog } from './orbit/boost'
 import { applyCheckins, type Checkins } from './orbit/checkin'
 import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
+import { applyPulse, type PulseSession } from './orbit/pulse'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { useStoredJson } from './hooks/useStoredJson'
@@ -41,6 +42,7 @@ export default function App() {
   const [outbox, setOutbox] = useStoredJson<Packet[]>('orbit.outbox', [])
   const [demoClock, setDemoClock] = useStoredJson('orbit.demoClock', true)
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
+  const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
 
   useEffect(() => {
     const onHash = () => {
@@ -64,8 +66,11 @@ export default function App() {
     }
   }, [])
 
-  // Her check-in answers replace that day's values, so every module sees the same data.
-  const demo = useMemo(() => ({ ...loaded, data: applyCheckins(loaded.data, checkins) }), [loaded, checkins])
+  // Her check-in answers and pulse sessions replace that day's values, so every module sees the same data.
+  const demo = useMemo(
+    () => ({ ...loaded, data: applyPulse(applyCheckins(loaded.data, checkins), pulseSessions) }),
+    [loaded, checkins, pulseSessions],
+  )
   const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS.find((s) => s.id === DEFAULT_SCENARIO_ID)!
   const active = MODULES.find((m) => m.id === route.id) ?? MODULES[0]
 
@@ -109,7 +114,14 @@ export default function App() {
         ) : active.id === 'boost' ? (
           <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} />
         ) : active.id === 'mind' ? (
-          <Mind demo={demo} day={day} checkins={checkins} onCheckinsChange={setCheckins} />
+          <Mind
+            demo={demo}
+            day={day}
+            checkins={checkins}
+            onCheckinsChange={setCheckins}
+            pulseSessions={pulseSessions}
+            onPulseSessionsChange={setPulseSessions}
+          />
         ) : (
           <Placeholder module={active} />
         )}
