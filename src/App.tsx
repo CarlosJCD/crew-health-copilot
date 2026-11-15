@@ -141,10 +141,10 @@ export default function App() {
     <div className={`app route-${active.id}`}>
       <header className="topbar">
         <span className="topbar-side" aria-hidden="true" />
-        {/* Wordmark in the center: the symbol and the whole word, so it never reads "RBIT". */}
+        {/* Wordmark in the center: the logo ring is the O of ORBIT (design proposal, variant V2). */}
         <a className="wordmark" href="#/body" aria-label={APP_NAME} title={APP_EXPANSION}>
           <Logo />
-          <span aria-hidden="true">{APP_NAME}</span>
+          <span aria-hidden="true">{APP_NAME.slice(1)}</span>
         </a>
         <span className={`topbar-side net ${online ? 'on' : 'off'}`} title={online ? t('net.online') : t('net.offlineLong')} role="status">
           <Icon name={online ? 'signal' : 'nosignal'} size={18} />

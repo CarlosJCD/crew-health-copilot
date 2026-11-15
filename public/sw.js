@@ -6,7 +6,7 @@
 //   the cached copy is used offline, and dropped when the server says the file no longer exists.
 // - Other same-origin GETs: cache first, refreshed in the background.
 // The page posts the URLs it already loaded (see main.tsx) so the first visit is cached too.
-const CACHE = 'orbit-v3'
+const CACHE = 'orbit-v4'
 const SHELL = ['./', './index.html', './manifest.webmanifest', './favicon.svg', './icons/icon-192.png']
 
 self.addEventListener('install', (event) => {

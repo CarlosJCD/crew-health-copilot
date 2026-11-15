@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>ORBIT</title>
-  <desc>Logo concept A (domain ring: three arcs for body, mind and crew). Drawn with assistance from Claude (Anthropic) for the ORBIT team, NASA Space Apps Challenge 2026. Not a NASA mark.</desc>
+  <desc>Logo concept A (domain ring). Drawn with assistance from Claude (Anthropic) for the ORBIT team, NASA Space Apps Challenge 2026. Not a NASA mark.</desc>
   <rect width="64" height="64" rx="14" fill="#000000"/>
   <g transform="translate(6.4 6.4) scale(0.8)">
     <g fill="none" stroke="#ffffff" stroke-width="9">
-      <path d="M23.792 9.447A24 24 0 0 1 55.635 27.832"/>
-      <path d="M55.635 36.168A24 24 0 0 1 23.792 54.553"/>
-      <path d="M16.573 50.385A24 24 0 0 1 16.573 13.615"/>
+      <path d="M9.4 24.7A24 24 0 0 1 24.7 9.4"/>
+      <path d="M39.3 9.4A24 24 0 0 1 54.6 24.7"/>
+      <path d="M54.6 39.3A24 24 0 0 1 39.3 54.6"/>
+      <path d="M24.7 54.6A24 24 0 0 1 9.4 39.3"/>
     </g>
     <path d="M2 32H20L28 14L37 48L44 32H62" fill="none" stroke="#f64137" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
