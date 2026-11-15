@@ -1180,3 +1180,33 @@ div.tx-share-row { cursor: default; }
 .sheet .pain .where-summary { flex: 1; min-width: 0; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.1rem 0.7rem;
   font-size: 0.92rem; font-weight: 600; }
 .where-summary .link { min-height: 32px; font-weight: 400; }
+
+/* ---- Private note: one note per day, saved on the device as she types; earlier days under it ---- */
+.note { display: grid; gap: 0.6rem; }
+.sheet .note p { margin: 0; }
+.note-private { display: flex; align-items: flex-start; gap: 0.5rem; color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
+.note-private svg { flex: none; margin-top: 0.1rem; }
+.note-day { margin-top: 0.4rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.note-text { width: 100%; min-height: 9.5rem; resize: vertical; padding: 0.8rem 0.9rem; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font: inherit; font-size: 1rem; line-height: 1.5; }
+.note-text:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.note-text::placeholder { color: var(--muted); }
+.sheet .note .note-status { display: flex; align-items: center; gap: 0.35rem; min-height: 1.4rem; font-size: 0.82rem; }
+.note-earlier-title { margin: 0.8rem 0 0; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); }
+.note-none { font-size: 0.88rem; }
+.note-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.note-list details { border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+.note-list summary { display: flex; align-items: center; gap: 0.6rem; min-height: 44px; padding: 0.4rem 0.8rem; cursor: pointer; list-style: none; }
+.note-list summary::-webkit-details-marker { display: none; }
+.note-list summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 12px; }
+.note-list-day { flex: none; font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.note-list-first { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9rem; }
+.sheet .note-list details p { margin: 0; padding: 0 0.8rem 0.7rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.5; }
+.note-done { margin-top: 0.6rem; }
+.care-done { color: var(--text); }
+.sheet .play-head { padding: 0.7rem 0.8rem; }
+.note-list details[open] .note-list-first { visibility: hidden; }
+.sheet .tile-grid { gap: 0.4rem; }
+.sheet .tile { padding-inline: 0.2rem; font-size: 0.8rem; overflow-wrap: normal; word-break: keep-all; }
+@media (max-width: 420px) { .sheet .tile { font-size: 0.74rem; } }

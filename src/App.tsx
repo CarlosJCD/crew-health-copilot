@@ -11,6 +11,7 @@ import { careSummary } from './orbit/care'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { Icon, type IconName } from './components/Icon'
+import { PrivateNoteSheet, type Notes } from './components/PrivateNote'
 import { Sheet } from './components/Sheet'
 import { Logo } from './components/Logo'
 import { ThemeToggle } from './components/ThemeToggle'
@@ -79,6 +80,8 @@ export default function App() {
   const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
   const [painLog, setPainLog] = useStoredJson<PainLog>('orbit.pain', {})
   const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
+  const [notes, setNotes] = useStoredJson<Notes>('orbit.notes', {})
+  const [notesOpen, setNotesOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   /** Testing: "Reset my symptoms" asks once more before clearing. */
   const [confirmReset, setConfirmReset] = useState(false)
@@ -234,7 +237,17 @@ export default function App() {
             initialSolved={route.solved}
           />
         ) : active.id === 'boost' ? (
-          <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} care={care} />
+          <Boost
+            demo={demo}
+            day={day}
+            log={boostLog}
+            onLogChange={setBoostLog}
+            care={care}
+            notes={notes}
+            onNotesChange={setNotes}
+            boardsDone={boardsDone}
+            onBoardDone={() => setBoardsDone((n) => n + 1)}
+          />
         ) : active.id === 'mind' ? (
           <Mind
             demo={demo}
@@ -262,6 +275,8 @@ export default function App() {
         </button>
       </nav>
 
+      {notesOpen && <PrivateNoteSheet day={day} notes={notes} onChange={setNotes} onClose={() => setNotesOpen(false)} />}
+
       {moreOpen && (
         <Sheet title={t('nav.more')} onClose={closeMore}>
           <div className="more-links">
@@ -271,6 +286,16 @@ export default function App() {
             <a className="button ghost wide" href="#/play" onClick={closeMore}>
               {t('more.play')}
             </a>
+            <button
+              type="button"
+              className="button ghost wide"
+              onClick={() => {
+                closeMore()
+                setNotesOpen(true)
+              }}
+            >
+              {t('more.notes')}
+            </button>
           </div>
           <div className="more-row">
             <span className="muted">{t('more.day')}</span>

@@ -9,10 +9,12 @@ interface Props {
   /** Deep link for screenshots: `#/play?board=2&solved=1`. */
   initialBoard?: number
   initialSolved?: boolean
+  /** In a pop-up the pop-up's title names the game: no second heading. */
+  heading?: boolean
 }
 
 /** Constellations, free mode: group 16 tiles into 4 sets. No timer, no score. */
-export function Play({ completed, onComplete, initialBoard = 0, initialSolved = false }: Props) {
+export function Play({ completed, onComplete, initialBoard = 0, initialSolved = false, heading = true }: Props) {
   const { t } = useI18n()
   const [boardIndex, setBoardIndex] = useState(Math.min(Math.max(initialBoard, 0), BOARDS.length - 1))
   const board = BOARDS[boardIndex]
@@ -52,7 +54,7 @@ export function Play({ completed, onComplete, initialBoard = 0, initialSolved = 
   return (
     <div className="play">
       <section className="play-head">
-        <h2>{t('play.title')}</h2>
+        {heading && <h2>{t('play.title')}</h2>}
         <div className="actions" role="group" aria-label={t('play.boards')}>
           {BOARDS.map((b, i) => (
             <button key={b.board} type="button" className="button secondary" aria-pressed={i === boardIndex} onClick={() => choose(i)} lang="en">
