@@ -135,36 +135,13 @@ export default function App() {
   return (
     <div className={`app route-${active.id}`}>
       <header className="topbar">
-        {/* Wordmark: the symbol and the whole word, so it never reads "RBIT". */}
+        <span className="topbar-side" aria-hidden="true" />
+        {/* Wordmark in the center: the symbol and the whole word, so it never reads "RBIT". */}
         <a className="wordmark" href="#/body" aria-label={APP_NAME} title={APP_EXPANSION}>
           <Logo />
           <span aria-hidden="true">{APP_NAME}</span>
         </a>
-        <div className="day-stepper" role="group" aria-label={t('home.demo')}>
-          <span className="demo-tag" title={inStory ? t('day.story', STORY_DAYS) : t('day.history', STORY_DAYS)}>
-            {inStory ? t('home.demo') : t('home.before')}
-          </span>
-          <button type="button" className="icon-btn" onClick={() => setDay(Math.max(first, day - 1))} disabled={day <= first} aria-label={t('home.prev')}>
-            <Icon name="prev" size={20} />
-          </button>
-          <span className="day-num">{t('home.day', { n: day })}</span>
-          <button type="button" className="icon-btn" onClick={() => setDay(Math.min(last, day + 1))} disabled={day >= last} aria-label={t('home.next')}>
-            <Icon name="next" size={20} />
-          </button>
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={() => {
-              if (!playing && !(day >= STORY_DAYS.first && day < STORY_DAYS.last)) setDay(STORY_DAYS.first)
-              setPlaying(!playing)
-            }}
-            aria-label={playing ? t('home.pause') : t('home.play')}
-            aria-pressed={playing}
-          >
-            <Icon name={playing ? 'pause' : 'play'} size={18} />
-          </button>
-        </div>
-        <span className={`net ${online ? 'on' : 'off'}`} title={online ? t('net.online') : t('net.offlineLong')} role="status">
+        <span className={`topbar-side net ${online ? 'on' : 'off'}`} title={online ? t('net.online') : t('net.offlineLong')} role="status">
           <Icon name={online ? 'signal' : 'nosignal'} size={18} />
           <span className={online ? 'sr-only' : 'net-text'}>{online ? t('net.online') : t('net.offlineLong')}</span>
         </span>
@@ -257,6 +234,30 @@ export default function App() {
             <a className="button ghost wide" href="#/play" onClick={closeMore}>
               {t('more.play')}
             </a>
+          </div>
+          <div className="more-row">
+            <span className="muted">{t('more.day')}</span>
+            <div className="day-stepper" role="group" aria-label={t('home.demo')}>
+              <button type="button" className="icon-btn" onClick={() => setDay(Math.max(first, day - 1))} disabled={day <= first} aria-label={t('home.prev')}>
+                <Icon name="prev" size={20} />
+              </button>
+              <span className="day-num" title={inStory ? t('day.story', STORY_DAYS) : t('day.history', STORY_DAYS)}>{t('home.day', { n: day })}</span>
+              <button type="button" className="icon-btn" onClick={() => setDay(Math.min(last, day + 1))} disabled={day >= last} aria-label={t('home.next')}>
+                <Icon name="next" size={20} />
+              </button>
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={() => {
+                  if (!playing && !(day >= STORY_DAYS.first && day < STORY_DAYS.last)) setDay(STORY_DAYS.first)
+                  setPlaying(!playing)
+                }}
+                aria-label={playing ? t('home.pause') : t('home.play')}
+                aria-pressed={playing}
+              >
+                <Icon name={playing ? 'pause' : 'play'} size={18} />
+              </button>
+            </div>
           </div>
           <div className="more-row">
             <ScenarioSelector scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} />
