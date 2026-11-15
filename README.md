@@ -60,6 +60,7 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `public/sw.js` | Offline service worker | Engineering |
 | `src/index.css` | Design tokens (dark and light themes), layout and components. See "Design" below | Engineering |
 | `src/components/Logo.tsx`, `public/favicon.svg`, `public/icons/` | Logo (the ring is the O of ORBIT) and app icons | Engineering |
+| `src/orbit/regions.ts`, `src/components/anatomy.ts`, `AnatomyFigure.tsx` | Body map: 17 regions front and back on top of the six systems, four layers, symptoms with the region where they are felt | Engineering (context texts: P1) |
 | `src/lib/orbit.ts` | Maps each ORBIT state to the step of the Observe, Read, Boost, Iterate, Transmit loop shown on Today | Engineering |
 
 ## Rules and the ORBIT engine
@@ -164,6 +165,11 @@ name, and says in the footer that it is not affiliated with or endorsed by NASA.
   O-R-B-I-T loop with today's letter: GREEN → **O**bserve; YELLOW and EARLY_SIGNAL → **B**oost (then
   **I**terate in 24 h); RED_PHYSICAL and RED_PSYCH → **T**ransmit. Verbs stay in English in both languages.
 - The demo replay is framed and labelled as a demo, with a play button for the story days.
+- Body map: 17 regions (muscle groups, joints and organs), front and back, with four layers. A region only shows
+  the state of its systems; bone-loss zones, fluid shift, balance and kidneys are context, never a state, and their
+  texts are marked "source pending" until P1 adds the sources. Symptoms use the same 15 buttons of the rules file
+  and remember the region where they were felt (`orbit.symptomPlaces` on the device); the engine is unchanged.
+  Load per muscle group needs exercise logged by type, which the data does not have yet.
 
 ## Deploy
 
