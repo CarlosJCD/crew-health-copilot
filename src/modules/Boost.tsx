@@ -5,7 +5,6 @@ import {
   CARDS,
   DISPLAY,
   downrankedCards,
-  protectiveCount,
   type BoostCard,
   type BoostDay,
   type BoostLog,
@@ -19,6 +18,8 @@ interface Props {
   day: number
   log: BoostLog
   onLogChange: (log: BoostLog) => void
+  /** All care actions so far (the protective-factors tank on Today). */
+  careActions: number
 }
 
 const EMPTY: BoostDay = { chosen: [], helped: {} }
@@ -31,7 +32,7 @@ function CardBody({ card }: { card: BoostCard }) {
       <h3 lang="en">{card.title_en}</h3>
       <p className="muted">
         {card.minutes > 0 ? t('boost.minutes', { n: card.minutes }) : t('boost.instant')}
-        {card.priority && ` · ${card.priority}`}
+        {card.priority && !DISPLAY.hide_priority_label_in_ui && ` · ${card.priority}`}
       </p>
       <p lang="en">{card.what_en}</p>
       <button type="button" className="link" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
@@ -67,7 +68,7 @@ function CardBody({ card }: { card: BoostCard }) {
 }
 
 /** Boost: protective actions for the day. She chooses up to 2; nothing is chosen for her. */
-export function Boost({ demo, day, log, onLogChange }: Props) {
+export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
   const { t } = useI18n()
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
@@ -97,7 +98,7 @@ export function Boost({ demo, day, log, onLogChange }: Props) {
         <h2>{t('boost.title', { day })}</h2>
         <p>{plan.red ? t('boost.red') : t('boost.intro', { n: DISPLAY.max_choices })}</p>
         <p className="muted">
-          <span lang="en">{BOOST_DISCLAIMER}</span> · {t('boost.tank', { n: protectiveCount(log) })}
+          <span lang="en">{BOOST_DISCLAIMER}</span> · {t('boost.tank', { n: careActions })}
         </p>
       </section>
 

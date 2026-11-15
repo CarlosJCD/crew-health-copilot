@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { getIndicator } from '../orbit/config'
-import { CHECKIN_ITEMS, type Checkin, type CheckinItem, type Checkins, type TalkTo } from '../orbit/checkin'
+import { CHECKIN_ITEMS, TALK_OPTIONS, type Checkin, type CheckinItem, type Checkins, type TalkTo } from '../orbit/checkin'
 import type { LoadedDemo } from '../orbit/demoData'
 import type { PulseSession } from '../orbit/pulse'
 import { PulseTask } from '../components/PulseTask'
@@ -109,12 +109,11 @@ export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onP
           </>
         ) : (
           <div className="actions">
-            <button type="button" className="button secondary" onClick={() => talk('crew_medical_officer')}>
-              {t('mind.talk.crew_medical_officer')}
-            </button>
-            <button type="button" className="button secondary" onClick={() => talk('psych_conference')}>
-              {t('mind.talk.psych_conference')}
-            </button>
+            {TALK_OPTIONS.map((o) => (
+              <button key={o} type="button" className="button secondary" onClick={() => talk(o)}>
+                {t(`mind.talk.${o}`)}
+              </button>
+            ))}
           </div>
         )}
       </section>

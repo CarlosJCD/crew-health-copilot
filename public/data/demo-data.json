@@ -357,9 +357,7 @@
     "phq2": 1,
     "gad2": 1
    },
-   "events": [
-    "Routine day"
-   ],
+   "events": [],
    "talk_request": false
   },
   {
@@ -380,8 +378,7 @@
    "symptoms": [],
    "screen": null,
    "events": [
-    "Shift schedule changed (sleep window moved 3 h)",
-    "No messages from family today (comms window missed)"
+    "Tomorrow her shift moves 3 hours earlier"
    ],
    "talk_request": false
   },
@@ -403,7 +400,7 @@
    "symptoms": [],
    "screen": null,
    "events": [
-    "Second day on the new shift"
+    "Shift change"
    ],
    "talk_request": false
   },
@@ -424,10 +421,7 @@
    "glucose": null,
    "symptoms": [],
    "screen": null,
-   "events": [
-    "Third day on the new shift",
-    "Still no family contact"
-   ],
+   "events": [],
    "talk_request": false
   },
   {
@@ -448,7 +442,7 @@
    "symptoms": [],
    "screen": null,
    "events": [
-    "Early signal: Orbit offers a conversation (crew chooses)"
+    "Early signal. She says she missed her sister's birthday call; she picks a protected sleep window and a video message with a puzzle for her sister"
    ],
    "talk_request": false
   },
@@ -470,8 +464,7 @@
    "symptoms": [],
    "screen": null,
    "events": [
-    "Back on the usual shift",
-    "Family contact restored"
+    "Her sister's reply arrives"
    ],
    "talk_request": false
   },
@@ -493,7 +486,7 @@
    "symptoms": [],
    "screen": null,
    "events": [
-    "Recovering"
+    "ORBIT asks: did it help?"
    ],
    "talk_request": false
   },
@@ -518,13 +511,14 @@
     "gad2": 2
    },
    "events": [
-    "Back to baseline"
+    "Weekly check: PHQ-2 = 1, GAD-2 = 2",
+    "Weekly summary: one early signal, resolved onboard"
    ],
    "talk_request": false
   }
  ],
  "generator": {
-  "tool": "Orbit human simulator (simulador humano)",
+  "tool": "ORBIT human simulator",
   "seed": 4,
   "story_days": "121-128 exact values from the engineering handoff, section 4",
   "background": "physiological model, AR(1) noise"

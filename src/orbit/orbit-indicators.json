@@ -1,7 +1,7 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "date": "2026-11-14",
-  "disclaimer_en": "Orbit supports decisions; it does not diagnose. Values marked team_criterion are design choices pending validation.",
+  "disclaimer_en": "ORBIT supports decisions; it does not diagnose. Values marked team_criterion are design choices pending validation.",
   "baseline": {
     "days": 14,
     "note": "Pre-flight baseline, recalculated once stable in flight (team criterion). For the demo, read persona.baseline."
@@ -46,7 +46,7 @@
       "to": "none"
     },
     "yellow": {
-      "en": "Self-care suggestion. Orbit checks again in 24 h.",
+      "en": "Self-care suggestion. ORBIT checks again in 24 h.",
       "to": "self"
     },
     "early_signal": {
@@ -97,7 +97,7 @@
           "url": "https://doi.org/10.1016/S1474-4422(14)70122-X"
         }
       ],
-      "why_en": "Sleep is the lever that touches mood, reaction time and immunity. Orbit compares each night with your own usual range, not with Earth averages."
+      "why_en": "Sleep is the lever that touches mood, reaction time and immunity. ORBIT compares each night with your own usual range, not with Earth averages."
     },
     {
       "id": "checkin",
@@ -133,7 +133,7 @@
           "url": "https://doi.org/10.3389/fpsyg.2018.02235"
         }
       ],
-      "why_en": "A dip can be a normal reaction to a hard week. Orbit only flags it when it lasts and shows up together with other signals."
+      "why_en": "A dip can be a normal reaction to a hard week. One low day only turns this card yellow; ORBIT raises an early signal only when it lasts and shows up together with other signals."
     },
     {
       "id": "crew_climate",
@@ -169,7 +169,7 @@
       "team_criterion": [
         "offer_conference_if_weeks_gte"
       ],
-      "rule_en": "Yellow: 3 or more on either scale (positive screen, not a diagnosis). No red: after two weeks, Orbit offers an earlier private conference.",
+      "rule_en": "Yellow: 3 or more on either scale (positive screen, not a diagnosis). No red: after two weeks, ORBIT offers an earlier private conference.",
       "action_en": "Offer a private conversation; share with the medical officer only if she agrees.",
       "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
       "hrp_url": "https://www.nasa.gov/hrp/risks/",
@@ -253,10 +253,13 @@
         "green_dia_lt": 80,
         "red_sys_gte": 140,
         "red_dia_gte": 90,
-        "red_needs_confirmation": true
+        "red_needs_confirmation": true,
+        "convergence_requires_consecutive_readings": 2
       },
-      "team_criterion": [],
-      "rule_en": "Green: under 120/80. Yellow: 120-129 systolic, or 130-139 / 80-89. Red: 140 or more, or 90 or more, confirmed on a second reading.",
+      "team_criterion": [
+        "convergence_requires_consecutive_readings"
+      ],
+      "rule_en": "Green: under 120/80. Yellow: 120-129 systolic, or 130-139 / 80-89. Red: 140 or more, or 90 or more, confirmed on a second reading. A single yellow reading asks you to repeat it and counts toward the early cross-domain signal only if the next reading is also yellow.",
       "action_en": "Repeat and review sleep, exercise and salt. Red: crew medical officer.",
       "hrp_risk": "Risk of Cardiovascular Adaptations",
       "hrp_url": "https://www.nasa.gov/hrp/risks/",
@@ -266,7 +269,8 @@
           "url": "https://doi.org/10.1016/j.jacc.2025.05.007"
         }
       ],
-      "why_en": "One high reading is repeated before it counts. Orbit shows your trend so you and your medical officer see the pattern."
+      "why_en": "One high reading is repeated before it counts. ORBIT shows your trend so you and your medical officer see the pattern.",
+      "evidence_en": "Guidelines classify blood pressure by the average of 2 or more careful readings on 2 or more occasions, not by a single reading."
     },
     {
       "id": "hr",
@@ -293,14 +297,14 @@
           "url": "https://www.mayoclinic.org/healthy-lifestyle/fitness/expert-answers/heart-rate/faq-20057979"
         }
       ],
-      "why_en": "Your resting heart rate rises with poor sleep, stress or illness. Orbit compares it with your own normal, which may be lower than average."
+      "why_en": "Your resting heart rate rises with poor sleep, stress or illness. ORBIT compares it with your own normal, which may be lower than average."
     },
     {
       "id": "temp",
       "label_en": "Body temperature",
       "domain": "body",
       "unit": "°C",
-      "input": "same method every day, on waking",
+      "input": "forehead core-temperature sensor (skin temperature plus heat flux), same time every day, on waking",
       "frequency": "daily",
       "params": {
         "yellow_above_inflight_baseline_gt": 0.5,
@@ -326,7 +330,8 @@
           "url": "https://doi.org/10.1038/s41598-017-15560-w"
         }
       ],
-      "why_en": "On long missions your body runs about 1 °C warmer than on Earth. Orbit uses your in-flight normal so it does not raise false fevers."
+      "why_en": "In long missions, astronauts' core temperature at rest rose about 1 °C over 2.5 months. ORBIT compares each reading with your own in-flight normal, measured the same way, so it does not raise false fevers.",
+      "note_en": "The +1 °C finding is core body temperature measured with a forehead dual sensor (Stahn et al., 2017). The in-flight baseline applies only to the same method; with an oral thermometer, the personal baseline still works but the +1 °C explanation does not apply directly."
     },
     {
       "id": "glucose",
@@ -363,7 +368,7 @@
           "url": "https://doi.org/10.1152/ajpheart.00802.2015"
         }
       ],
-      "why_en": "Fasting glucose shows how your body handles energy. Insulin resistance has risen in flight studies, so Orbit tracks your trend."
+      "why_en": "Fasting glucose shows how your body handles energy. Insulin resistance has risen in flight studies, so ORBIT tracks your trend."
     },
     {
       "id": "exercise",
@@ -394,7 +399,7 @@
           "url": "https://doi.org/10.1002/jbmr.1647"
         }
       ],
-      "why_en": "Exercise protects bone, heart and mood. Orbit counts what you did against your plan and never shames a missed day."
+      "why_en": "Exercise protects bone, heart and mood. ORBIT counts what you did against your plan and never shames a missed day."
     },
     {
       "id": "contact",
@@ -422,7 +427,7 @@
           "url": "https://doi.org/10.3389/fphys.2021.751170"
         }
       ],
-      "why_en": "Talking less with Earth is common on long missions. Orbit notices the trend so you can choose when to reconnect."
+      "why_en": "Talking less with Earth is common on long missions. ORBIT notices the trend so you can choose when to reconnect."
     },
     {
       "id": "symptoms",
@@ -439,11 +444,90 @@
           "fainting",
           "vision change",
           "severe headache"
-        ]
+        ],
+        "vocabulary": [
+          {
+            "text": "severe headache",
+            "system": "brain_mood",
+            "red_flag": true
+          },
+          {
+            "text": "headache",
+            "system": "brain_mood",
+            "red_flag": false
+          },
+          {
+            "text": "dizziness",
+            "system": "brain_mood",
+            "red_flag": false
+          },
+          {
+            "text": "vision change",
+            "system": "eyes",
+            "red_flag": true
+          },
+          {
+            "text": "eye irritation",
+            "system": "eyes",
+            "red_flag": false
+          },
+          {
+            "text": "chest pain",
+            "system": "heart_vessels",
+            "red_flag": true
+          },
+          {
+            "text": "shortness of breath",
+            "system": "heart_vessels",
+            "red_flag": true
+          },
+          {
+            "text": "fainting",
+            "system": "heart_vessels",
+            "red_flag": true
+          },
+          {
+            "text": "palpitations",
+            "system": "heart_vessels",
+            "red_flag": false
+          },
+          {
+            "text": "back pain",
+            "system": "bone_muscle",
+            "red_flag": false
+          },
+          {
+            "text": "joint or muscle pain",
+            "system": "bone_muscle",
+            "red_flag": false
+          },
+          {
+            "text": "skin rash",
+            "system": "immune_skin",
+            "red_flag": false
+          },
+          {
+            "text": "sore throat or congestion",
+            "system": "immune_skin",
+            "red_flag": false
+          },
+          {
+            "text": "nausea",
+            "system": "gut",
+            "red_flag": false
+          },
+          {
+            "text": "stomach pain",
+            "system": "gut",
+            "red_flag": false
+          }
+        ],
+        "vocabulary_note": "Fixed buttons on the body map. Red flags match red_flags exactly; 'dizziness' and 'fainting' feed the low heart rate red rule. List pending physician review (team criterion)."
       },
       "team_criterion": [
         "yellow_duration_days_gt",
-        "red_flags"
+        "red_flags",
+        "vocabulary"
       ],
       "rule_en": "Yellow: a symptom lasting more than 2 days. Red: any red-flag symptom (list pending review by a physician).",
       "action_en": "Log it. Red: crew medical officer immediately.",
@@ -495,7 +579,7 @@
           "url": "https://ccmc.gsfc.nasa.gov/tools/DONKI/"
         }
       ],
-      "why_en": "This is your mission's estimated dose and solar activity, from NASA data. Shelter decisions belong to crew procedures, not to Orbit."
+      "why_en": "This is your mission's estimated dose and solar activity, from NASA data. Shelter decisions belong to crew procedures, not to ORBIT."
     },
     {
       "id": "protective",
@@ -513,7 +597,7 @@
       "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
       "hrp_url": "https://www.nasa.gov/hrp/risks/",
       "sources": [],
-      "why_en": "These are the things that keep you well. Orbit counts them so you can see what works for you."
+      "why_en": "These are the things that keep you well. ORBIT counts them so you can see what works for you."
     }
   ],
   "changes_0_2": [
@@ -521,5 +605,19 @@
     "Symptoms: 'shortness of breath' added to red_flags",
     "Convergence: ISS evidence added (evidence_en, sources)",
     "Boost content lives in boost-cards.json (P0) and orbit-boost-library.json (triggers and safety flow)"
-  ]
+  ],
+  "changes_0_3": [
+    "App name: 'ORBIT' in every text (team decision, 18:49)",
+    "Final 'Why?' texts (checkin and temp reworded; the rest kept)",
+    "bp: counts toward the early cross-domain signal only when repeated on the next reading (question 18)",
+    "consecutive_rule: consecutive = consecutive records, with at most 1 day without data between them (question 19)",
+    "symptoms: fixed vocabulary for the body map buttons, by system (question 20)",
+    "temp: demo method is a forehead core-temperature sensor, as in the flight study (data team question)"
+  ],
+  "consecutive_rule": {
+    "counts": "records",
+    "max_gap_days_without_data": 1,
+    "team_criterion": true,
+    "text_en": "In a row means consecutive readings; one missing day does not break the run, two or more missing days start it again."
+  }
 }

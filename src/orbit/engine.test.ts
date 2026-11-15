@@ -37,6 +37,32 @@ const withDays = (...changes: Partial<DayRecord>[]): DemoData => ({
 })
 const lastDay = (data: DemoData) => evaluateDay(data, data.days.at(-1)!.day)
 
+describe('v0.3 rules (questions 18 and 19)', () => {
+  const day = (d: number, change: Partial<DayRecord> = {}): DayRecord => ({ ...base, events: [], ...change, day: d })
+
+  it('says how many days in a row she has been without contact (4 on day 125)', () => {
+    expect(evaluateDay(BUILT_IN_DEMO, 125).indicators.contact.reason).toBe('4 days in a row without contact.')
+  })
+
+  it('one missing day does not break a run; two missing days start it again', () => {
+    const short = { sleep_h: 4.8 }
+    const oneGap = { ...BUILT_IN_DEMO, days: [day(200, short), day(201, short), day(203, short)] }
+    const twoGap = { ...BUILT_IN_DEMO, days: [day(200, short), day(201, short), day(204, short)] }
+    expect(evaluateDay(oneGap, 203).indicators.sleep.color).toBe('red')
+    expect(evaluateDay(twoGap, 204).indicators.sleep.color).toBe('yellow')
+  })
+
+  it('a single yellow blood pressure reading does not count toward the early signal; two in a row do', () => {
+    // Mind yellow (stress 7) on both days; Body yellow only from blood pressure.
+    const mind = { stress: 7 }
+    const single = { ...BUILT_IN_DEMO, days: [day(200, { ...mind, sbp: 125 }), day(201, { ...mind, sbp: 112 }), day(202, { ...mind, sbp: 125 })] }
+    const repeated = { ...BUILT_IN_DEMO, days: [day(200, { ...mind, sbp: 125 }), day(201, { ...mind, sbp: 126 }), day(202, { ...mind, sbp: 125 })] }
+    expect(evaluateDay(single, 202).indicators.bp.color).toBe('yellow')
+    expect(evaluateDay(single, 202).state).toBe('YELLOW')
+    expect(evaluateDay(repeated, 202).state).toBe('EARLY_SIGNAL')
+  })
+})
+
 describe('rules outside the demo story', () => {
   it('sleep is red after 3 nights of 5 h or less', () => {
     expect(lastDay(withDays({ sleep_h: 5 }, { sleep_h: 4.8 }, { sleep_h: 5 })).indicators.sleep.color).toBe('red')

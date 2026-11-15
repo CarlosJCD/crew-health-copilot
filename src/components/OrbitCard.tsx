@@ -105,6 +105,15 @@ export function OrbitCard({ id, result, data, day, openWhy = false }: Props) {
         <p className="delta">{t('card.usual', { value: `${view.usual?.(data) ?? base[0]} ${unit(view.unit)}` })}</p>
       )}
       <p className="reason">{result.reason}</p>
+      {id === 'exercise' && today && typeof today.exercise_min === 'number' && (
+        <div
+          className="progress"
+          role="img"
+          aria-label={t('care.exercise', { pct: Math.round((100 * today.exercise_min) / data.persona.baseline.exercise_prescription_min) })}
+        >
+          <span style={{ width: `${Math.min(100, (100 * today.exercise_min) / data.persona.baseline.exercise_prescription_min)}%` }} />
+        </div>
+      )}
 
       {points.length > 1 && (
         <Sparkline

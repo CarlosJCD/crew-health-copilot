@@ -25,10 +25,12 @@ npm test         # Vitest: ORBIT engine acceptance tests, rules file, data check
 node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (no key needed)
 node scripts/fetch-sep-replay.mjs     # refresh the May 2024 SEP replay file (committed)
 node scripts/screenshots.mjs [url]    # deck screenshots with headless Chrome into screenshots/
+node scripts/build-engine-bundle.mjs  # engine as one ES module for the data team simulator (dist-engine/)
 ```
 
 Deep links open a module on a given day, and optionally a card's "Why?":
-`#/today?day=125`, `#/today?day=121&why=temp`, `#/transmit?day=125`, `#/mind?day=125`.
+`#/today?day=125`, `#/today?day=121&why=temp`, `#/transmit?day=125`, `#/mind?day=125`, `#/body?day=124`,
+`#/play?board=1&solved=1`.
 
 ## Structure
 
@@ -39,6 +41,9 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `src/orbit/boost.ts`, `src/modules/Boost.tsx` | Boost: safety question, "check first", up to 4 cards, she chooses up to 2, "Did it help?", 24 h follow-up, protective-factor count | Engineering |
 | `src/orbit/pulse-spec.json`, `src/orbit/pulse.ts`, `src/components/PulseTask.tsx` | Pulse mode: 3-minute PVT-B-style task (1 to 4 s waits, false start under 100 ms, lapse at 355 ms, median of valid responses, at least 20). A session replaces that day's value for the engine; a 30 s trial run saves nothing. Not a validated PVT-B | Psychology 1 (spec), Engineering |
 | `public/data/demo-data.json` | Data team's demo data (days 107 to 128), loaded by the app; `src/orbit/demoFile.test.ts` checks it against the acceptance table | Data science |
+| `src/orbit/constellations.json`, `src/orbit/constellations.ts`, `src/modules/Play.tsx` | Constellations free mode: 2 boards of 16 tiles with NASA planetary data, hint, fact and source per group. No timer, no score | Psychology 1 (content), Engineering |
+| `src/orbit/body.ts`, `src/modules/BodyMap.tsx` | Body map: 6 systems with state, what ORBIT watches, HRP risk and the fixed symptom vocabulary | Engineering |
+| `src/orbit/care.ts`, `src/components/CareTank.tsx` | Gamification without punishment: the "protective factors used" tank (check-ins, Boost actions and ratings, pulse sessions, Constellations boards). Only fills up; no performance points, no comparison, nothing resets | Engineering |
 | `src/orbit/scenarios.json` | Four scenarios: one-way delay, estimated dose, first responder, ground contact (handoff 2.2) | Psychology + Data science |
 | `src/orbit/config.ts` | Typed reader for both files; lists every param the engine needs | Engineering |
 | `src/orbit/engine.ts` | ORBIT engine: one rule per indicator, Body / Mind / Crew roll-up, state (GREEN, YELLOW, EARLY_SIGNAL, RED_PHYSICAL, RED_PSYCH) | Data science + Engineering |
@@ -79,8 +84,11 @@ Rule interpretations approved by Psychology (answer of Nov 14, 17:30):
 - Blood pressure "confirmed on a second reading": the previous day's reading in the demo; roadmap: `sbp_2`/`dbp_2`.
 - Red temperature "with symptoms": any symptom. Yellow symptom: same text 3 days in a row.
 
-Open points for P1:
-- The app is named ORBIT; texts in `orbit-indicators.json` v0.2 and the Boost library still say "Orbit". Update them in the next version.
+Rules added in `orbit-indicators.json` v0.3 (Psychology, Nov 14 20:45):
+- `bp.params.convergence_requires_consecutive_readings`: a single yellow blood pressure reading keeps its card yellow
+  but counts toward the early cross-domain signal only when the next reading is also yellow.
+- `consecutive_rule`: "in a row" means consecutive records with at most 1 day without data between them.
+- `symptoms.params.vocabulary`: the 15 fixed body-map buttons by system (5 alarm signs).
 - `screen.offer_conference_if_weeks_gte` is implemented (offer only, never red). `pulse.practice_sessions` is used by
   `pulseBaseline()` for live sessions; the demo gives the baseline directly.
 

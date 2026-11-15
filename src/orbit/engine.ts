@@ -48,6 +48,17 @@ function history(data: DemoData, day: number): DayRecord[] {
 }
 
 const lastN = (h: DayRecord[], n: number) => h.slice(Math.max(0, h.length - n))
+
+/**
+ * The records that can count as "in a row" up to the last one: consecutive records with at most
+ * `consecutive_rule.max_gap_days_without_data` days without data between them (v0.3, question 19).
+ */
+export function inARow(h: DayRecord[]): DayRecord[] {
+  const maxGap = RULES.consecutive_rule?.max_gap_days_without_data ?? Infinity
+  let start = h.length - 1
+  while (start > 0 && h[start].day - h[start - 1].day - 1 <= maxGap) start--
+  return h.slice(Math.max(0, start))
+}
 const values = (h: DayRecord[], f: NumericField) => h.map((d) => d[f]).filter((v): v is number => typeof v === 'number')
 
 type Rule = (h: DayRecord[], data: DemoData) => IndicatorResult
@@ -58,7 +69,7 @@ const RULE_FNS: Record<string, Rule> = {
     if (typeof v !== 'number') return NO_DATA
     const base = data.persona.baseline.sleep_h[0]
     const nights = num('sleep', 'red_consecutive_nights')
-    const recent = lastN(h, nights).map((d) => d.sleep_h)
+    const recent = lastN(inARow(h), nights).map((d) => d.sleep_h)
     if (recent.length === nights && recent.every((x) => typeof x === 'number' && x <= num('sleep', 'red_lte_h'))) {
       return res('red', `${num('sleep', 'red_lte_h')} h or less for ${nights} nights in a row.`)
     }
@@ -142,7 +153,7 @@ const RULE_FNS: Record<string, Rule> = {
       (d.sbp >= num('bp', 'red_sys_gte') || d.dbp >= num('bp', 'red_dia_gte'))
     const reading = `${sys}/${dia} mmHg`
     if (high(today)) {
-      const confirmed = !flag('bp', 'red_needs_confirmation') || high(h.at(-2))
+      const confirmed = !flag('bp', 'red_needs_confirmation') || high(inARow(h).at(-2))
       return confirmed
         ? res('red', `${reading}, confirmed on a second reading.`)
         : res('yellow', `${reading}: repeat the reading to confirm.`)
@@ -157,7 +168,7 @@ const RULE_FNS: Record<string, Rule> = {
     if (!today || typeof v !== 'number') return NO_DATA
     const base = data.persona.baseline.hr[0]
     const redGt = num('hr', 'red_gt')
-    const prev = h.at(-2)?.hr
+    const prev = inARow(h).at(-2)?.hr
     if (v > redGt && typeof prev === 'number' && prev > redGt) return res('red', `Over ${redGt} bpm at rest on repeated days.`)
     const dizzy = today.symptoms.some((s) => /dizz|faint/i.test(s))
     if (v < num('hr', 'red_low_lt_with_symptoms') && dizzy) return res('red', `Under ${num('hr', 'red_low_lt_with_symptoms')} bpm with dizziness or fainting.`)
@@ -218,11 +229,12 @@ const RULE_FNS: Record<string, Rule> = {
     const v = h.at(-1)?.contact
     if (typeof v !== 'number') return NO_DATA
     const days = num('contact', 'yellow_days_without_contact')
-    const recent = lastN(h, days).map((d) => d.contact)
-    if (recent.length === days && recent.every((x) => x === 0)) return res('yellow', `${days} days in a row without contact.`)
-    // "Drop of 50 % or more versus the previous 14 days", read as the last 14 days against the
-    // 14 before them (a slow trend). Shorter windows contradict the acceptance table (handoff
-    // section 5): pending confirmation by P1.
+    const run = inARow(h)
+    let zeros = 0
+    for (let i = run.length - 1; i >= 0 && run[i].contact === 0; i--) zeros++
+    if (zeros >= days) return res('yellow', `${zeros} days in a row without contact.`)
+    // "Drop of 50 % or more versus the previous 14 days": the last 14 days against the 14 before
+    // them, a slow trend (approved by Psychology, answer 1).
     const counts = h.map((d) => d.contact)
     const recent14 = counts.slice(-14).filter((x): x is number => typeof x === 'number')
     const prev14 = counts.slice(-28, -14).filter((x): x is number => typeof x === 'number')
@@ -246,7 +258,8 @@ const RULE_FNS: Record<string, Rule> = {
     const limit = num('symptoms', 'yellow_duration_days_gt')
     const lasting = today.symptoms.find((s) => {
       let n = 0
-      for (let i = h.length - 1; i >= 0 && h[i].symptoms.includes(s); i--) n++
+      const run = inARow(h)
+      for (let i = run.length - 1; i >= 0 && run[i].symptoms.includes(s); i--) n++
       return n > limit
     })
     return lasting
@@ -283,7 +296,22 @@ function colorsFor(data: DemoData, day: number) {
   const domains = Object.fromEntries(
     DOMAIN_IDS.map((d) => [d, worstColor(RULES.domains[d].map((id) => indicators[id]?.color ?? 'none'))]),
   ) as Record<DomainId, Color>
-  const flaggedDomains = DOMAIN_IDS.filter((d) => domains[d] === 'yellow' || domains[d] === 'red')
+  // For the early cross-domain signal a single yellow blood pressure reading does not count: it needs
+  // `convergence_requires_consecutive_readings` yellow-or-worse readings in a row (v0.3, question 18).
+  const counts = (id: string) => {
+    const c = indicators[id]?.color
+    if (c !== 'yellow' && c !== 'red') return false
+    if (id !== 'bp' || c === 'red') return true
+    const need = num('bp', 'convergence_requires_consecutive_readings')
+    const run = inARow(h)
+    if (run.length < need) return false
+    return run.slice(-need).every((_, k, arr) => {
+      const upTo = run.slice(0, run.length - (arr.length - 1 - k))
+      const col = RULE_FNS.bp(upTo, data).color
+      return col === 'yellow' || col === 'red'
+    })
+  }
+  const flaggedDomains = DOMAIN_IDS.filter((d) => RULES.domains[d].some(counts))
   return { h, indicators, domains, flaggedDomains }
 }
 

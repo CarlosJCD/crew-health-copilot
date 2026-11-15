@@ -1,7 +1,7 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "date": "2026-11-14",
-  "disclaimer_en": "Orbit offers self-care options and routes concerns to people. It does not diagnose or give medication advice.",
+  "disclaimer_en": "ORBIT offers self-care options and routes concerns to people. It does not diagnose or give medication advice.",
   "display_rules": {
     "order": [
       "safety_question",
@@ -29,7 +29,8 @@
       "max_cards_shown",
       "ask_after_minutes",
       "use"
-    ]
+    ],
+    "hide_priority_label_in_ui": true
   },
   "design_basis": [
     {
@@ -60,7 +61,7 @@
       "status": "mvp",
       "minutes": 0,
       "title_en": "Contact your crew medical officer now",
-      "what_en": "Orbit has already notified your crew medical officer. Stay where you are, tell a crewmate, and do not exercise until you are checked.",
+      "what_en": "ORBIT has already notified your crew medical officer. Stay where you are, tell a crewmate, and do not exercise until you are checked.",
       "why_en": "Some signs need a person, not an app.",
       "es": "Escalamiento inmediato. Sin tarjetas de autocuidado antes de esta.",
       "evidencia_es": "Señales de alarma de Mayo Clinic: dolor en el pecho, falta de aire, debilidad y desmayo requieren ayuda médica inmediata. Lista final pendiente de un médico.",
@@ -129,7 +130,7 @@
       "status": "mvp",
       "minutes": 1,
       "title_en": "What might explain it?",
-      "what_en": "Tap what applies: exercised recently, caffeine, short sleep, feeling warm or unwell, stressed, thirsty. Orbit keeps this note with the reading.",
+      "what_en": "Tap what applies: exercised recently, caffeine, short sleep, feeling warm or unwell, stressed, thirsty. ORBIT keeps this note with the reading.",
       "why_en": "Most changes have an everyday explanation. Knowing it helps you and, if needed, your medical officer.",
       "es": "Preguntas rápidas de contexto que quedan junto a la medición (sueño, cafeína, fiebre, estrés, ejercicio, hidratación).",
       "evidencia_es": "Mayo Clinic: la taquicardia sinusal suele deberse a ejercicio o estrés; entre las causas de hábitos está la cafeína. La hidratación se incluye como inferencia del equipo.",
@@ -202,7 +203,7 @@
       "status": "mvp",
       "minutes": 0,
       "title_en": "Caffeine cut-off",
-      "what_en": "No caffeine in the 6 hours before your sleep window. Orbit shows the cut-off time for today.",
+      "what_en": "No caffeine in the 6 hours before your sleep window. ORBIT shows the cut-off time for today.",
       "why_en": "In a study, a strong dose of caffeine 6 hours before bed still cut more than an hour of sleep, and people did not notice.",
       "es": "Hora límite de cafeína: 6 h antes de dormir.",
       "evidencia_es": "400 mg de cafeína 6 h antes de dormir redujeron el sueño total más de 1 h; los participantes no lo percibieron (Drake et al., 2013). Muestra de 12 personas y dosis alta.",
@@ -339,7 +340,7 @@
       "status": "mvp",
       "minutes": 2,
       "title_en": "Plan one thing that matters to you",
-      "what_en": "Choose one small activity you value or enjoy for today, pick a time, and Orbit will ask later how it went.",
+      "what_en": "Choose one small activity you value or enjoy for today, pick a time, and ORBIT will ask later how it went.",
       "why_en": "Scheduling meaningful activities is behavioral activation, an effective approach for low mood.",
       "es": "Activación conductual: programar una actividad valiosa o placentera.",
       "evidencia_es": "Metaanálisis de 26 ensayos: la activación conductual superó a los controles (DME de -0.74); la calidad de la mayoría de los estudios fue baja (Ekers et al., 2014). Es tratamiento para depresión; aquí se usa como prevención (extrapolación).",
@@ -495,7 +496,7 @@
       "status": "mvp",
       "minutes": 0,
       "title_en": "Talk to someone today",
-      "what_en": "Choose who: your crew medical officer, an earlier private conference with your ground psychologist, a crewmate, or someone at home. Orbit only shares what you allow.",
+      "what_en": "Choose who: your crew medical officer, an earlier private conference with your ground psychologist, a crewmate, or someone at home. ORBIT only shares what you allow.",
       "why_en": "You decide who hears what. Talking early is easier than waiting.",
       "es": "Rojo psicológico: ella elige con quién hablar.",
       "evidencia_es": "NASA ofrece conferencias psicológicas privadas y apoyo a la tripulación (NASA, Space Psychology, 2023). La elección por la astronauta es decisión de diseño del equipo.",
@@ -584,9 +585,9 @@
       "minutes": 0,
       "title_en": "Solar particle event: follow the shelter procedure",
       "what_en": "A solar particle event is active (NASA DONKI). Follow your vehicle's shelter procedure and flight director's instructions.",
-      "why_en": "Shelter is an operational decision. Orbit only shows the event and logs it with your day.",
+      "why_en": "Shelter is an operational decision. ORBIT only shows the event and logs it with your day.",
       "es": "Recordatorio del procedimiento de refugio; la decisión es operativa.",
-      "evidencia_es": "Riesgo de radiación espacial del Human Research Program; eventos de DONKI. No es una intervención de salud de Orbit.",
+      "evidencia_es": "Riesgo de radiación espacial del Human Research Program; eventos de DONKI. No es una intervención de salud de ORBIT.",
       "tipo": "Procedimiento operativo",
       "conf": "No aplica",
       "sources": [
@@ -695,7 +696,7 @@
         "caffeine_cutoff",
         "sleep_window"
       ],
-      "escalation_es": "Ella misma; Orbit revisa en 24 h"
+      "escalation_es": "Ella misma; ORBIT revisa en 24 h"
     },
     {
       "trigger": "hr.red",
@@ -720,7 +721,7 @@
         "move",
         "sleep_window"
       ],
-      "escalation_es": "Ella misma; Orbit revisa en 24 h"
+      "escalation_es": "Ella misma; ORBIT revisa en 24 h"
     },
     {
       "trigger": "bp.red",
@@ -745,7 +746,7 @@
         "cool_down",
         "sleep_window"
       ],
-      "escalation_es": "Ella misma; Orbit revisa en horas"
+      "escalation_es": "Ella misma; ORBIT revisa en horas"
     },
     {
       "trigger": "temp.red",
@@ -969,7 +970,7 @@
         "micro_break",
         "one_valued_thing"
       ],
-      "escalation_es": "Ella elige hasta 2; Orbit ofrece compartir con el médico. Demo, día 125: se ven las 4 primeras y Lena elige las 2 primeras"
+      "escalation_es": "Ella elige hasta 2; ORBIT ofrece compartir con el médico. Demo, día 125: se ven las 4 primeras y Lena elige las 2 primeras"
     },
     {
       "trigger": "green",

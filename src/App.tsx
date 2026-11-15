@@ -5,6 +5,8 @@ import { applyCheckins, type Checkins } from './orbit/checkin'
 import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { applyPulse, type PulseSession } from './orbit/pulse'
+import { applySymptoms, type SymptomLog } from './orbit/body'
+import { careSummary } from './orbit/care'
 import { LanguageToggle } from './components/LanguageToggle'
 import { Logo } from './components/Logo'
 import { ScenarioSelector } from './components/ScenarioSelector'
@@ -13,8 +15,10 @@ import { useTheme } from './lib/theme'
 import { useStoredJson } from './hooks/useStoredJson'
 import { useI18n } from './i18n/context'
 import { Boost } from './modules/Boost'
+import { BodyMap } from './modules/BodyMap'
 import { Mind } from './modules/Mind'
 import { Placeholder } from './modules/Placeholder'
+import { Play } from './modules/Play'
 import { Today } from './modules/Today'
 import { Transmit } from './modules/Transmit'
 import { DEFAULT_MODULE, MODULES } from './modules/registry'
@@ -22,8 +26,8 @@ import { DEFAULT_MODULE, MODULES } from './modules/registry'
 export const APP_NAME = 'ORBIT'
 const APP_EXPANSION = 'Observe · Read · Boost · Iterate · Transmit'
 
-/** Route from the hash: `#/today?day=125&why=temp` (deep links for the deck and the demo). */
-function readRoute(): { id: string; day?: number; why?: string } {
+/** Route from the hash: `#/today?day=125&why=temp`, `#/play?board=2&solved=1` (deep links for the deck and the demo). */
+function readRoute(): { id: string; day?: number; why?: string; board?: number; solved?: boolean } {
   const [path, query = ''] = window.location.hash.replace(/^#\/?/, '').split('?')
   const params = new URLSearchParams(query)
   const day = Number(params.get('day'))
@@ -31,6 +35,8 @@ function readRoute(): { id: string; day?: number; why?: string } {
     id: MODULES.some((m) => m.id === path) ? path : DEFAULT_MODULE,
     day: params.has('day') && Number.isInteger(day) ? day : undefined,
     why: params.get('why') ?? undefined,
+    board: params.has('board') ? Number(params.get('board')) - 1 : undefined,
+    solved: params.get('solved') === '1',
   }
 }
 
@@ -47,6 +53,8 @@ export default function App() {
   const [demoClock, setDemoClock] = useStoredJson('orbit.demoClock', true)
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
   const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
+  const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
+  const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
   const [theme, setTheme] = useTheme()
 
   useEffect(() => {
@@ -71,10 +79,14 @@ export default function App() {
     }
   }, [])
 
-  // Her check-in answers and pulse sessions replace that day's values, so every module sees the same data.
+  // Her check-in answers, pulse sessions and logged symptoms replace that day's values, so every module sees the same data.
   const demo = useMemo(
-    () => ({ ...loaded, data: applyPulse(applyCheckins(loaded.data, checkins), pulseSessions) }),
-    [loaded, checkins, pulseSessions],
+    () => ({ ...loaded, data: applySymptoms(applyPulse(applyCheckins(loaded.data, checkins), pulseSessions), symptomLog) }),
+    [loaded, checkins, pulseSessions, symptomLog],
+  )
+  const care = useMemo(
+    () => careSummary({ checkins, boostLog, pulseSessions, boardsDone }),
+    [checkins, boostLog, pulseSessions, boardsDone],
   )
   const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS.find((s) => s.id === DEFAULT_SCENARIO_ID)!
   const active = MODULES.find((m) => m.id === route.id) ?? MODULES[0]
@@ -105,7 +117,7 @@ export default function App() {
 
       <main>
         {active.id === 'today' ? (
-          <Today demo={demo} day={day} onDayChange={setDay} scenario={scenario} openWhy={route.why} />
+          <Today demo={demo} day={day} onDayChange={setDay} scenario={scenario} openWhy={route.why} care={care} />
         ) : active.id === 'transmit' ? (
           <Transmit
             demo={demo}
@@ -118,8 +130,18 @@ export default function App() {
             demoClock={demoClock}
             onDemoClockChange={setDemoClock}
           />
+        ) : active.id === 'body' ? (
+          <BodyMap demo={demo} day={day} log={symptomLog} onLogChange={setSymptomLog} />
+        ) : active.id === 'play' ? (
+          <Play
+            key={`${route.board ?? 0}-${route.solved}`}
+            completed={boardsDone}
+            onComplete={() => setBoardsDone((n) => n + 1)}
+            initialBoard={route.board}
+            initialSolved={route.solved}
+          />
         ) : active.id === 'boost' ? (
-          <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} />
+          <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} careActions={care.actions} />
         ) : active.id === 'mind' ? (
           <Mind
             demo={demo}

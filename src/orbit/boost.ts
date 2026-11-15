@@ -58,6 +58,8 @@ export const DISPLAY = library.display_rules as {
   did_it_help: { options_en: string[]; ask_after_minutes: number }
   red_overrides_self_care: boolean
   roadmap_cards_hidden_in_mvp: boolean
+  /** P0/P1 are build priorities, not information for the astronaut. */
+  hide_priority_label_in_ui?: boolean
 }
 const SAFETY = library.safety_questions as unknown as Record<string, Omit<SafetyQuestion, 'id'>>
 export const BOOST_DISCLAIMER = library.disclaimer_en as string

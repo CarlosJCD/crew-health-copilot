@@ -338,6 +338,57 @@ button.link {
 .pulse-early { color: var(--muted); }
 .pulse-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem; }
 
+/* ---------- Body map ---------- */
+.bodymap { display: grid; grid-template-columns: minmax(240px, 340px) 1fr; gap: 1rem; align-items: start; }
+.bodymap-figure { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem; }
+.figure { width: 100%; max-width: 280px; display: block; margin: 0 auto; }
+.silhouette > * { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }
+.spot { cursor: pointer; outline: none; }
+.spot circle { fill: color-mix(in srgb, var(--status) 30%, transparent); stroke: var(--status); stroke-width: 2; }
+.spot text { fill: var(--status); font-family: var(--font-mono); font-size: 11px; font-weight: 500; pointer-events: none; }
+.spot.selected circle, .spot:focus-visible circle { stroke-width: 4; stroke: var(--text); }
+.system-list { list-style: none; padding: 0; margin: 0.6rem 0 0; display: grid; gap: 0.3rem; }
+.system-btn {
+  width: 100%; text-align: left; background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+  border-left: 4px solid var(--status); border-radius: 8px; padding: 0.4rem 0.6rem; cursor: pointer;
+  font-family: var(--font-display); font-weight: 600; font-size: 0.86rem;
+}
+.system-btn[aria-pressed='true'] { border-color: var(--accent); border-left-color: var(--status); }
+.bodymap-detail h3 { margin-top: 0.6rem; }
+.watch-list { padding-left: 1.1rem; margin: 0.3rem 0; font-size: 0.88rem; }
+.watch-list li { margin: 0.35rem 0; }
+.button.alarm { border-color: var(--act); }
+.other-symptom { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; margin: 0.5rem 0; font-size: 0.88rem; }
+.other-symptom input { flex: 1; min-width: 10rem; padding: 0.4rem 0.55rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; }
+.chip { margin: 0 0.25rem 0.25rem 0; padding: 0.15rem 0.55rem; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); cursor: pointer; font: inherit; font-size: 0.82rem; }
+@media (max-width: 720px) { .bodymap { grid-template-columns: 1fr; } }
+
+/* ---------- Constellations ---------- */
+.play section, .solved-group { margin-bottom: 0.9rem; }
+.play-head, .play-done { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem; }
+.play-head p { margin: 0.3rem 0; }
+.tile-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; margin: 0.5rem 0; }
+.tile {
+  min-height: 3.4rem; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text);
+  font-family: var(--font-display); font-weight: 600; cursor: pointer; padding: 0.4rem; overflow-wrap: anywhere;
+}
+.tile[aria-pressed='true'] { background: color-mix(in srgb, var(--accent-fill) 30%, var(--panel-2)); border-color: var(--accent); }
+.solved-group { background: color-mix(in srgb, var(--nominal) 8%, var(--panel)); border: 1px solid color-mix(in srgb, var(--nominal) 60%, var(--line)); border-radius: var(--radius); padding: 0.7rem 0.95rem; }
+.solved-group h3 { margin-bottom: 0.2rem; }
+.solved-group p { margin: 0.2rem 0; font-size: 0.88rem; }
+.tiles-line { font-family: var(--font-mono); font-weight: 500; }
+@media (max-width: 520px) { .tile { font-size: 0.85rem; min-height: 3rem; } }
+
+/* ---------- Protective-factors tank (only fills; no status color) ---------- */
+.care { display: flex; gap: 1rem; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin-bottom: 1.5rem; }
+.care p { margin: 0.2rem 0; }
+.care h2 { margin-bottom: 0.2rem; }
+.tank { width: 44px; flex: none; }
+.tank-shell { fill: var(--panel-2); stroke: var(--line); stroke-width: 2; }
+.tank-fill { fill: var(--text); opacity: 0.85; }
+.progress { height: 8px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--text); opacity: 0.85; }
+
 /* ---------- Other modules ---------- */
 .placeholder { background: var(--panel); border: 1px dashed var(--line); border-radius: var(--radius); padding: 1.2rem; }
 .placeholder h3 { margin-top: 1rem; }

@@ -6,7 +6,10 @@ export const CHECKIN_ITEMS = ['mood', 'stress', 'fatigue', 'crew_climate'] as co
 export type CheckinItem = (typeof CHECKIN_ITEMS)[number]
 
 /** Who she chose to talk to (checkin.action_en in orbit-indicators.json). */
-export type TalkTo = 'crew_medical_officer' | 'psych_conference'
+export type TalkTo = 'crew_medical_officer' | 'psych_conference' | 'crewmate' | 'someone_home'
+
+/** In the order of the talk_now card in the Boost library. */
+export const TALK_OPTIONS: TalkTo[] = ['crew_medical_officer', 'psych_conference', 'crewmate', 'someone_home']
 
 export type Checkin = Record<CheckinItem, number> & { talk_to?: TalkTo }
 
