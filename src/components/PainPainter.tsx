@@ -1,6 +1,7 @@
 import { useRef, useState, type PointerEvent } from 'react'
 import Body, { type ExtendedBodyPart } from 'react-muscle-highlighter'
 import { FIGURE, partKey } from '../orbit/display'
+import type { DotHeat } from '../orbit/heat'
 import { BRUSH, MARK_COLOR, MAX_DOTS, MAX_STROKES, VIEW_PARTS, zoneOf, type BodyView, type BrushSize, type PaintStroke, type Slug } from '../orbit/pain'
 import { useI18n } from '../i18n/context'
 
@@ -26,16 +27,25 @@ function zoneHighlights(strokes: PaintStroke[]): ExtendedBodyPart[] {
   }))
 }
 
-/**
- * She is not sure what hurts: she paints the area with her finger or the mouse. Only paint on the body
- * counts; ORBIT reads the zone under each dab. Keyboard path: choose a zone and paint it whole.
- */
-export function PainPainter({ view, size, strokes, onChange }: Props) {
-  const { t } = useI18n()
+interface SurfaceProps {
+  view: BodyView
+  size: BrushSize
+  strokes: PaintStroke[]
+  onChange: (strokes: PaintStroke[]) => void
+  scale?: number
+  className?: string
+  label: string
+  /** What is already on the body under the new paint (the heat map on the home screen). */
+  base?: ExtendedBodyPart[]
+  baseDots?: (DotHeat & { color: string })[]
+  fill?: string
+  border?: string
+}
+
+/** The figure she paints on with her finger or the mouse. Only paint on the body counts; ORBIT reads the zone under each dab. */
+export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, className = 'pain-figure', label, base = [], baseDots = [], fill = FIGURE.fill, border = FIGURE.border }: SurfaceProps) {
   const box = useRef<HTMLDivElement>(null)
   const [current, setCurrent] = useState<PaintStroke | null>(null)
-  const [picked, setZone] = useState<Slug>(VIEW_PARTS[view][0])
-  const zone = VIEW_PARTS[view].includes(picked) ? picked : VIEW_PARTS[view][0]
   const shown = [...strokes, ...(current ? [current] : [])].filter((s) => s.view === view)
 
   /** Zone of the figure under the pointer (the paint layer ignores the pointer). */
@@ -70,6 +80,63 @@ export function PainPainter({ view, size, strokes, onChange }: Props) {
     if (current) onChange([...strokes, current])
     setCurrent(null)
   }
+
+  // New paint goes on top of what is already there (same zone: the new mark wins).
+  const bySlug = new Map<string, ExtendedBodyPart>()
+  for (const p of [...base, ...zoneHighlights(shown)]) bySlug.set(`${p.slug}-${p.side ?? ''}`, { ...bySlug.get(`${p.slug}-${p.side ?? ''}`), ...p })
+
+  return (
+    <div
+      ref={box}
+      className={`${className} paintable`}
+      onPointerDown={start}
+      onPointerMove={move}
+      onPointerUp={end}
+      onPointerCancel={end}
+      aria-label={label}
+    >
+      <Body gender="female" side={view} scale={scale} data={[...bySlug.values()]} defaultFill={fill} border={border} />
+      <div className="paint-layer" aria-hidden="true">
+        {baseDots.map((d) => (
+          <span
+            key={d.key}
+            className="paint-dot"
+            style={{
+              left: `${d.x * 100}%`,
+              top: `${d.y * 100}%`,
+              width: `${BRUSH[d.size] * 100}%`,
+              opacity: 0.35 + 0.6 * d.warmth,
+              background: `radial-gradient(circle, ${d.color} 0 35%, transparent 70%)`,
+            }}
+          />
+        ))}
+        {shown.flatMap((s) =>
+          s.dots.map(([x, y], i) => (
+            <span
+              key={`${s.id}-${i}`}
+              className="paint-dot new"
+              style={{
+                left: `${x * 100}%`,
+                top: `${y * 100}%`,
+                width: `${BRUSH[s.size] * 100}%`,
+                background: `radial-gradient(circle, ${MARK_COLOR} 0 35%, transparent 70%)`,
+              }}
+            />
+          )),
+        )}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * She is not sure what hurts: she paints the area with her finger or the mouse.
+ * Keyboard path: choose a zone and paint it whole.
+ */
+export function PainPainter({ view, size, strokes, onChange }: Props) {
+  const { t } = useI18n()
+  const [picked, setZone] = useState<Slug>(VIEW_PARTS[view][0])
+  const zone = VIEW_PARTS[view].includes(picked) ? picked : VIEW_PARTS[view][0]
   const paintWhole = () => {
     if (strokes.length >= MAX_STROKES) return
     onChange([...strokes, { id: `zone-${zone}-${strokes.length}`, view, size, dots: [], zones: [zone] }])
@@ -78,33 +145,13 @@ export function PainPainter({ view, size, strokes, onChange }: Props) {
   return (
     <div className="pain-mode">
       <p className="muted">{t('pain.paintHint')}</p>
-      <div
-        ref={box}
-        className="pain-figure paintable"
-        onPointerDown={start}
-        onPointerMove={move}
-        onPointerUp={end}
-        onPointerCancel={end}
-        aria-label={t('pain.figure', { view: t(view === 'front' ? 'pain.front' : 'pain.back') })}
-      >
-        <Body gender="female" side={view} scale={1.3} data={zoneHighlights(shown)} defaultFill={FIGURE.fill} border={FIGURE.border} />
-        <div className="paint-layer" aria-hidden="true">
-          {shown.flatMap((s) =>
-            s.dots.map(([x, y], i) => (
-              <span
-                key={`${s.id}-${i}`}
-                className="paint-dot"
-                style={{
-                  left: `${x * 100}%`,
-                  top: `${y * 100}%`,
-                  width: `${BRUSH[s.size] * 100}%`,
-                  background: `radial-gradient(circle, ${MARK_COLOR} 0 35%, transparent 70%)`,
-                }}
-              />
-            )),
-          )}
-        </div>
-      </div>
+      <PaintSurface
+        view={view}
+        size={size}
+        strokes={strokes}
+        onChange={onChange}
+        label={t('pain.figure', { view: t(view === 'front' ? 'pain.front' : 'pain.back') })}
+      />
       <div className="actions">
         <label htmlFor="pain-zone">{t('pain.zone')}</label>
         <select id="pain-zone" value={zone} onChange={(e) => setZone(e.target.value as Slug)}>

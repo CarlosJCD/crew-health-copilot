@@ -37,6 +37,10 @@ interface Props {
   /** Self-care she chose today (same choice as in Boost and "For today"). */
   chosen: string[]
   onToggleCard: (cardId: string) => void
+  /** Area she already painted on the home figure: the flow starts at "what does it feel like". */
+  painted?: PaintStroke[]
+  /** Called once a report is saved (the home figure clears its new paint). */
+  onSaved?: () => void
 }
 
 type Step = 'where' | 'what' | 'details' | 'safety'
@@ -50,14 +54,14 @@ type Mode = 'exact' | 'area'
  * side, front or back), then what it feels like, how strong, when, what was happening and whether moving or
  * pressing makes it worse. Pain in the head, eyes or chest asks the alarm question before saving.
  */
-export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) {
+export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted = [], onSaved }: Props) {
   const { t, lang } = useI18n()
-  const [step, setStep] = useState<Step>('where')
-  const [mode, setMode] = useState<Mode | null>(null)
-  const [view, setView] = useState<BodyView>('front')
+  const [step, setStep] = useState<Step>(painted.length ? 'what' : 'where')
+  const [mode, setMode] = useState<Mode | null>(painted.length ? 'area' : null)
+  const [view, setView] = useState<BodyView>(painted[0]?.view ?? 'front')
   const [size, setSize] = useState<BrushSize>('m')
   const [muscles, setMuscles] = useState<MuscleMark[]>([])
-  const [strokes, setStrokes] = useState<PaintStroke[]>([])
+  const [strokes, setStrokes] = useState<PaintStroke[]>(painted)
   const [extra, setExtra] = useState<string[]>([])
   const [details, setDetails] = useState<PainDetailsValue>(EMPTY_DETAILS)
   const [alarms, setAlarms] = useState<string[]>([])
@@ -85,6 +89,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) 
     const event: PainEvent = { id: newEventId(), muscles, strokes, ...where, ...described, alarms: confirmed, pain: feels.pain, symptoms: feels.symptoms }
     onChange({ events: [...today.events, event] })
     reset()
+    onSaved?.()
   }
 
   return (

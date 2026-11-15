@@ -454,7 +454,7 @@ h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
 .segmented button { border: 0; background: transparent; color: var(--muted); font: inherit; font-family: var(--font-title); font-weight: 600;
   font-size: 0.88rem; min-height: 36px; min-width: 88px; padding: 0 0.9rem; border-radius: 999px; cursor: pointer; }
 .segmented button[aria-pressed='true'] { background: var(--panel-2); color: var(--text); }
-.figure { position: relative; z-index: 1; height: clamp(300px, calc(100dvh - 420px), 680px); aspect-ratio: 0.5; max-width: 92vw; margin-top: 0.4rem; }
+.figure { position: relative; z-index: 1; height: clamp(280px, calc(100dvh - 470px), 660px); aspect-ratio: 0.5; max-width: 92vw; margin-top: 0.4rem; }
 .figure svg { width: 100%; height: 100%; display: block; cursor: pointer; }
 .figure svg path { transition: fill 0.4s ease; }
 .figure .spot-layer { position: absolute; inset: 0; pointer-events: none; }
@@ -540,3 +540,14 @@ h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
 :root[data-theme='light'] .sheet-backdrop { background: rgba(23, 23, 27, 0.35); }
 .figure-history { position: relative; z-index: 1; width: min(100%, 460px); margin-top: 0.4rem; text-align: left; }
 .segmented button { min-width: 76px; }
+
+/* Home heat map: she draws on the figure itself. */
+.figure.paintable svg { cursor: crosshair; }
+.paint-dot.new { opacity: 0.9; }
+:root[data-theme='light'] .paint-layer { mix-blend-mode: multiply; }
+.paint-hint { position: relative; z-index: 1; margin: 0.5rem 0 0; color: var(--muted); font-size: 0.92rem; }
+.heat-key { position: relative; z-index: 1; display: flex; align-items: center; gap: 0.5rem; color: var(--muted); font-size: 0.78rem; margin-top: 0.3rem; }
+.heat-key .heat-bar { width: 120px; height: 8px; border-radius: 999px; display: inline-block; }
+.segmented .warm-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 0.4rem; vertical-align: middle; background: var(--orange); }
+.paint-tools { display: flex; gap: 0.5rem; }
+.paint-tools .button { flex: 1; }
