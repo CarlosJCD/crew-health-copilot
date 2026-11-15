@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { SymptomLog } from '../orbit/body'
-import { DOMAIN_IDS, type Color, type Scenario } from '../orbit/config'
+import type { Color, Scenario } from '../orbit/config'
 import { COLOR_SYMBOL, FIGURE, FIGURE_LIGHT } from '../orbit/display'
 import type { Theme } from '../lib/theme'
 import type { LoadedDemo } from '../orbit/demoData'
@@ -87,14 +87,6 @@ export function BodyMap(props: Props) {
           {t(`home.state.${state}`)}
         </p>
         <p className="hero-sub">{t(`home.sub.${state}`)}</p>
-        <ul className="domain-row">
-          {DOMAIN_IDS.map((d) => (
-            <li key={d} className={`pill color-${result.domains[d]}`}>
-              <span aria-hidden="true">{COLOR_SYMBOL[result.domains[d]]}</span> {t(`domain.${d}`)}
-              <span className="sr-only">: {t(`color.${result.domains[d]}`)}</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       <section className="figure-stage" aria-label={t('home.figure')}>
@@ -107,7 +99,7 @@ export function BodyMap(props: Props) {
               </button>
             ))}
           </div>
-          <div className="segmented compact" role="group" aria-label={t('home.figureKind')}>
+          <div className="figure-kind" role="group" aria-label={t('home.figureKind')}>
             {(['female', 'male'] as const).map((k) => (
               <button key={k} type="button" aria-pressed={figure === k} onClick={() => setFigure(k)}>
                 {t(k === 'female' ? 'home.woman' : 'home.man')}

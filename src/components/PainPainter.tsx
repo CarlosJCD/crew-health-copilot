@@ -171,8 +171,8 @@ export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, class
   // New paint goes on top of what is already there (same zone: the new paint wins).
   const bySlug = new Map<string, ExtendedBodyPart>()
   for (const p of [...base, ...paintHighlights(shown, view)]) bySlug.set(p.slug!, p)
-  // The male model draws the face in a fixed light gray; give it the figure's fill like every other part.
-  if (!bySlug.has('head')) bySlug.set('head', { slug: 'head', color: fill })
+  // The models carry their own grays for some parts (the male face is light): every part takes the figure's fill.
+  for (const slug of VIEW_PARTS[view]) if (!bySlug.has(slug)) bySlug.set(slug, { slug, color: fill })
 
   return (
     <div
