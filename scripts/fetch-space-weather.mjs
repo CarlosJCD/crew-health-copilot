@@ -5,8 +5,9 @@
 // mission space weather would be uplinked, not browsed), and the shared DEMO_KEY is heavily
 // rate-limited. CI runs this before every build and on a daily schedule.
 //
-// Usage: NASA_API_KEY=your_key node scripts/fetch-space-weather.mjs   (falls back to DEMO_KEY)
-// Get a free key at https://api.nasa.gov/. Never commit a key; in CI it comes from a repo secret.
+// Usage: node scripts/fetch-space-weather.mjs
+// The CCMC DONKI API needs no key. NASA_API_KEY (repo secret) is only used by the api.nasa.gov fallback;
+// never commit a key.
 // A NASA outage never breaks the deploy: if both lists fail, the previous snapshot is kept (CI
 // restores the last published one first); if only one fails, it is written as null so the app
 // says "not downloaded" instead of showing a misleading zero.
@@ -26,11 +27,12 @@ const start = new Date(end.getTime() - WINDOW_DAYS * 86_400_000)
 const hasPrevious = existsSync(OUT) && readFileSync(OUT, 'utf8').trim().startsWith('{')
 
 const query = `startDate=${day(start)}&endDate=${day(end)}`
-// api.nasa.gov first; the CCMC host is the same DONKI service without a key. On 2026-11-14 the
-// api.nasa.gov FLR request answered HTTP 404 in CI and CCMC timed out from a local machine.
+// CCMC moved DONKI to ccmc.gsfc.nasa.gov/DONKI-API on 2026-09-30 (the old kauai host no longer
+// answers). On 2026-11-14 the new route returned FLR and SEP without a key, while api.nasa.gov
+// forwarded FLR to ".../get/FLR/" (trailing slash) and got HTTP 404. api.nasa.gov stays as fallback.
 const endpoints = (type) => [
+  { name: 'CCMC', url: `https://ccmc.gsfc.nasa.gov/DONKI-API/get/${type}?${query}` },
   { name: 'api.nasa.gov', url: `https://api.nasa.gov/DONKI/${type}?${query}&api_key=${KEY}` },
-  { name: 'CCMC', url: `https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/${type}?${query}` },
 ]
 
 async function get(url) {
@@ -76,8 +78,8 @@ if (!flares && !sep) {
     endDate: day(end),
     source: {
       name: 'NASA DONKI (Space Weather Database Of Notifications, Knowledge, Information)',
-      url: 'https://kauai.ccmc.gsfc.nasa.gov/DONKI/',
-      api: 'https://api.nasa.gov/',
+      url: 'https://ccmc.gsfc.nasa.gov/tools/DONKI/',
+      api: 'https://ccmc.gsfc.nasa.gov/DONKI-API/',
     },
     flares, // null = not downloaded
     sep,

@@ -1,16 +1,11 @@
 {
   "name": "ORBIT",
   "short_name": "ORBIT",
-  "description": "ORBIT (Observe, Read, Boost, Iterate, Transmit): preventive health self-assessment for astronauts, built on the biopsychosocial model and the five NASA HRP hazards. Works offline.",
+  "description": "Catch the early signals. Act onboard. Offline health companion for astronauts (synthetic data, not a diagnostic tool).",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0a0a0d",
-  "theme_color": "#000000",
-  "icons": [
-    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" },
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }

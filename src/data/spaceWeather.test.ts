@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { flareRank, loadSpaceWeather, summarize, type SpaceWeatherSnapshot } from './spaceWeather'
+import { flareRank, isModel, loadSepReplay, loadSpaceWeather, summarize, type SpaceWeatherSnapshot } from './spaceWeather'
 
 const snapshot: SpaceWeatherSnapshot = {
   fetchedAt: '2026-11-14T12:00:00Z',
   windowDays: 30,
   startDate: '2026-10-15',
   endDate: '2026-11-14',
-  source: { name: 'NASA DONKI', url: 'https://kauai.ccmc.gsfc.nasa.gov/DONKI/' },
+  source: { name: 'NASA DONKI', url: 'https://ccmc.gsfc.nasa.gov/tools/DONKI/' },
   flares: [
     { id: 'f1', time: '2026-10-20T01:00Z', classType: 'C3.1' },
     { id: 'f2', time: '2026-11-02T05:00Z', classType: 'M1.4' },
@@ -64,5 +64,21 @@ describe('loadSpaceWeather', () => {
     expect(await loadSpaceWeather(respond('<!doctype html>', 200, 'text/html'))).toBeUndefined()
     expect(await loadSpaceWeather(respond('{"flares": 3}'))).toBeUndefined()
     expect(await loadSpaceWeather(respond('{"flares": null, "sep": null}'))).toBeUndefined()
+  })
+})
+
+describe('SEP replay (May 2024)', () => {
+  const event = (instruments: string[]) => ({ id: 'e', time: '2024-05-09T13:59Z', instruments, linkedEvents: [] })
+
+  it('tells forecast-model entries from instrument detections', () => {
+    expect(isModel(event(['MODEL: REleASE:ACE/EPAM 15.8-39.8 MeV']))).toBe(true)
+    expect(isModel(event(['GOES-P: SEISS >10 MeV']))).toBe(false)
+  })
+
+  it('loads the committed replay file, or nothing if it is missing', async () => {
+    const ok = (async () => new Response(JSON.stringify({ startDate: '2024-05-01', endDate: '2024-05-31', source: { name: 'x', url: 'y' }, sep: [event(['GOES-P: SEISS >10 MeV'])] }), { headers: { 'content-type': 'application/json' } })) as unknown as typeof fetch
+    const missing = (async () => new Response('nope', { status: 404 })) as unknown as typeof fetch
+    expect((await loadSepReplay(ok))?.sep).toHaveLength(1)
+    expect(await loadSepReplay(missing)).toBeUndefined()
   })
 })

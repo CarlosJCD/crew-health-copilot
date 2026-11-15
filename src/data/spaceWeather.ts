@@ -78,3 +78,38 @@ export async function loadSpaceWeather(fetchImpl: typeof fetch = fetch): Promise
     return undefined
   }
 }
+
+// ---------------------------------------------------------------------------------------------
+// Solar particle event replay: real SEP events of May 2024 (public/data/donki-sep-2024-05.json,
+// written by scripts/fetch-sep-replay.mjs and committed).
+
+export interface ReplayEvent {
+  id: string
+  time: string
+  instruments: string[]
+  linkedEvents: string[]
+  link?: string
+}
+
+export interface SepReplay {
+  startDate: string
+  endDate: string
+  source: { name: string; url: string }
+  sep: ReplayEvent[]
+}
+
+export const SEP_REPLAY_URL = './data/donki-sep-2024-05.json'
+
+/** "MODEL: ..." entries in DONKI come from a forecast model, not from a spacecraft instrument. */
+export const isModel = (e: ReplayEvent) => e.instruments.every((i) => i.startsWith('MODEL'))
+
+export async function loadSepReplay(fetchImpl: typeof fetch = fetch): Promise<SepReplay | undefined> {
+  try {
+    const res = await fetchImpl(SEP_REPLAY_URL)
+    if (!res.ok || !(res.headers.get('content-type') ?? '').includes('json')) return undefined
+    const json = (await res.json()) as SepReplay
+    return Array.isArray(json.sep) && json.sep.length ? json : undefined
+  } catch {
+    return undefined
+  }
+}

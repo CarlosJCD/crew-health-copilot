@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { loadSpaceWeather, summarize, type SpaceWeatherSnapshot } from '../data/spaceWeather'
 import { useI18n } from '../i18n/context'
+import { SepReplay } from './SepReplay'
 
 const HRP_HAZARDS_URL = 'https://www.nasa.gov/hrp/hazards/'
 
-/** Compact context for the space-radiation hazard, fed by the NASA DONKI snapshot. Not a health status. */
-export function SpaceWeatherPanel() {
-  const { t, lang } = useI18n()
+/** Radiation context: NASA DONKI snapshot plus the scenario's estimated mission dose (RAD, scenarios.json). */
+export function SpaceWeatherPanel({ doseMSvDay }: { doseMSvDay?: number | null }) {
+  const { t, lang, num } = useI18n()
   const [snapshot, setSnapshot] = useState<SpaceWeatherSnapshot | undefined | null>(null)
 
   useEffect(() => {
@@ -21,18 +22,15 @@ export function SpaceWeatherPanel() {
       timeZone: 'UTC',
     })
 
-  if (snapshot === null) return null // still loading
-
   return (
     <section className="space-weather" aria-labelledby="sw-title">
-      <h3 id="sw-title" className="overline">
-        <span className="sun" aria-hidden="true">
-          ☉
-        </span>{' '}
-        {t('sw.title')}
-      </h3>
-      {snapshot ? <SnapshotBody snapshot={snapshot} date={date} /> : <p>{t('sw.missing')}</p>}
-      <p>
+      <h2 id="sw-title">{t('sw.title')}</h2>
+      {snapshot ? <SnapshotBody snapshot={snapshot} date={date} /> : snapshot === undefined && <p>{t('sw.missing')}</p>}
+      <p className="dose">
+        {typeof doseMSvDay === 'number' ? t('sw.dose', { dose: num(doseMSvDay, 2) }) : t('sw.doseNone')}
+      </p>
+      <SepReplay />
+      <p className="disclaimer">
         {t('sw.context')}{' '}
         <a href={HRP_HAZARDS_URL} target="_blank" rel="noreferrer">
           {t('sw.hazardLink')}
@@ -69,7 +67,7 @@ function SnapshotBody({ snapshot, date }: { snapshot: SpaceWeatherSnapshot; date
         {t('sw.window', { days: snapshot.windowDays, end: date(snapshot.endDate) })}
         {s.strongest?.classType && <> {t('sw.strongest', { cls: s.strongest.classType, date: date(s.strongest.time) })}</>}
       </p>
-      <p>
+      <p className="source">
         {t('sw.source')}{' '}
         <a href={snapshot.source.url} target="_blank" rel="noreferrer">
           NASA DONKI
