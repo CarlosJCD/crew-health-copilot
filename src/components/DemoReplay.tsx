@@ -39,7 +39,7 @@ export function DemoReplay({ day, range, onChange, hint, children }: Props) {
   return (
     <div className="demo-bar">
       <span className="demo-tag">{t('demo.tag')}</span>
-      <button type="button" className="play" onClick={toggle} aria-label={running ? t('demo.pause') : t('demo.play')}>
+      <button type="button" className="demo-play" onClick={toggle} aria-label={running ? t('demo.pause') : t('demo.play')}>
         <span aria-hidden="true">{running ? '❚❚' : '▶'}</span>
       </button>
       <div className="timeline">

@@ -159,7 +159,7 @@ button.link {
   font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--bg); background: var(--muted); border-radius: 3px; padding: 0.2rem 0.4rem;
 }
-.play {
+.demo-play {
   width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: transparent;
   color: var(--text); cursor: pointer; display: grid; place-items: center; font-size: 0.7rem; flex: none;
 }
