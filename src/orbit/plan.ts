@@ -70,7 +70,9 @@ export function recentPain(day: number, log: PainLog): { day: number; event: Pai
 /**
  * Self-care for today, next to the body. A red day shows only the escalation cards. Otherwise Boost's
  * offered cards come first (Psychology's order), then the cards of recent pain contexts; at most
- * `max_cards_shown`, each with the reasons it is there.
+ * `max_cards_shown`, each with the reasons it is there. When everything is in her usual range (only the
+ * library's "green" trigger) nothing is suggested here: Psychology 1, testing on Nov 15, asked that
+ * recommendations stop appearing when all is well. The green cards stay in Boost, which she opens herself.
  */
 export function todaySuggestions(plan: BoostPlan, day: number, painLog: PainLog): { red: boolean; items: Suggestion[] } {
   const recent = recentPain(day, painLog)
@@ -85,8 +87,9 @@ export function todaySuggestions(plan: BoostPlan, day: number, painLog: PainLog)
     s.because.push(because)
     items.set(card.id, s)
   }
+  const reasons = plan.triggers.filter((t) => t !== 'green')
   for (const card of plan.offered) {
-    for (const t of plan.triggers) if (offeredBy(t).includes(card.id)) add(card, { kind: 'trigger', trigger: t })
+    for (const t of reasons) if (offeredBy(t).includes(card.id)) add(card, { kind: 'trigger', trigger: t })
   }
   for (const r of recent) for (const card of painSuggestions(r.event)) add(card, { kind: 'pain', day: r.day, event: r.event })
   return { red: false, items: [...items.values()].slice(0, DISPLAY.max_cards_shown) }

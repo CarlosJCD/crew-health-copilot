@@ -101,3 +101,16 @@ describe('reminders', () => {
     expect(CARDS.cmo_now).toBeDefined()
   })
 })
+
+describe('when everything is fine', () => {
+  it('suggests nothing on a green day (Psychology 1, Nov 15)', () => {
+    const plan = planOf(121)
+    expect(plan.triggers).toEqual(['green'])
+    expect(todaySuggestions(plan, 121, {}).items).toEqual([])
+  })
+
+  it('still suggests the cards of a pain she logged on a green day', () => {
+    const log: PainLog = { 121: { events: [event({ contexts: ['stress'] })] } }
+    expect(todaySuggestions(planOf(121), 121, log).items.map((i) => i.card.id)).toContain('breathe')
+  })
+})

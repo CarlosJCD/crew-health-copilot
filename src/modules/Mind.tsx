@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { getIndicator } from '../orbit/config'
+import { getIndicator, num } from '../orbit/config'
 import { CHECKIN_ITEMS, TALK_OPTIONS, type Checkin, type CheckinItem, type Checkins, type TalkTo } from '../orbit/checkin'
 import type { LoadedDemo } from '../orbit/demoData'
 import type { PulseSession } from '../orbit/pulse'
+import { InfoTip } from '../components/InfoTip'
 import { PulseTask } from '../components/PulseTask'
 import { useI18n } from '../i18n/context'
 
@@ -15,7 +16,17 @@ interface Props {
   onPulseSessionsChange: (s: PulseSession[]) => void
 }
 
-/** Daily check-in: 4 sliders (0 to 10), under a minute, plus "I want to talk to someone today". */
+/**
+ * Which way is worse for each check-in item, and how many points from her usual turn its card yellow
+ * (read from orbit-indicators.json: checkin.worse_direction and yellow_worse_than_baseline_points).
+ */
+function worseRule(item: CheckinItem): { dir: 'lower' | 'higher'; n: number } {
+  if (item === 'crew_climate') return { dir: 'lower', n: num('crew_climate', 'yellow_worse_than_baseline_points') }
+  const dirs = (getIndicator('checkin').params.worse_direction ?? {}) as Record<string, string>
+  return { dir: dirs[item] === 'down' ? 'lower' : 'higher', n: num('checkin', 'yellow_worse_than_baseline_points') }
+}
+
+/** Daily check-in: 4 sliders (0 to 10), under a minute, plus "I want to talk to someone today". Each item has a "?" that explains it. */
 export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onPulseSessionsChange }: Props) {
   const { t } = useI18n()
   const record = demo.data.days.find((d) => d.day === day)
@@ -60,9 +71,14 @@ export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onP
         <p className="why" lang="en">{getIndicator('checkin').why_en}</p>
         {CHECKIN_ITEMS.map((item: CheckinItem) => (
           <div key={item} className="slider-row">
-            <label htmlFor={`ci-${item}`}>
-              <strong>{t(`mind.${item}`)}</strong> <span className="value-pill">{draft[item]}</span>
-            </label>
+            <div className="slider-head">
+              <label htmlFor={`ci-${item}`}>
+                <strong>{t(`mind.${item}`)}</strong> <span className="value-pill">{draft[item]}</span>
+              </label>
+              <InfoTip label={t('mind.tip.label', { item: t(`mind.${item}`) })}>
+                {t(`mind.tip.${item}`)} {t(`mind.tip.${worseRule(item).dir}`, { usual: base[item][0], n: worseRule(item).n })}
+              </InfoTip>
+            </div>
             <input
               id={`ci-${item}`}
               type="range"
@@ -90,7 +106,7 @@ export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onP
         </div>
         {done && (
           <p role="status">
-            {t('mind.saved')} <a href="#/today">{t('mind.seeToday')}</a>
+            {t('mind.saved')} <a href="#/body">{t('mind.seeToday')}</a>
           </p>
         )}
       </section>
