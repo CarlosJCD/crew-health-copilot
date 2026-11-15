@@ -248,6 +248,7 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 
 /* ORBIT: body map */
 .bodymap { display: grid; grid-template-columns: minmax(240px, 340px) 1fr; gap: 1rem; align-items: start; }
+.bodymap-side { display: grid; gap: 1rem; align-content: start; min-width: 0; }
 .bodymap-figure { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.9rem 1rem; }
 .system-figure { position: relative; width: min(100%, 280px); margin: 0 auto; }
 .system-figure svg { width: 100%; height: auto; display: block; }
@@ -335,3 +336,13 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .pain-safety { border: 1px solid var(--act); border-radius: var(--radius); padding: 0.6rem 0.8rem; margin: 0.5rem 0; }
 .pain-events { list-style: none; padding: 0; margin: 0.2rem 0; display: grid; gap: 0.35rem; font-size: 0.88rem; }
 .pain-events p { margin: 0.15rem 0 0; }
+
+/* ORBIT: "For today" beside the body, and suggestions after logging a pain */
+.plan-today h3 { margin-top: 0.4rem; }
+.reminders { list-style: none; padding: 0; margin: 0.2rem 0 0.4rem; display: grid; gap: 0.4rem; font-size: 0.88rem; }
+.reminders li { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.reminders .button { flex: none; padding: 0.25rem 0.7rem; }
+.suggestions { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; align-items: start; }
+.suggestion { --status: var(--accent); }
+.suggestion.chosen { border-color: var(--accent); }
+.pain-suggest { margin-top: 0.3rem; }

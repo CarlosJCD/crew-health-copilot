@@ -140,6 +140,10 @@ export default function App() {
             onLogChange={setSymptomLog}
             painLog={painLog}
             onPainChange={(p: PainDay) => setPainLog((all) => ({ ...all, [day]: p }))}
+            checkins={checkins}
+            pulseSessions={pulseSessions}
+            boostLog={boostLog}
+            onBoostLogChange={setBoostLog}
           />
         ) : active.id === 'play' ? (
           <Play

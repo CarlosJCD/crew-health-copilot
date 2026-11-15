@@ -20,7 +20,10 @@ import {
   type PainEvent,
   type PaintStroke,
 } from '../orbit/pain'
+import { DISPLAY } from '../orbit/boost'
+import { painSuggestions } from '../orbit/plan'
 import { useI18n } from '../i18n/context'
+import { SuggestionCard } from './SuggestionCard'
 import { MuscleSelector } from './MuscleSelector'
 import { PainDetails } from './PainDetails'
 import { PainPainter } from './PainPainter'
@@ -29,6 +32,9 @@ interface Props {
   day: number
   pain: PainDay | undefined
   onChange: (pain: PainDay) => void
+  /** Self-care she chose today (same choice as in Boost and "For today"). */
+  chosen: string[]
+  onToggleCard: (cardId: string) => void
 }
 
 type Step = 'where' | 'details' | 'safety'
@@ -42,7 +48,7 @@ type Mode = 'exact' | 'area'
  * side, front or back), then what it feels like, how strong, when, what was happening and whether moving or
  * pressing makes it worse. Pain in the head, eyes or chest asks the alarm question before saving.
  */
-export function PainPanel({ day, pain, onChange }: Props) {
+export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) {
   const { t, lang } = useI18n()
   const [step, setStep] = useState<Step>('where')
   const [mode, setMode] = useState<Mode | null>(null)
@@ -222,6 +228,7 @@ export function PainPanel({ day, pain, onChange }: Props) {
                   </button>
                   {e.alarms.length > 0 && <p className="alarm-text">{t('body.redNow')} <a href="#/transmit">{t('boost.openTransmit')}</a></p>}
                   {e.alarms.length === 0 && nerveLike(e.qualities) && <p className="hint">{t('pain.nerve')}</p>}
+                  {i === today.events.length - 1 && <PainSuggestions event={e} chosen={chosen} onToggle={onToggleCard} />}
                   {e.regions.includes('head') && (
                     <p className="hint">
                       {t('pain.co2')}{' '}
@@ -248,5 +255,30 @@ export function PainPanel({ day, pain, onChange }: Props) {
       )}
       <p className="muted">{t('pain.private')}</p>
     </section>
+  )
+}
+
+/** Right after she logs a pain: the self-care that matches it, or what to do if there is none. */
+function PainSuggestions({ event, chosen, onToggle }: { event: PainEvent; chosen: string[]; onToggle: (id: string) => void }) {
+  const { t } = useI18n()
+  const cards = painSuggestions(event)
+  if (!cards.length) return <p className="hint">{t('pain.noCard')}</p>
+  return (
+    <div className="pain-suggest">
+      <p>
+        <strong>{t('pain.suggest')}</strong>
+      </p>
+      <div className="suggestions">
+        {cards.map((c) => (
+          <SuggestionCard
+            key={c.id}
+            card={c}
+            chosen={chosen.includes(c.id)}
+            full={chosen.length >= DISPLAY.max_choices}
+            onToggle={() => onToggle(c.id)}
+          />
+        ))}
+      </div>
+    </div>
   )
 }

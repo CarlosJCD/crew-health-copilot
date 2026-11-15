@@ -6,11 +6,16 @@ import { COLOR_SYMBOL, FIGURE, STATUS_FILL } from '../orbit/display'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay } from '../orbit/engine'
 import type { PainDay, PainLog } from '../orbit/pain'
+import { boostPlan, DISPLAY, downrankedCards, type BoostLog } from '../orbit/boost'
+import type { Checkins } from '../orbit/checkin'
+import { remindersFor } from '../orbit/plan'
+import type { PulseSession } from '../orbit/pulse'
 import { useI18n } from '../i18n/context'
 import { DayControl } from '../components/DayControl'
 import { PainPanel } from '../components/PainPanel'
 import { StatePanel } from '../components/StatePanel'
 import { SymptomHeatmap } from '../components/SymptomHeatmap'
+import { TodayPlan } from '../components/TodayPlan'
 
 interface Props {
   demo: LoadedDemo
@@ -22,6 +27,11 @@ interface Props {
   /** Pain logged on every day (the heat map needs the history). */
   painLog: PainLog
   onPainChange: (pain: PainDay) => void
+  /** For the reminders and the self-care she chooses next to the body (same log as Boost). */
+  checkins: Checkins
+  pulseSessions: PulseSession[]
+  boostLog: BoostLog
+  onBoostLogChange: (log: BoostLog) => void
 }
 
 /**
@@ -41,10 +51,12 @@ const SPOTS: Record<SystemId, { x: number; y: number }> = {
 
 /**
  * Home screen. Astronauts have little medical background and little time, so the first thing they see
- * is the body: today's state in one panel, the six-system figure, and "Does something hurt?". The
- * numbers live one tap away in Metrics; the technical details of each system stay folded.
+ * is the body: today's state in one panel, the six-system figure with "For today" beside it (reminders
+ * and the self-care she can choose), and "Does something hurt?". The numbers live one tap away in Metrics;
+ * the technical details of each system stay folded.
  */
-export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, painLog, onPainChange }: Props) {
+export function BodyMap(props: Props) {
+  const { demo, day, onDayChange, scenario, log, onLogChange, painLog, onPainChange, checkins, pulseSessions, boostLog, onBoostLogChange } = props
   const { t } = useI18n()
   const [selected, setSelected] = useState<SystemId>('heart')
   const [mode, setMode] = useState<'today' | 'history'>('today')
@@ -62,6 +74,22 @@ export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pa
     if (s && !logged.includes(s)) onLogChange({ ...log, [day]: [...logged, s] })
   }
   const remove = (symptom: string) => onLogChange({ ...log, [day]: logged.filter((s) => s !== symptom) })
+  // Boost's plan for the day, the reminders, and her choices (shared with Boost).
+  const plan = useMemo(
+    () => boostPlan(result, record, data.persona, downrankedCards(boostLog), data.days.filter((d) => d.day <= day)),
+    [result, record, data, boostLog, day],
+  )
+  const reminders = remindersFor({ day, checkins, pulseSessions, boostLog, painLog, plan })
+  const boostToday = boostLog[day] ?? { chosen: [], helped: {} }
+  const toggleCard = (id: string) => {
+    const chosen = boostToday.chosen.includes(id)
+      ? boostToday.chosen.filter((c) => c !== id)
+      : boostToday.chosen.length < DISPLAY.max_choices
+        ? [...boostToday.chosen, id]
+        : boostToday.chosen
+    onBoostLogChange({ ...boostLog, [day]: { ...boostToday, chosen } })
+  }
+  const goToPain = () => document.getElementById('pain-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   // Each system paints its zones with its state; the selected one gets an outline.
   const zones: ExtendedBodyPart[] = SYSTEMS.flatMap((s) =>
     s.zones.map((slug) => ({
@@ -142,6 +170,16 @@ export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pa
           )}
         </section>
 
+        <div className="bodymap-side">
+        <TodayPlan
+          day={day}
+          plan={plan}
+          reminders={reminders}
+          painLog={painLog}
+          chosen={boostToday.chosen}
+          onToggle={toggleCard}
+          onPainAgain={goToPain}
+        />
         <section className={`bodymap-detail card color-${colors[selected]}`} aria-live="polite">
           <header className="card-head">
             <h2>{name(selected)}</h2>
@@ -228,9 +266,16 @@ export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pa
             </div>
           )}
         </section>
+        </div>
       </div>
 
-      <PainPanel day={day} pain={painLog[day]} onChange={onPainChange} />
+      <PainPanel
+        day={day}
+        pain={painLog[day]}
+        onChange={onPainChange}
+        chosen={boostToday.chosen}
+        onToggleCard={toggleCard}
+      />
     </div>
   )
 }

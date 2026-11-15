@@ -1,17 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import {
   BOOST_DISCLAIMER,
   boostPlan,
   CARDS,
   DISPLAY,
   downrankedCards,
-  type BoostCard,
   type BoostDay,
   type BoostLog,
 } from '../orbit/boost'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay } from '../orbit/engine'
 import { useI18n } from '../i18n/context'
+import { BoostCardBody } from '../components/BoostCardBody'
 
 interface Props {
   demo: LoadedDemo
@@ -23,49 +23,6 @@ interface Props {
 }
 
 const EMPTY: BoostDay = { chosen: [], helped: {} }
-
-function CardBody({ card }: { card: BoostCard }) {
-  const { t } = useI18n()
-  const [open, setOpen] = useState(false)
-  return (
-    <>
-      <h3 lang="en">{card.title_en}</h3>
-      <p className="muted">
-        {card.minutes > 0 ? t('boost.minutes', { n: card.minutes }) : t('boost.instant')}
-        {card.priority && !DISPLAY.hide_priority_label_in_ui && ` · ${card.priority}`}
-      </p>
-      <p lang="en">{card.what_en}</p>
-      <button type="button" className="link" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        {open ? t('card.hide') : t('card.why')}
-      </button>
-      {open && (
-        <div className="details">
-          <p className="why" lang="en">{card.why_en}</p>
-          {card.confidence_en && (
-            <p>
-              <strong>{t('boost.confidence')}</strong> <span lang="en">{card.confidence_en}</span>
-            </p>
-          )}
-          <p>
-            <strong>{t('card.sources')}</strong>{' '}
-            {card.sources.map((s, i) => (
-              <span key={s.cite}>
-                {i > 0 && ' · '}
-                {s.url ? (
-                  <a href={s.url} target="_blank" rel="noreferrer">
-                    {s.cite}
-                  </a>
-                ) : (
-                  s.cite
-                )}
-              </span>
-            ))}
-          </p>
-        </div>
-      )}
-    </>
-  )
-}
 
 /** Boost: protective actions for the day. She chooses up to 2; nothing is chosen for her. */
 export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
@@ -124,7 +81,7 @@ export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
         <section className="boost-escalate">
           {plan.escalate.map((c) => (
             <article key={c.id} className="card color-red">
-              <CardBody card={c} />
+              <BoostCardBody card={c} />
               <a className="button" href={c.id === 'talk_now' ? '#/mind' : '#/transmit'}>
                 {c.id === 'talk_now' ? t('state.choose') : t('boost.openTransmit')}
               </a>
@@ -149,7 +106,7 @@ export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
           </div>
           {askedYes && CARDS[plan.safetyQuestion.if_yes] && (
             <article className="card color-red">
-              <CardBody card={CARDS[plan.safetyQuestion.if_yes]} />
+              <BoostCardBody card={CARDS[plan.safetyQuestion.if_yes]} />
               <a className="button" href="#/transmit">
                 {t('boost.openTransmit')}
               </a>
@@ -164,7 +121,7 @@ export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
           <div className="grid">
             {plan.checkFirst.map((c) => (
               <article key={c.id} className="card">
-                <CardBody card={c} />
+                <BoostCardBody card={c} />
               </article>
             ))}
           </div>
@@ -180,7 +137,7 @@ export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
               const full = !chosen && today.chosen.length >= DISPLAY.max_choices
               return (
                 <article key={c.id} className={`card boost-card${chosen ? ' chosen' : ''}`}>
-                  <CardBody card={c} />
+                  <BoostCardBody card={c} />
                   <button type="button" className="button" aria-pressed={chosen} disabled={full} onClick={() => toggle(c.id)}>
                     {chosen ? t('boost.chosen') : t('boost.pick')}
                   </button>
