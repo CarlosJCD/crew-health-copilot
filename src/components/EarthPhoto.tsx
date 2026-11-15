@@ -6,8 +6,8 @@ import { useI18n } from '../i18n/context'
 const API_TIMEOUT_MS = 6000
 
 /**
- * The photo of the Earth Window card: the newest EPIC photo of Earth, or a fixed EPIC photo if the list
- * does not arrive. If the photo itself cannot load (no network), the card shows no photo.
+ * The photo of the Earth Window card, shown once she chooses it: the newest EPIC photo of Earth, or a fixed
+ * EPIC photo if the list does not arrive. If the photo itself cannot load (no network), the card shows none.
  */
 export function EarthPhoto() {
   const { t } = useI18n()

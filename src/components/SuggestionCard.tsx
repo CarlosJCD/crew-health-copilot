@@ -17,7 +17,7 @@ export function SuggestionCard({ card, because = [], chosen, full, onToggle }: P
   const { t } = useI18n()
   return (
     <article className={`card boost-card suggestion${chosen ? ' chosen' : ''}`}>
-      <BoostCardBody card={card} />
+      <BoostCardBody card={card} chosen={chosen} />
       {because.length > 0 && (
         <p className="hint">
           {t('plan.because')} {because.join(' · ')}

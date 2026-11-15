@@ -137,7 +137,7 @@ export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
               const full = !chosen && today.chosen.length >= DISPLAY.max_choices
               return (
                 <article key={c.id} className={`card boost-card${chosen ? ' chosen' : ''}`}>
-                  <BoostCardBody card={c} />
+                  <BoostCardBody card={c} chosen={chosen} />
                   <button type="button" className="button" aria-pressed={chosen} disabled={full} onClick={() => toggle(c.id)}>
                     {chosen ? t('boost.chosen') : t('boost.pick')}
                   </button>
