@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getIndicator } from '../orbit/config'
 import { COLOR_SYMBOL } from '../orbit/display'
 import type { DayRecord, DemoData, MeanSd, NumericField } from '../orbit/demoData'
@@ -63,12 +63,18 @@ interface Props {
   result: IndicatorResult
   data: DemoData
   day: number
+  /** Open "Why?" and scroll to this card on load (deep link). */
+  openWhy?: boolean
 }
 
 /** Traffic-light card: color AND shape AND word, so it reads without color. */
-export function OrbitCard({ id, result, data, day }: Props) {
+export function OrbitCard({ id, result, data, day, openWhy = false }: Props) {
   const { t, unit, lang } = useI18n()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(openWhy)
+  const ref = useRef<HTMLElement>(null)
+  useEffect(() => {
+    if (openWhy) ref.current?.scrollIntoView({ block: 'nearest' })
+  }, [openWhy])
   const def = getIndicator(id)
   const view = VIEWS[id]
   const h = data.days.filter((d) => d.day <= day)
@@ -83,7 +89,7 @@ export function OrbitCard({ id, result, data, day }: Props) {
   const teamParams = def.team_criterion
 
   return (
-    <article className={`card color-${result.color}`}>
+    <article ref={ref} className={`card color-${result.color}`}>
       <header className="card-head">
         <h3>{def.label_en}</h3>
         <span className="badge" aria-label={t('color.aria', { domain: def.label_en, color: colorWord })}>

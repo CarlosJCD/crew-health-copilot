@@ -25,3 +25,6 @@ dist-ssr
 
 # Generated in CI from NASA DONKI (scripts/fetch-space-weather.mjs)
 public/data/space-weather.json
+
+# Deck screenshots (scripts/screenshots.mjs)
+screenshots/

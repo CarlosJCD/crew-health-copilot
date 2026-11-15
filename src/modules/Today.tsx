@@ -13,10 +13,12 @@ interface Props {
   day: number
   onDayChange: (d: number) => void
   scenario: Scenario
+  /** Indicator whose "Why?" opens on load (deep link `why=`). */
+  openWhy?: string
 }
 
 /** Today: three rings, the ORBIT state and one card per indicator, replaying the demo story. */
-export function Today({ demo, day, onDayChange, scenario }: Props) {
+export function Today({ demo, day, onDayChange, scenario, openWhy }: Props) {
   const { t } = useI18n()
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
@@ -78,7 +80,7 @@ export function Today({ demo, day, onDayChange, scenario }: Props) {
             {RULES.domains[d]
               .filter((id) => result.indicators[id])
               .map((id) => (
-                <OrbitCard key={id} id={id} result={result.indicators[id]} data={data} day={day} />
+                <OrbitCard key={id} id={id} result={result.indicators[id]} data={data} day={day} openWhy={openWhy === id} />
               ))}
           </div>
         </section>

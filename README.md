@@ -23,7 +23,12 @@ npm run build    # production build in dist/ (includes the offline service worke
 npm run preview  # serve the production build locally
 npm test         # Vitest: ORBIT engine acceptance tests, rules file, data checks, translations
 node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (no key needed)
+node scripts/fetch-sep-replay.mjs     # refresh the May 2024 SEP replay file (committed)
+node scripts/screenshots.mjs [url]    # deck screenshots with headless Chrome into screenshots/
 ```
+
+Deep links open a module on a given day, and optionally a card's "Why?":
+`#/today?day=125`, `#/today?day=121&why=temp`, `#/transmit?day=125`, `#/mind?day=125`.
 
 ## Structure
 
@@ -36,6 +41,9 @@ node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (no key 
 | `src/orbit/engine.test.ts` | Acceptance table of the handoff (days 121 to 128) plus rules the story does not exercise | Data science + Engineering |
 | `src/orbit/demoData.ts` | `demo-data.json` contract, checks, and the built-in copy of the demo story | Data science |
 | `src/modules/Today.tsx` | Rings, state, cards with "Why?", day control, radiation context | Engineering |
+| `src/orbit/transmit.ts`, `src/modules/Transmit.tsx` | Outbox with the scenario delay, privacy switches, packets (share with the crew medical officer, weekly summary, escalation) | Engineering |
+| `src/orbit/checkin.ts`, `src/modules/Mind.tsx` | Daily check-in (4 sliders) and "I want to talk to someone today"; answers replace that day's values on the device | Engineering (items: Psychology 2) |
+| `src/components/SepReplay.tsx`, `public/data/donki-sep-2024-05.json` | Replay of the real solar particle event of May 9, 2024 in the radiation layer | Engineering |
 | `src/modules/registry.ts` | Module list and owners (drives navigation) | Engineering |
 | `src/data/knowledge.json` | Data team's reference catalog (`datos_nasav1.json`): plausible ranges used to check `demo-data.json`, NASA sources, physics | Data science |
 | `src/data/spaceWeather.ts`, `scripts/fetch-space-weather.mjs` | NASA DONKI snapshot (flares and SEP events) | Engineering |
@@ -62,7 +70,12 @@ To change a rule, edit the JSON and run `npm test`: the acceptance table must st
 Open points for P1:
 - `contact.yellow_drop_fraction_vs_14d` is read as "mean of the last 14 days vs the 14 days before". Comparing
   shorter windows with the previous 14 days would turn day 122 or 127 yellow, against the acceptance table.
-- `screen.offer_conference_if_weeks_gte` and `pulse.practice_sessions` are not used yet (the demo gives the baseline).
+- `screen.offer_conference_if_weeks_gte` is implemented (offer only, never red). `pulse.practice_sessions` is used by
+  `pulseBaseline()` for live sessions; the demo gives the baseline directly.
+
+Privacy in Transmit: Body status and red physical safety rails always reach the crew medical officer (agreed before
+the mission); Mind and Crew go out only if she switches them on; check-in answers, journal and game content never
+leave the device. Everything the app stores (check-ins, outbox, switches) stays in the browser's localStorage.
 
 ## Demo data (`public/data/demo-data.json`)
 
@@ -95,6 +108,7 @@ ranges of the data team's catalog are rejected and listed in a notice on Today.
 | Human Research Program risks | "Why?" on every indicator card | https://www.nasa.gov/hrp/risks/ |
 | Human Research Program hazards | Radiation context panel | https://www.nasa.gov/hrp/hazards/ |
 | DONKI space weather (NASA CCMC) | Solar flares and SEP events of the last 30 days, downloaded at build time and daily | https://ccmc.gsfc.nasa.gov/tools/DONKI/ |
+| DONKI SEP events of May 2024 | "Solar particle event replay" in the radiation layer (file committed; entries marked MODEL come from a forecast model) | https://ccmc.gsfc.nasa.gov/DONKI-API/get/SEP?startDate=2024-05-01&endDate=2024-05-31 |
 | MSL RAD dose measurements | Estimated mission dose per scenario (1.84 mSv/day cruise, 0.64 mSv/day Mars surface) | https://doi.org/10.1126/science.1235989, https://doi.org/10.1126/science.1244797 |
 
 CI reads `https://ccmc.gsfc.nasa.gov/DONKI-API/get/FLR` and `/SEP` (no key). api.nasa.gov is a fallback and

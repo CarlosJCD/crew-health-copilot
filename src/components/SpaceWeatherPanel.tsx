@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { loadSpaceWeather, summarize, type SpaceWeatherSnapshot } from '../data/spaceWeather'
 import { useI18n } from '../i18n/context'
+import { SepReplay } from './SepReplay'
 
 const HRP_HAZARDS_URL = 'https://www.nasa.gov/hrp/hazards/'
 
@@ -28,6 +29,7 @@ export function SpaceWeatherPanel({ doseMSvDay }: { doseMSvDay?: number | null }
       <p className="dose">
         {typeof doseMSvDay === 'number' ? t('sw.dose', { dose: num(doseMSvDay, 2) }) : t('sw.doseNone')}
       </p>
+      <SepReplay />
       <p className="disclaimer">
         {t('sw.context')}{' '}
         <a href={HRP_HAZARDS_URL} target="_blank" rel="noreferrer">

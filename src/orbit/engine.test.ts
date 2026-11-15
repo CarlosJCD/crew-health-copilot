@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { RULES_ERRORS, type Color } from './config'
 import { BUILT_IN_DEMO, type DayRecord, type DemoData } from './demoData'
-import { evaluateDay, type OrbitState } from './engine'
+import { evaluateDay, pulseBaseline, type OrbitState } from './engine'
 
 describe('orbit-indicators.json', () => {
   it('has every rule, param and text the engine reads', () => {
@@ -93,5 +93,20 @@ describe('rules outside the demo story', () => {
 
   it('the weekly check is yellow at 3 or more on either scale', () => {
     expect(lastDay(withDays({ screen: { phq2: 3, gad2: 0 } })).indicators.screen.color).toBe('yellow')
+  })
+
+  it('after two positive weekly checks in a row, Orbit offers an earlier private conference (never red)', () => {
+    const week = (phq2: number, day: number): DayRecord => ({ ...base, events: [], day, screen: { phq2, gad2: 0 } })
+    const one = { ...BUILT_IN_DEMO, days: [week(1, 300), week(3, 307)] }
+    const two = { ...BUILT_IN_DEMO, days: [week(3, 300), week(4, 307)] }
+    expect(evaluateDay(one, 307).indicators.screen.offer).toBeUndefined()
+    const r = evaluateDay(two, 307).indicators.screen
+    expect([r.color, r.offer]).toEqual(['yellow', 'earlier_conference'])
+  })
+
+  it('the pulse baseline skips the 5 practice sessions', () => {
+    expect(pulseBaseline([400, 380, 360, 340, 330, 320, 322])).toBeUndefined()
+    const b = pulseBaseline([400, 380, 360, 340, 330, 320, 322, 318])
+    expect(b?.[0]).toBeCloseTo(320)
   })
 })

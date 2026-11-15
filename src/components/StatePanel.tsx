@@ -27,6 +27,11 @@ export function StatePanel({ result, scenario }: { result: DayResult; scenario: 
           {t('state.boost')}
         </a>
       )}
+      {result.state === 'RED_PSYCH' && (
+        <a className="button" href="#/mind">
+          {t('state.choose')}
+        </a>
+      )}
       <p className="disclaimer">{t('state.disclaimer')}</p>
     </section>
   )

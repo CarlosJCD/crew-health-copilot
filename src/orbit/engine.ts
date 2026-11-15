@@ -19,6 +19,8 @@ export interface IndicatorResult {
   color: Color
   /** Short, plain explanation of why it has this color (English, app text). */
   reason: string
+  /** Something Orbit offers her (never imposes): an earlier private psychological conference. */
+  offer?: 'earlier_conference'
 }
 
 export interface DayResult {
@@ -106,9 +108,16 @@ const RULE_FNS: Record<string, Rule> = {
     if (!latest?.screen) return res('none', 'No weekly check this week.')
     const { phq2, gad2 } = latest.screen
     const limit = num('screen', 'yellow_gte')
-    return phq2 >= limit || gad2 >= limit
-      ? res('yellow', `PHQ-2 ${phq2}, GAD-2 ${gad2}: worth talking to someone (not a diagnosis).`)
-      : res('green', `PHQ-2 ${phq2}, GAD-2 ${gad2} (day ${latest.day}).`)
+    const positive = (d: DayRecord) => !!d.screen && (d.screen.phq2 >= limit || d.screen.gad2 >= limit)
+    if (!positive(latest)) return res('green', `PHQ-2 ${phq2}, GAD-2 ${gad2} (day ${latest.day}).`)
+    // No red: after N weeks in a row with a positive check, Orbit offers an earlier private conference.
+    const weeks = num('screen', 'offer_conference_if_weeks_gte')
+    const checks = h.filter((d) => d.screen && d.day <= latest.day).slice(-weeks)
+    const inARow = checks.length === weeks && checks.every(positive) &&
+      checks.every((d, i) => i === 0 || d.day - checks[i - 1].day <= 7)
+    return inARow
+      ? { ...res('yellow', `PHQ-2 ${phq2}, GAD-2 ${gad2}, ${weeks} weeks in a row: Orbit offers an earlier private conference.`), offer: 'earlier_conference' }
+      : res('yellow', `PHQ-2 ${phq2}, GAD-2 ${gad2}: worth talking to someone (not a diagnosis).`)
   },
 
   pulse(h, data) {
@@ -249,6 +258,19 @@ const RULE_FNS: Record<string, Rule> = {
 function getDirections(): Record<string, 'up' | 'down'> {
   const raw = RULES.indicators.find((i) => i.id === 'checkin')?.params.worse_direction
   return (raw ?? {}) as Record<string, 'up' | 'down'>
+}
+
+/**
+ * Pulse baseline from her own sessions (live use, not the demo): the first `practice_sessions`
+ * are practice and do not count, because reaction time improves with practice (Basner et al., 2015).
+ * Returns undefined until there are at least 3 sessions after practice.
+ */
+export function pulseBaseline(sessionsMs: number[]): [mean: number, sd: number] | undefined {
+  const counted = sessionsMs.slice(num('pulse', 'practice_sessions'))
+  if (counted.length < 3) return undefined
+  const mean = counted.reduce((a, b) => a + b, 0) / counted.length
+  const sd = Math.sqrt(counted.reduce((a, b) => a + (b - mean) ** 2, 0) / (counted.length - 1))
+  return [mean, sd]
 }
 
 /** Indicator ids the engine evaluates (those with a rule and listed under a domain). */
