@@ -3,6 +3,7 @@ import {
   BOOST_DISCLAIMER,
   boostPlan,
   CARDS,
+  DESIGN_BASIS,
   DISPLAY,
   downrankedCards,
   type BoostCard,
@@ -70,6 +71,24 @@ export function Boost({ demo, day, log, onLogChange, care }: Props) {
           {plan.offered.length > 0 && !askedYes && <ChosenSlots ids={today.chosen} max={max} />}
         </div>
         <p className="muted">{plan.red ? t('boost.red') : t('care.yours')}</p>
+        {/* Why the limit: Psychology's design basis, and an honest note that the number itself is a design choice. */}
+        {!plan.red && plan.offered.length > 0 && (
+          <details className="care-why">
+            <summary>{t('boost.whyTwoTitle', { n: max })}</summary>
+            <p>{t('boost.whyTwo', { n: max })}</p>
+            <p className="choose-basis">
+              {t('boost.whyTwoBasis')}{' '}
+              {DESIGN_BASIS.map((s, i) => (
+                <span key={s.cite}>
+                  {i > 0 && ' · '}
+                  <a href={s.url} target="_blank" rel="noreferrer">
+                    {s.cite}
+                  </a>
+                </span>
+              ))}
+            </p>
+          </details>
+        )}
         <TankLine care={care} />
       </header>
 
