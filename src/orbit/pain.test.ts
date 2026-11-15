@@ -1,102 +1,147 @@
 import { describe, expect, it } from 'vitest'
-import { isRedFlag } from './body'
+import { SYSTEMS } from './body'
+import { list } from './config'
 import { BUILT_IN_DEMO } from './demoData'
 import { evaluateDay } from './engine'
 import {
+  ALARM_CHECK,
+  alarmCheckFor,
   applyPain,
-  checkPainVocabulary,
+  CONTEXTS,
   EMPTY_PAIN,
-  INTENSITY_COLORS,
-  muscleHighlights,
-  muscleSymptom,
-  musclesOf,
+  MAX_QUALITIES,
+  nerveLike,
+  OFF_FIGURE,
+  painDay,
+  painPacketLines,
   painSymptoms,
+  painSystem,
+  QUALITIES,
+  REGIONS,
+  regionOfZone,
   toggleMuscle,
   toHerSide,
-  zoneSymptom,
+  verbalLabel,
+  VIEW_PARTS,
+  whereOf,
   type PainDay,
-  type PaintStroke,
+  type PainEvent,
 } from './pain'
 
-const stroke = (zones: PaintStroke['zones'], dots: PaintStroke['dots'] = [[0.5, 0.5]]): PaintStroke => ({
-  id: zones.join('+'),
-  view: 'front',
+const event = (patch: Partial<PainEvent>): PainEvent => ({
+  id: 'e1',
+  muscles: [],
+  strokes: [],
+  regions: ['lower_back'],
+  qualities: ['aching'],
   intensity: 6,
-  size: 'm',
-  dots,
-  zones,
+  contexts: [],
+  alarms: [],
+  ...patch,
+})
+const day = (...events: PainEvent[]): PainDay => ({ events })
+
+describe("pain-spec.json (Psychology's pain spec, read as is)", () => {
+  it('has the regions, words and contexts the report flow uses', () => {
+    expect(REGIONS).toHaveLength(14)
+    expect(QUALITIES).toHaveLength(9)
+    expect(CONTEXTS).toHaveLength(9)
+    expect(MAX_QUALITIES).toBe(3)
+    expect(CONTEXTS.find((c) => c.id === 'stress')?.domain).toBe('mind')
+  })
+
+  it('maps every region to one of the six body systems', () => {
+    const keys = new Set(['brain_mood', 'eyes', 'heart_vessels', 'bone_muscle', 'immune_skin', 'gut'])
+    for (const r of REGIONS) expect(keys.has(r.system), r.id).toBe(true)
+    expect(SYSTEMS).toHaveLength(6)
+  })
+
+  it('maps every zone of the figure to a region of the spec; eyes and skin are off the figure', () => {
+    const ids = new Set(REGIONS.map((r) => r.id))
+    for (const view of ['front', 'back'] as const) for (const z of VIEW_PARTS[view]) expect(ids.has(regionOfZone(z, view)), z).toBe(true)
+    for (const r of OFF_FIGURE) expect(ids.has(r)).toBe(true)
+    expect(regionOfZone('deltoids', 'front')).toBe('shoulder')
+    expect(regionOfZone('trapezius', 'front')).toBe('neck')
+    expect(regionOfZone('trapezius', 'back')).toBe('upper_back')
+    expect(regionOfZone('quadriceps', 'front')).toBe('leg')
+    expect(regionOfZone('hair', 'back')).toBe('head')
+  })
+
+  it('asks only about alarm signs of orbit-indicators.json', () => {
+    const flags = list('symptoms', 'red_flags')
+    for (const words of Object.values(ALARM_CHECK)) for (const w of words) expect(flags).toContain(w)
+    expect(alarmCheckFor(['lower_back'])).toEqual([])
+    expect(alarmCheckFor(['head', 'eyes'])).toEqual(['severe headache', 'vision change'])
+  })
 })
 
-describe('pain on the body map', () => {
-  it('only produces symptoms of the fixed vocabulary of the rules file', () => {
-    expect(checkPainVocabulary()).toEqual([])
+describe('a pain report', () => {
+  it('uses NRS 0 to 10 with the verbal label of the spec', () => {
+    expect([0, 2, 5, 7, 10].map(verbalLabel)).toEqual(['none', 'mild', 'moderate', 'severe', 'severe'])
   })
 
-  it('muscle mode: back muscles are back pain, the rest joint or muscle pain, the chest stays an alarm', () => {
-    expect(muscleSymptom('lower-back')).toBe('back pain')
-    expect(muscleSymptom('trapezius')).toBe('back pain')
-    expect(muscleSymptom('quadriceps')).toBe('joint or muscle pain')
-    expect(muscleSymptom('chest')).toBe('chest pain')
-    expect(isRedFlag(muscleSymptom('chest'))).toBe(true)
-  })
-
-  it('paint mode: head, chest, belly and back map to their own symptom; hair counts as head', () => {
-    expect(zoneSymptom('head')).toBe('headache')
-    expect(zoneSymptom('hair')).toBe('headache')
-    expect(zoneSymptom('chest')).toBe('chest pain')
-    expect(zoneSymptom('abs')).toBe('stomach pain')
-    expect(zoneSymptom('obliques')).toBe('stomach pain')
-    expect(zoneSymptom('upper-back')).toBe('back pain')
-    expect(zoneSymptom('knees')).toBe('joint or muscle pain')
-  })
-
-  it('muscle mode does not offer zones that are not muscles', () => {
-    expect(musclesOf('front')).not.toContain('head')
-    expect(musclesOf('front')).not.toContain('knees')
-    expect(musclesOf('back')).toContain('lower-back')
-  })
-
-  it('her side is the opposite of the viewer side from the front, the same from the back', () => {
+  it('knows her side: from the front, the viewer left is her right', () => {
     expect(toHerSide('left', 'front')).toBe('right')
     expect(toHerSide('left', 'back')).toBe('left')
   })
 
-  it('toggling the same muscle twice leaves nothing; one side colors only that side', () => {
-    const mark = { slug: 'biceps' as const, side: 'left' as const, view: 'front' as const, intensity: 4 }
-    const once = toggleMuscle(EMPTY_PAIN, mark)
-    expect(once.muscles).toHaveLength(1)
-    expect(toggleMuscle(once, mark).muscles).toHaveLength(0)
-    // Her left biceps is on the viewer's right from the front.
-    expect(muscleHighlights(once.muscles, 'front')).toEqual([{ slug: 'biceps', intensity: 4, side: 'right' }])
-    const both = toggleMuscle(once, { ...mark, side: 'right', intensity: 7 })
-    expect(muscleHighlights(both.muscles, 'front')).toEqual([{ slug: 'biceps', intensity: 7 }])
-    expect(muscleHighlights(both.muscles, 'back')).toEqual([])
+  it('says where: regions and side, and no side for regions that have none', () => {
+    const left = toggleMuscle([], { slug: 'biceps', side: 'left', view: 'front' })
+    expect(whereOf(left, [], [])).toEqual({ regions: ['arm'], side: 'left' })
+    const both = toggleMuscle(left, { slug: 'biceps', side: 'right', view: 'front' })
+    expect(whereOf(both, [], []).side).toBe('both')
+    expect(whereOf([], [{ id: 's', view: 'front', size: 'm', dots: [[0.5, 0.3]], zones: ['chest'] }], ['skin'])).toEqual({ regions: ['chest', 'skin'] })
+    expect(toggleMuscle(left, left[0])).toEqual([])
   })
 
-  it('a day of pain lists each symptom once', () => {
-    const day: PainDay = {
-      muscles: [{ slug: 'lower-back', side: 'left', view: 'back', intensity: 5 }],
-      strokes: [stroke(['upper-back', 'lower-back'], []), stroke(['knees'])],
-    }
-    expect(painSymptoms(day)).toEqual(['back pain', 'joint or muscle pain'])
+  it('shows the nerve note with 3 or more nerve-like words, never as an alarm', () => {
+    expect(nerveLike(['tingling', 'numb', 'burning'])).toBe(true)
+    expect(nerveLike(['tingling', 'numb', 'aching'])).toBe(false)
   })
 
-  it('feeds the engine: chest pain painted on day 121 turns the day red, back pain alone does not', () => {
-    const chest = applyPain(BUILT_IN_DEMO, { 121: { muscles: [], strokes: [stroke(['chest'])] } })
-    expect(evaluateDay(chest, 121).state).toBe('RED_PHYSICAL')
-    const back = applyPain(BUILT_IN_DEMO, { 121: { muscles: [], strokes: [stroke(['lower-back'])] } })
-    expect(evaluateDay(back, 121).indicators.symptoms.color).toBe('green')
-    expect(evaluateDay(back, 121).state).toBe(evaluateDay(BUILT_IN_DEMO, 121).state)
+  it('stands for one symptom per region, plus the alarm signs she confirmed', () => {
+    expect(painSymptoms(day(event({}), event({ id: 'e2', regions: ['lower_back', 'hip'] })))).toEqual(['pain in lower back', 'pain in hip or pelvis'])
+    expect(painSymptoms(day(event({ regions: ['chest'], alarms: ['chest pain'] })))).toEqual(['pain in chest', 'chest pain'])
+    expect(painSymptoms(day(event({ intensity: 0 })))).toEqual([])
+    expect(painSystem('pain in lower back')).toBe('bone_muscle')
+    expect(painSystem('headache')).toBeUndefined()
   })
 
-  it('back pain on three days in a row turns the symptoms rule yellow (more than 2 days)', () => {
-    const day = { muscles: [], strokes: [stroke(['lower-back'])] }
-    const data = applyPain(BUILT_IN_DEMO, { 121: day, 122: day, 123: day })
-    expect(evaluateDay(data, 123).indicators.symptoms.color).toBe('yellow')
+  it('reads an old or malformed day as empty', () => {
+    expect(painDay({ muscles: [], strokes: [] })).toEqual(EMPTY_PAIN)
+    expect(painDay(undefined)).toEqual(EMPTY_PAIN)
+  })
+})
+
+describe('pain and the engine', () => {
+  it('chest pain is red only if she confirms an alarm sign', () => {
+    const quiet = applyPain(BUILT_IN_DEMO, { 121: day(event({ regions: ['chest'] })) })
+    expect(evaluateDay(quiet, 121).state).not.toBe('RED_PHYSICAL')
+    const alarm = applyPain(BUILT_IN_DEMO, { 121: day(event({ regions: ['chest'], alarms: ['chest pain'] })) })
+    expect(evaluateDay(alarm, 121).state).toBe('RED_PHYSICAL')
+  })
+
+  it('a pain in the same region on 3 days in a row turns the symptoms rule yellow (more than 2 days)', () => {
+    const d = day(event({}))
+    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 121: d, 122: d }), 122).indicators.symptoms.color).toBe('green')
+    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 121: d, 122: d, 123: d }), 123).indicators.symptoms.color).toBe('yellow')
   })
 
   it('an empty log leaves the data untouched', () => {
     expect(applyPain(BUILT_IN_DEMO, {})).toBe(BUILT_IN_DEMO)
-    expect(INTENSITY_COLORS).toHaveLength(10)
+  })
+})
+
+describe('pain for the crew medical officer', () => {
+  const e = event({ side: 'left', started: '1_2_days', course: 'comes_and_goes', worse: 'yes', contexts: ['exercise', 'stress'] })
+
+  it('sends where, how strong, the words, timing and mechanics, never a cause', () => {
+    const [line] = painPacketLines(day(e), false)
+    expect(line).toBe('Pain: Lower back (left), 6/10 moderate; Aching; started 1 to 2 days ago, comes and goes; worse on move or press: yes; context: during or after exercise.')
+  })
+
+  it('keeps the stress context private unless she shares Mind', () => {
+    expect(painPacketLines(day(e), false)[0]).not.toContain('stressful')
+    expect(painPacketLines(day(e), true)[0]).toContain('stressful moment today')
   })
 })

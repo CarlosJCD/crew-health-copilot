@@ -6,6 +6,7 @@ import type { Slug } from 'react-muscle-highlighter'
 import { getIndicator, list, type Color } from './config'
 import type { DemoData } from './demoData'
 import { worstColor, type DayResult } from './engine'
+import { painSystem } from './pain'
 
 export type SystemId = 'brain' | 'eyes' | 'heart' | 'musculoskeletal' | 'immune' | 'gut'
 
@@ -81,7 +82,8 @@ export function systemRisks(system: BodySystem): string[] {
  * yellow if one of its symptoms has lasted long enough to turn the symptoms rule yellow.
  */
 export function systemColor(system: BodySystem, result: DayResult, symptomsToday: string[]): Color {
-  const own = symptomsToday.filter((s) => system.symptoms.includes(s.toLowerCase()))
+  // Its own symptom buttons, plus pain logged in a region of this system (pain-spec.json regions).
+  const own = symptomsToday.filter((s) => system.symptoms.includes(s.toLowerCase()) || painSystem(s) === VOCAB_SYSTEM[system.id])
   const lasting = own.length > 0 && result.indicators.symptoms?.color === 'yellow'
   const fromSymptoms: Color = own.some(isRedFlag) ? 'red' : lasting ? 'yellow' : 'green'
   const colors = system.indicators.map((id) => result.indicators[id]?.color ?? 'none')

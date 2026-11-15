@@ -14,6 +14,7 @@ import {
 } from '../orbit/transmit'
 import { useI18n } from '../i18n/context'
 import type { StringKey } from '../i18n/strings'
+import { painPacketLines, type PainDay } from '../orbit/pain'
 
 interface Props {
   demo: LoadedDemo
@@ -25,6 +26,8 @@ interface Props {
   onOutboxChange: (p: Packet[]) => void
   demoClock: boolean
   onDemoClockChange: (on: boolean) => void
+  /** Her pain reports of the day: Body, so they go with the medical officer packet. */
+  pain?: PainDay
 }
 
 const SPEED = 60 // demo clock: one minute passes in one second
@@ -38,7 +41,7 @@ const mmss = (ms: number) => {
 }
 
 /** Outbox with the mission's signal delay, and the switches for what leaves the device. */
-export function Transmit({ demo, day, scenario, share, onShareChange, outbox, onOutboxChange, demoClock, onDemoClockChange }: Props) {
+export function Transmit({ demo, day, scenario, share, onShareChange, outbox, onOutboxChange, demoClock, onDemoClockChange, pain }: Props) {
   const { t, lang } = useI18n()
   const [now, setNow] = useState(clockNow)
   const speed = demoClock ? SPEED : 1
@@ -64,7 +67,7 @@ export function Transmit({ demo, day, scenario, share, onShareChange, outbox, on
   }
 
   const drafts: { draft: PacketDraft; label: StringKey; note: StringKey; suggested: boolean }[] = [
-    { draft: cmoShare(result, share), label: 'tx.cmo', note: 'tx.cmoNote', suggested: result.state === 'EARLY_SIGNAL' },
+    { draft: cmoShare(result, share, painPacketLines(pain, share.mind)), label: 'tx.cmo', note: 'tx.cmoNote', suggested: result.state === 'EARLY_SIGNAL' },
     { draft: weeklySummary(demo.data, day, share), label: 'tx.weekly', note: 'tx.weeklyNote', suggested: !!record?.screen },
   ]
   const escalation = escalationPacket(result)

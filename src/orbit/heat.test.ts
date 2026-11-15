@@ -1,10 +1,26 @@
 import { describe, expect, it } from 'vitest'
 import { FIXED_SYMPTOMS } from './body'
 import { HEAT, heatOn, SYMPTOM_ZONES, warmth } from './heat'
-import { VIEW_PARTS, type PainLog } from './pain'
+import { VIEW_PARTS, type PainLog, type Slug } from './pain'
 
-const painted = (day: number, zones: PainLog[string]['strokes'][number]['zones'], intensity = 10, dots: [number, number][] = [[0.5, 0.4]]): PainLog => ({
-  [day]: { muscles: [], strokes: [{ id: `s${day}`, view: 'front', intensity, size: 'm', dots, zones }] },
+const painted = (day: number, zones: Slug[], intensity = 10, dots: [number, number][] = [[0.5, 0.4]]): PainLog => ({
+  [day]: {
+    events: [
+      {
+        id: `e${day}`,
+        muscles: [],
+        strokes: [{ id: `s${day}`, view: 'front', size: 'm', dots, zones }],
+        regions: ['abdomen'],
+        qualities: [],
+        intensity,
+        contexts: [],
+        alarms: [],
+      },
+    ],
+  },
+})
+const muscle = (slug: Slug, side: 'left' | 'right', intensity: number): PainLog[string] => ({
+  events: [{ id: `m-${slug}-${side}`, muscles: [{ slug, side, view: 'front' }], strokes: [], regions: ['leg'], qualities: [], intensity, contexts: [], alarms: [] }],
 })
 
 describe('symptom heat map', () => {
@@ -62,12 +78,14 @@ describe('symptom heat map', () => {
   })
 
   it('keeps her side when every warm log of a muscle was on that side', () => {
-    const one: PainLog = { 125: { muscles: [{ slug: 'quadriceps', side: 'right', view: 'front', intensity: 9 }], strokes: [] } }
+    const one: PainLog = { 125: muscle('quadriceps', 'right', 9) }
     expect(heatOn(125, 'front', one, {}).zones[0]).toMatchObject({ zone: 'quadriceps', side: 'right' })
-    const both: PainLog = {
-      ...one,
-      124: { muscles: [{ slug: 'quadriceps', side: 'left', view: 'front', intensity: 9 }], strokes: [] },
-    }
+    const both: PainLog = { ...one, 124: muscle('quadriceps', 'left', 9) }
     expect(heatOn(125, 'front', both, {}).zones[0].side).toBeUndefined()
+  })
+
+  it('lists pain in the eyes or skin apart, since the figure has no zone for them', () => {
+    const log: PainLog = { 125: { events: [{ id: 'x', muscles: [], strokes: [], regions: ['skin'], qualities: [], intensity: 4, contexts: [], alarms: [] }] } }
+    expect(heatOn(125, 'front', log, {}).noPlace).toEqual([{ symptom: 'pain in skin (any area)', day: 125 }])
   })
 })

@@ -64,14 +64,14 @@ function privacyLine(share: ShareSettings): string {
   return hidden.length ? `Not shared by her choice: ${hidden.join(', ')}.` : 'She chose to share Body, Mind and Crew.'
 }
 
-/** Onboard packet she chooses to send to the crew medical officer. */
-export function cmoShare(result: DayResult, share: ShareSettings): PacketDraft {
+/** Onboard packet she chooses to send to the crew medical officer. `pain` = her pain reports of the day (Body). */
+export function cmoShare(result: DayResult, share: ShareSettings, pain: string[] = []): PacketDraft {
   return {
     kind: 'cmo_share',
     to: 'crew_medical_officer',
     day: result.day,
     title: `Day ${result.day} status, shared by the astronaut`,
-    lines: [`ORBIT state: ${STATE_EN[result.state]}`, ...domainLines(result, share), privacyLine(share)],
+    lines: [`ORBIT state: ${STATE_EN[result.state]}`, ...domainLines(result, share), ...pain, privacyLine(share)],
   }
 }
 

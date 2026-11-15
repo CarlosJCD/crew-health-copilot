@@ -1,27 +1,14 @@
 import { useRef, useState, type PointerEvent } from 'react'
 import Body, { type ExtendedBodyPart } from 'react-muscle-highlighter'
 import { FIGURE, partKey } from '../orbit/display'
-import {
-  BRUSH,
-  intensityColor,
-  MAX_DOTS,
-  MAX_STROKES,
-  VIEW_PARTS,
-  zoneOf,
-  type BodyView,
-  type BrushSize,
-  type PainDay,
-  type PaintStroke,
-  type Slug,
-} from '../orbit/pain'
+import { BRUSH, MARK_COLOR, MAX_DOTS, MAX_STROKES, VIEW_PARTS, zoneOf, type BodyView, type BrushSize, type PaintStroke, type Slug } from '../orbit/pain'
 import { useI18n } from '../i18n/context'
 
 interface Props {
   view: BodyView
-  intensity: number
   size: BrushSize
-  pain: PainDay
-  onChange: (pain: PainDay) => void
+  strokes: PaintStroke[]
+  onChange: (strokes: PaintStroke[]) => void
 }
 
 const ALL_PARTS = new Set<string>([...VIEW_PARTS.front, ...VIEW_PARTS.back, 'hair'])
@@ -29,17 +16,12 @@ const round = (x: number) => Math.round(x * 1000) / 1000
 
 /** What the figure library should color: whole zones (chosen from the list) and an outline on painted zones. */
 function zoneHighlights(strokes: PaintStroke[]): ExtendedBodyPart[] {
-  const whole = new Map<Slug, number>()
+  const whole = new Set<Slug>()
   const outlined = new Set<Slug>()
-  for (const s of strokes) {
-    for (const z of s.zones) {
-      if (s.dots.length) outlined.add(z)
-      else whole.set(z, Math.max(whole.get(z) ?? 0, s.intensity))
-    }
-  }
-  return [...new Set([...whole.keys(), ...outlined])].map((slug) => ({
+  for (const s of strokes) for (const z of s.zones) (s.dots.length ? outlined : whole).add(z)
+  return [...new Set([...whole, ...outlined])].map((slug) => ({
     slug,
-    ...(whole.has(slug) ? { color: intensityColor(whole.get(slug)!) } : {}),
+    ...(whole.has(slug) ? { color: MARK_COLOR } : {}),
     ...(outlined.has(slug) ? { styles: { stroke: FIGURE.outline, strokeWidth: 5 } } : {}),
   }))
 }
@@ -48,13 +30,13 @@ function zoneHighlights(strokes: PaintStroke[]): ExtendedBodyPart[] {
  * She is not sure what hurts: she paints the area with her finger or the mouse. Only paint on the body
  * counts; ORBIT reads the zone under each dab. Keyboard path: choose a zone and paint it whole.
  */
-export function PainPainter({ view, intensity, size, pain, onChange }: Props) {
+export function PainPainter({ view, size, strokes, onChange }: Props) {
   const { t } = useI18n()
   const box = useRef<HTMLDivElement>(null)
   const [current, setCurrent] = useState<PaintStroke | null>(null)
   const [picked, setZone] = useState<Slug>(VIEW_PARTS[view][0])
   const zone = VIEW_PARTS[view].includes(picked) ? picked : VIEW_PARTS[view][0]
-  const shown = [...pain.strokes, ...(current ? [current] : [])].filter((s) => s.view === view)
+  const shown = [...strokes, ...(current ? [current] : [])].filter((s) => s.view === view)
 
   /** Zone of the figure under the pointer (the paint layer ignores the pointer). */
   const zoneAt = (x: number, y: number): Slug | undefined => {
@@ -70,10 +52,10 @@ export function PainPainter({ view, intensity, size, pain, onChange }: Props) {
 
   const start = (e: PointerEvent<HTMLDivElement>) => {
     const z = zoneAt(e.clientX, e.clientY)
-    if (!z || pain.strokes.length >= MAX_STROKES) return
+    if (!z || strokes.length >= MAX_STROKES) return
     e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
-    setCurrent({ id: `${e.timeStamp}-${pain.strokes.length}`, view, intensity, size, dots: [where(e)], zones: [z] })
+    setCurrent({ id: `${e.timeStamp}-${strokes.length}`, view, size, dots: [where(e)], zones: [z] })
   }
   const move = (e: PointerEvent<HTMLDivElement>) => {
     if (!current || current.dots.length >= MAX_DOTS) return
@@ -85,12 +67,12 @@ export function PainPainter({ view, intensity, size, pain, onChange }: Props) {
     setCurrent({ ...current, dots: [...current.dots, p], zones: current.zones.includes(z) ? current.zones : [...current.zones, z] })
   }
   const end = () => {
-    if (current) onChange({ ...pain, strokes: [...pain.strokes, current] })
+    if (current) onChange([...strokes, current])
     setCurrent(null)
   }
   const paintWhole = () => {
-    if (pain.strokes.length >= MAX_STROKES) return
-    onChange({ ...pain, strokes: [...pain.strokes, { id: `zone-${zone}-${pain.strokes.length}`, view, intensity, size, dots: [], zones: [zone] }] })
+    if (strokes.length >= MAX_STROKES) return
+    onChange([...strokes, { id: `zone-${zone}-${strokes.length}`, view, size, dots: [], zones: [zone] }])
   }
 
   return (
@@ -116,7 +98,7 @@ export function PainPainter({ view, intensity, size, pain, onChange }: Props) {
                   left: `${x * 100}%`,
                   top: `${y * 100}%`,
                   width: `${BRUSH[s.size] * 100}%`,
-                  background: `radial-gradient(circle, ${intensityColor(s.intensity)} 0 35%, transparent 70%)`,
+                  background: `radial-gradient(circle, ${MARK_COLOR} 0 35%, transparent 70%)`,
                 }}
               />
             )),

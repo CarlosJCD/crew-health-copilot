@@ -128,6 +128,7 @@ export default function App() {
             onOutboxChange={setOutbox}
             demoClock={demoClock}
             onDemoClockChange={setDemoClock}
+            pain={painLog[day]}
           />
         ) : active.id === 'body' ? (
           <BodyMap

@@ -325,3 +325,13 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .heat-list-title { margin: 0.5rem 0 0.2rem; font-size: 0.85rem; font-weight: 600; }
 .heat-list { list-style: none; padding: 0; margin: 0 0 0.5rem; display: grid; gap: 0.25rem; font-size: 0.82rem; }
 .heat-list li { display: flex; align-items: center; gap: 0.4rem; }
+
+/* ORBIT: pain report (Psychology's flow) */
+.pain h3 { margin-top: 0.4rem; }
+.pain-details fieldset { border: 0; border-top: 1px solid var(--line); margin: 0.5rem 0 0; padding: 0.5rem 0 0; }
+.pain-details legend { font-weight: 600; font-size: 0.92rem; padding: 0; }
+.pain-details input[type='range'] { width: 100%; accent-color: var(--watch); }
+.pain-sub { margin: 0.5rem 0 0; font-weight: 600; font-size: 0.88rem; }
+.pain-safety { border: 1px solid var(--act); border-radius: var(--radius); padding: 0.6rem 0.8rem; margin: 0.5rem 0; }
+.pain-events { list-style: none; padding: 0; margin: 0.2rem 0; display: grid; gap: 0.35rem; font-size: 0.88rem; }
+.pain-events p { margin: 0.15rem 0 0; }

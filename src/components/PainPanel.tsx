@@ -1,9 +1,28 @@
 import { useState } from 'react'
-import { isRedFlag } from '../orbit/body'
-import { partKey } from '../orbit/display'
-import { BRUSH, EMPTY_PAIN, INTENSITY, intensityColor, painSymptoms, type BodyView, type BrushSize, type PainDay } from '../orbit/pain'
+import { qualityLabel, regionLabel } from '../orbit/display'
+import {
+  alarmCheckFor,
+  BRUSH,
+  CO2_SOURCE,
+  EMPTY_DETAILS,
+  nerveLike,
+  OFF_FIGURE,
+  painDay,
+  painSymptoms,
+  verbalLabel,
+  whereOf,
+  type BodySide,
+  type BodyView,
+  type BrushSize,
+  type MuscleMark,
+  type PainDay,
+  type PainDetailsValue,
+  type PainEvent,
+  type PaintStroke,
+} from '../orbit/pain'
 import { useI18n } from '../i18n/context'
 import { MuscleSelector } from './MuscleSelector'
+import { PainDetails } from './PainDetails'
 import { PainPainter } from './PainPainter'
 
 interface Props {
@@ -12,125 +31,216 @@ interface Props {
   onChange: (pain: PainDay) => void
 }
 
-type Mode = 'muscle' | 'paint'
+type Step = 'where' | 'details' | 'safety'
+
+/** Id of a new report (wall clock, read only in event handlers). */
+const newEventId = () => `ev-${Date.now()}`
+type Mode = 'exact' | 'area'
 
 /**
- * "Does something hurt?" One question first: is she sure it is muscle pain? Yes = pick the muscle;
- * not sure = paint where it hurts. Both end in the fixed symptom vocabulary, shown under the figure.
+ * "Does something hurt?" Psychology's report flow (pain-spec.json): where (exact muscle or painted area,
+ * side, front or back), then what it feels like, how strong, when, what was happening and whether moving or
+ * pressing makes it worse. Pain in the head, eyes or chest asks the alarm question before saving.
  */
-export function PainPanel({ day, pain = EMPTY_PAIN, onChange }: Props) {
-  const { t } = useI18n()
+export function PainPanel({ day, pain, onChange }: Props) {
+  const { t, lang } = useI18n()
+  const [step, setStep] = useState<Step>('where')
   const [mode, setMode] = useState<Mode | null>(null)
   const [view, setView] = useState<BodyView>('front')
-  const [intensity, setIntensity] = useState(INTENSITY.start)
   const [size, setSize] = useState<BrushSize>('m')
-  const symptoms = painSymptoms(pain)
-  const sideText = (s?: 'left' | 'right') => (s ? ` (${t(s === 'left' ? 'pain.left' : 'pain.right')})` : '')
-  const any = pain.muscles.length > 0 || pain.strokes.length > 0
+  const [muscles, setMuscles] = useState<MuscleMark[]>([])
+  const [strokes, setStrokes] = useState<PaintStroke[]>([])
+  const [extra, setExtra] = useState<string[]>([])
+  const [details, setDetails] = useState<PainDetailsValue>(EMPTY_DETAILS)
+  const [alarms, setAlarms] = useState<string[]>([])
+  const today = painDay(pain)
+  const where = whereOf(muscles, strokes, extra)
+  const checks = alarmCheckFor(where.regions)
+
+  const sideText = (side?: BodySide | 'both') => (side ? ` (${t(side === 'left' ? 'pain.left' : side === 'right' ? 'pain.right' : 'pain.both')})` : '')
+  const whereText = (e: Pick<PainEvent, 'regions' | 'side'>) => e.regions.map((r) => regionLabel(r, lang)).join(', ') + sideText(e.side)
+
+  const reset = () => {
+    setStep('where')
+    setMode(null)
+    setMuscles([])
+    setStrokes([])
+    setExtra([])
+    setDetails(EMPTY_DETAILS)
+    setAlarms([])
+  }
+  const save = (confirmed: string[]) => {
+    const event: PainEvent = { id: newEventId(), muscles, strokes, ...where, ...details, alarms: confirmed }
+    onChange({ events: [...today.events, event] })
+    reset()
+  }
 
   return (
     <section className="pain card" aria-labelledby="pain-title">
       <h2 id="pain-title">{t('pain.title')}</h2>
-      <p>{t('pain.ask')}</p>
-      <div className="actions" role="group" aria-label={t('pain.ask')}>
-        <button type="button" className="button secondary" aria-pressed={mode === 'muscle'} onClick={() => setMode('muscle')}>
-          {t('pain.muscle')}
-        </button>
-        <button type="button" className="button secondary" aria-pressed={mode === 'paint'} onClick={() => setMode('paint')}>
-          {t('pain.paint')}
-        </button>
-      </div>
+      <p className="muted">{t('pain.noCause')}</p>
 
-      {mode && (
-        <div className="pain-work">
-          <div className="pain-controls">
-            <div className="actions" role="group" aria-label={t('pain.view')}>
-              {(['front', 'back'] as const).map((v) => (
-                <button key={v} type="button" className="button secondary" aria-pressed={view === v} onClick={() => setView(v)}>
-                  {t(v === 'front' ? 'pain.front' : 'pain.back')}
-                </button>
-              ))}
-            </div>
-            <label htmlFor="pain-intensity" className="pain-intensity">
-              <span className="swatch" style={{ background: intensityColor(intensity) }} aria-hidden="true" />
-              {t('pain.intensity', { n: intensity })}
-            </label>
-            <input
-              id="pain-intensity"
-              type="range"
-              min={INTENSITY.min}
-              max={INTENSITY.max}
-              value={intensity}
-              onChange={(e) => setIntensity(Number(e.target.value))}
-            />
-            <p className="hint">{t('pain.scale')}</p>
-            {mode === 'paint' && (
-              <div className="actions" role="group" aria-label={t('pain.brush')}>
-                {(Object.keys(BRUSH) as BrushSize[]).map((s) => (
-                  <button key={s} type="button" className="button secondary" aria-pressed={size === s} onClick={() => setSize(s)}>
-                    {t(`pain.brush.${s}`)}
-                  </button>
-                ))}
-              </div>
-            )}
+      {step === 'where' && (
+        <>
+          <h3>{t('pain.where')}</h3>
+          <p>{t('pain.ask')}</p>
+          <div className="actions" role="group" aria-label={t('pain.ask')}>
+            <button type="button" className="button secondary" aria-pressed={mode === 'exact'} onClick={() => setMode('exact')}>
+              {t('pain.muscle')}
+            </button>
+            <button type="button" className="button secondary" aria-pressed={mode === 'area'} onClick={() => setMode('area')}>
+              {t('pain.paint')}
+            </button>
+          </div>
+          <div className="actions" role="group" aria-label={t('pain.offFigure')}>
+            <span className="muted">{t('pain.offFigure')}</span>
+            {OFF_FIGURE.map((r) => (
+              <button
+                key={r}
+                type="button"
+                className="button secondary"
+                aria-pressed={extra.includes(r)}
+                onClick={() => setExtra((x) => (x.includes(r) ? x.filter((y) => y !== r) : [...x, r]))}
+              >
+                {regionLabel(r, lang)}
+              </button>
+            ))}
           </div>
 
-          {mode === 'muscle' ? (
-            <MuscleSelector view={view} intensity={intensity} pain={pain} onChange={onChange} />
-          ) : (
-            <PainPainter view={view} intensity={intensity} size={size} pain={pain} onChange={onChange} />
+          {mode && (
+            <div className="pain-work">
+              <div className="pain-controls">
+                <div className="actions" role="group" aria-label={t('pain.view')}>
+                  {(['front', 'back'] as const).map((v) => (
+                    <button key={v} type="button" className="button secondary" aria-pressed={view === v} onClick={() => setView(v)}>
+                      {t(v === 'front' ? 'pain.front' : 'pain.back')}
+                    </button>
+                  ))}
+                </div>
+                {mode === 'area' && (
+                  <div className="actions" role="group" aria-label={t('pain.brush')}>
+                    {(Object.keys(BRUSH) as BrushSize[]).map((s) => (
+                      <button key={s} type="button" className="button secondary" aria-pressed={size === s} onClick={() => setSize(s)}>
+                        {t(`pain.brush.${s}`)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {mode === 'exact' ? (
+                <MuscleSelector view={view} marks={muscles} onChange={setMuscles} />
+              ) : (
+                <PainPainter view={view} size={size} strokes={strokes} onChange={setStrokes} />
+              )}
+            </div>
           )}
+
+          {where.regions.length > 0 && <p role="status">{t('pain.whereIs', { where: whereText(where) })}</p>}
+          <div className="actions">
+            <button type="button" className="button" disabled={!where.regions.length} onClick={() => setStep('details')}>
+              {t('pain.next')}
+            </button>
+            {(muscles.length > 0 || strokes.length > 0 || extra.length > 0) && (
+              <button type="button" className="button secondary" onClick={reset}>
+                {t('pain.clearMarks')}
+              </button>
+            )}
+          </div>
+        </>
+      )}
+
+      {step === 'details' && (
+        <>
+          <p>
+            <strong>{t('pain.whereIs', { where: whereText(where) })}</strong>
+          </p>
+          <PainDetails value={details} onChange={setDetails} />
+          <div className="actions">
+            <button type="button" className="button secondary" onClick={() => setStep('where')}>
+              {t('pain.prev')}
+            </button>
+            <button type="button" className="button" onClick={() => (checks.length ? setStep('safety') : save([]))}>
+              {t('pain.save')}
+            </button>
+          </div>
+        </>
+      )}
+
+      {step === 'safety' && (
+        <div role="alertdialog" aria-labelledby="pain-safety" className="pain-safety">
+          <p id="pain-safety">
+            <strong>{t('pain.safety')}</strong>
+          </p>
+          <div className="actions">
+            {checks.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className="button secondary alarm"
+                aria-pressed={alarms.includes(s)}
+                onClick={() => setAlarms((a) => (a.includes(s) ? a.filter((x) => x !== s) : [...a, s]))}
+                lang="en"
+              >
+                <span aria-hidden="true">■ </span>
+                {s}
+              </button>
+            ))}
+          </div>
+          <div className="actions">
+            <button type="button" className="button secondary" onClick={() => save([])}>
+              {t('pain.none')}
+            </button>
+            <button type="button" className="button" disabled={!alarms.length} onClick={() => save(alarms)}>
+              {t('pain.save')}
+            </button>
+          </div>
         </div>
       )}
 
-      {any && (
+      {today.events.length > 0 && (
         <div role="status" className="pain-summary">
           <p>
-            <strong>{t('pain.marked', { day })}</strong>{' '}
-            {pain.muscles.map((m, i) => {
-              const label = `${t(partKey(m.slug))}${sideText(m.side)} · ${m.intensity}/10`
-              return (
-                <button
-                  key={`m-${m.slug}-${m.side ?? 'both'}-${m.view}`}
-                  type="button"
-                  className="chip"
-                  aria-label={t('pain.remove', { s: label })}
-                  onClick={() => onChange({ ...pain, muscles: pain.muscles.filter((_, k) => k !== i) })}
-                >
-                  {label} ✕
-                </button>
-              )
-            })}
-            {pain.strokes.map((s, i) => {
-              const label = `${t('pain.painted', { zones: s.zones.map((z) => t(partKey(z))).join(', ') })} · ${s.intensity}/10`
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  className="chip"
-                  aria-label={t('pain.remove', { s: label })}
-                  onClick={() => onChange({ ...pain, strokes: pain.strokes.filter((_, k) => k !== i) })}
-                >
-                  {label} ✕
-                </button>
-              )
-            })}
+            <strong>{t('pain.events', { day })}</strong>
           </p>
+          <ul className="pain-events">
+            {today.events.map((e, i) => {
+              const label = `${whereText(e)} · ${e.intensity}/10 ${t(`pain.level.${verbalLabel(e.intensity)}`)}`
+              const words = e.qualities.map((q) => qualityLabel(q, lang)).join(', ')
+              return (
+                <li key={e.id}>
+                  <span>
+                    {label}
+                    {words && ` · ${words}`}
+                  </span>{' '}
+                  <button
+                    type="button"
+                    className="chip"
+                    aria-label={t('pain.remove', { s: label })}
+                    onClick={() => onChange({ events: today.events.filter((_, k) => k !== i) })}
+                  >
+                    ✕
+                  </button>
+                  {e.alarms.length > 0 && <p className="alarm-text">{t('body.redNow')} <a href="#/transmit">{t('boost.openTransmit')}</a></p>}
+                  {e.alarms.length === 0 && nerveLike(e.qualities) && <p className="hint">{t('pain.nerve')}</p>}
+                  {e.regions.includes('head') && (
+                    <p className="hint">
+                      {t('pain.co2')}{' '}
+                      {CO2_SOURCE.url && (
+                        <a href={CO2_SOURCE.url} target="_blank" rel="noreferrer">
+                          {t('pain.source')}: {CO2_SOURCE.cite.split(',').slice(0, 2).join(',')}
+                        </a>
+                      )}
+                    </p>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
           <p>
-            <strong>{t('pain.loggedAs')}</strong> <span lang="en">{symptoms.join(', ')}</span>
+            <strong>{t('pain.loggedAs')}</strong> <span lang="en">{painSymptoms(today).join(', ')}</span>
           </p>
-          {symptoms.some(isRedFlag) && (
-            <p className="alarm-text">
-              {t('body.redNow')} <a href="#/transmit">{t('boost.openTransmit')}</a>
-            </p>
-          )}
           <div className="actions">
-            {pain.strokes.length > 0 && (
-              <button type="button" className="button secondary" onClick={() => onChange({ ...pain, strokes: pain.strokes.slice(0, -1) })}>
-                {t('pain.undo')}
-              </button>
-            )}
-            <button type="button" className="button secondary" onClick={() => onChange(EMPTY_PAIN)}>
+            <button type="button" className="button secondary" onClick={() => onChange({ events: [] })}>
               {t('pain.clear')}
             </button>
           </div>

@@ -5,7 +5,19 @@
 // The cooling numbers and the place of each button symptom are team criterion (engineering proposal,
 // pending review by Psychology 1). Days are mission days: the logs carry no clock time.
 import type { SymptomLog } from './body'
-import { INTENSITY_COLORS, VIEW_PARTS, zoneOf, type BodySide, type BodyView, type BrushSize, type PainLog, type Slug } from './pain'
+import {
+  INTENSITY_COLORS,
+  OFF_FIGURE,
+  painDay,
+  regionSymptom,
+  VIEW_PARTS,
+  zoneOf,
+  type BodySide,
+  type BodyView,
+  type BrushSize,
+  type PainLog,
+  type Slug,
+} from './pain'
 
 export const HEAT = {
   /** Warmth halves every this many days without a new log of that zone. */
@@ -66,7 +78,7 @@ export interface DotHeat {
 export interface HeatMap {
   zones: ZoneHeat[]
   dots: DotHeat[]
-  /** Symptoms logged with no place on the figure (skin rash, joint or muscle pain from a button). */
+  /** Symptoms logged with no place on the figure (skin rash, pain in the eyes or skin, joint or muscle pain from a button). */
   noPlace: { symptom: string; day: number }[]
 }
 
@@ -95,15 +107,21 @@ export function heatOn(day: number, view: BodyView, pain: PainLog, symptoms: Sym
   }
 
   for (let d = day - HEAT.windowDays + 1; d <= day; d++) {
-    const p = pain[d]
-    for (const m of p?.muscles ?? []) if (m.view === view) warm(m.slug, d, m.intensity, 'pain', m.side)
-    for (const s of p?.strokes ?? []) {
-      // Painted strokes belong to the view they were painted on; whole zones show on any view that draws them.
-      if (s.dots.length && s.view !== view) continue
-      for (const z of s.zones) warm(zoneOf(z), d, s.intensity, 'pain')
-      const w = warmth(s.intensity, day - d)
-      if (s.view === view && w >= HEAT.minWarmth) {
-        s.dots.forEach(([x, y], i) => dots.push({ key: `${s.id}-${i}`, x, y, size: s.size, warmth: w }))
+    for (const e of painDay(pain[d]).events) {
+      if (e.intensity <= 0) continue
+      for (const m of e.muscles) if (m.view === view) warm(m.slug, d, e.intensity, 'pain', m.side)
+      for (const s of e.strokes) {
+        // Painted strokes belong to the view they were painted on; whole zones show on any view that draws them.
+        if (s.dots.length && s.view !== view) continue
+        for (const z of s.zones) warm(zoneOf(z), d, e.intensity, 'pain')
+        const w = warmth(e.intensity, day - d)
+        if (s.view === view && w >= HEAT.minWarmth) {
+          s.dots.forEach(([x, y], i) => dots.push({ key: `${e.id}-${s.id}-${i}`, x, y, size: s.size, warmth: w }))
+        }
+      }
+      // Eyes and skin have no zone on the figure.
+      for (const r of e.regions.filter((r) => OFF_FIGURE.includes(r))) {
+        if (warmth(e.intensity, day - d) >= HEAT.minWarmth) noPlace.push({ symptom: regionSymptom(r), day: d })
       }
     }
     for (const symptom of symptoms[d] ?? []) {
