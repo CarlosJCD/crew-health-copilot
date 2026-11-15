@@ -1047,3 +1047,99 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .care-why p { max-width: 72ch; margin: 0 0 0.4rem; color: var(--muted); font-size: 0.86rem; line-height: 1.45; }
 .care-why .choose-basis { font-size: 0.82rem; }
 .care-why a { color: var(--accent); }
+
+/* ---- Transmit, redesigned: the delay drawn as a path, three clear switches, packets that show their own
+   status (bar in transit, check once delivered), the demo clock tucked under the outbox ---- */
+.transmit { max-width: 760px; margin: 0 auto; }
+.tx-head { margin: 0.25rem 0 1rem; }
+.tx-head h1 { margin: 0 0 0.6rem; font-size: 1.6rem; line-height: 1.2; }
+.transmit section.tx-card, .tx-path { padding: 1rem 1.1rem; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); }
+.transmit section.tx-packets { padding: 0; border: 0; background: none; }
+.transmit section { margin-bottom: 1.1rem; }
+.tx-section-title { margin: 0 0 0.7rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); }
+
+.tx-path { display: grid; gap: 0.8rem; }
+.transmit .tx-path p { margin: 0; }
+.tx-path-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.tx-path-track { display: flex; align-items: flex-start; }
+.tx-node { flex: none; width: 4.6rem; display: grid; justify-items: center; gap: 0.3rem; text-align: center; font-size: 0.74rem; line-height: 1.2; color: var(--muted); }
+.tx-node-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); }
+.tx-node.first .tx-node-icon { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); color: var(--accent); }
+.tx-node.first { color: var(--text); }
+.tx-link { position: relative; flex: 1; min-width: 2.5rem; height: 44px; display: grid; align-content: center; justify-items: center; text-align: center; }
+.tx-link::before { content: ''; position: absolute; left: -0.9rem; right: -0.9rem; top: 50%; border-top: 2px solid var(--line); z-index: 0; }
+.tx-link.long::before { border-top-style: dashed; }
+.tx-link-label, .tx-link-sub { position: relative; z-index: 1; padding: 0 0.35rem; background: var(--panel); white-space: nowrap; }
+.tx-link-label { transform: translateY(-0.7rem); font-family: var(--font-mono); font-size: 0.74rem; color: var(--text); }
+.tx-link-sub { transform: translateY(0.55rem); font-size: 0.7rem; color: var(--muted); }
+.tx-link.short .tx-link-label { color: var(--muted); }
+.tx-first { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; }
+.tx-first-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); flex: none; }
+
+.tx-share-row { display: flex; align-items: center; gap: 0.75rem; min-height: 52px; padding: 0.35rem 0; border-top: 1px solid var(--line); cursor: pointer; }
+.tx-share .tx-section-title + .tx-share-row { border-top: 0; }
+div.tx-share-row { cursor: default; }
+.tx-domain { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); flex: none; }
+.tx-share-name { flex: 1; font-weight: 600; font-family: var(--font-title); }
+.tx-always { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+.tx-switch { -webkit-appearance: none; appearance: none; position: relative; flex: none; width: 52px; height: 30px; margin: 0; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel-2); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.tx-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--muted); transition: transform 0.15s, background 0.15s; }
+.tx-switch:checked { background: var(--accent-strong); border-color: var(--accent-strong); }
+.tx-switch:checked::after { transform: translateX(22px); background: #fff; }
+.tx-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tx-switch.small { width: 40px; height: 24px; }
+.tx-switch.small::after { width: 16px; height: 16px; }
+.tx-switch.small:checked::after { transform: translateX(16px); }
+.transmit .tx-never { display: flex; align-items: flex-start; gap: 0.5rem; margin: 0.6rem 0 0; padding-top: 0.7rem; border-top: 1px solid var(--line);
+  color: var(--muted); font-size: 0.84rem; line-height: 1.4; }
+.tx-never svg { flex: none; margin-top: 0.1rem; }
+
+.tx-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; align-items: start; }
+@media (min-width: 720px) { .tx-grid { grid-template-columns: 1fr 1fr; } }
+.tx-packet { position: relative; display: grid; gap: 0.7rem; padding: 1rem; border-radius: 16px; border: 1px solid var(--glass-border, var(--line));
+  background: var(--glass-sheen), var(--glass-bg, var(--panel)); }
+.tx-packet.suggested { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.tx-packet.red { border-color: var(--act); background: color-mix(in oklab, var(--act) 10%, var(--panel)); }
+.tx-packet-head { display: flex; align-items: center; gap: 0.7rem; }
+.tx-who-icon { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); }
+.tx-who-icon.small { width: 30px; height: 30px; border-radius: 9px; }
+.tx-who { flex: 1; min-width: 0; display: grid; line-height: 1.25; }
+.tx-who strong { font-family: var(--font-title); font-size: 0.95rem; }
+.tx-who .muted { font-size: 0.8rem; }
+.tx-eta { flex: none; display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: 0.72rem; }
+.tx-suggested { justify-self: start; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--accent-strong); color: #fff; font-size: 0.72rem; font-weight: 700; }
+.tx-preview { padding: 0.7rem 0.85rem; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); font-size: 0.82rem; line-height: 1.45; }
+.transmit .tx-preview p { margin: 0 0 0.3rem; font-weight: 600; }
+.tx-preview ul { margin: 0; padding-left: 1rem; color: var(--muted); }
+.transmit .tx-note { margin: -0.3rem 0 0; color: var(--muted); font-size: 0.8rem; text-align: center; }
+.transmit .tx-wait { margin: 0; font-weight: 600; font-size: 0.88rem; }
+
+.tx-status { display: grid; gap: 0.35rem; font-size: 0.86rem; }
+.transmit .tx-status p { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.tx-status.moving p { color: var(--watch); font-weight: 600; }
+.tx-bar { height: 6px; border-radius: 999px; background: var(--panel-2); overflow: hidden; }
+.tx-bar span { display: block; height: 100%; width: calc(var(--p) * 100%); background: var(--watch); transition: width 1s linear; }
+.tx-packet > .tx-status { padding: 0.6rem 0.75rem; border-radius: 12px; background: var(--panel-2); }
+
+.tx-outbox-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.tx-outbox-head .tx-section-title { margin: 0; }
+.tx-outbox-head .link { min-height: 44px; display: inline-flex; align-items: center; align-self: center; }
+.transmit .tx-outbox ul { list-style: none; margin: 0.3rem 0 0; padding: 0; }
+.transmit .tx-outbox li { display: flex; align-items: flex-start; gap: 0.7rem; padding: 0.6rem 0; border-top: 1px solid var(--line); font-size: 0.88rem; }
+.transmit .tx-outbox li > div { flex: 1; min-width: 0; display: grid; gap: 0.25rem; }
+.transmit .tx-empty { margin: 0.5rem 0 0; }
+.tx-demo-clock { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.8rem; padding-top: 0.7rem; border-top: 1px solid var(--line);
+  color: var(--muted); font-size: 0.8rem; cursor: pointer; }
+.tx-node { width: 4.2rem; }
+.tx-link { min-width: 1.5rem; }
+.tx-link.short { flex: 0.45; }
+.tx-link-label, .tx-link-sub { white-space: nowrap; }
+.transmit .tx-first, .transmit .tx-reply { display: flex; align-items: flex-start; gap: 0.5rem; }
+.tx-first-dot { margin-top: 0.3rem; }
+.transmit .tx-reply { color: var(--muted); font-size: 0.82rem; }
+.tx-reply svg { flex: none; margin-top: 0.15rem; }
+.tx-link-label { transform: translateY(-0.75rem); }
