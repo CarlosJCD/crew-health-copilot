@@ -61,6 +61,9 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `src/data/spaceWeather.ts`, `scripts/fetch-space-weather.mjs` | NASA DONKI snapshot (flares and SEP events) | Engineering |
 | `src/i18n/strings.ts` | Interface text in English (default) and Spanish. Rule texts come from the JSON, in English | Everyone who adds text |
 | `public/sw.js` | Offline service worker | Engineering |
+| `src/index.css` | Design tokens (dark and light themes), layout and components. See "Design" below | Engineering |
+| `src/components/Logo.tsx`, `public/favicon.svg`, `public/icons/` | Logo (the ring is the O of ORBIT) and app icons | Engineering |
+| `src/lib/orbit.ts` | Maps each ORBIT state to the step of the Observe, Read, Boost, Iterate, Transmit loop shown on Today | Engineering |
 
 ## Rules and the ORBIT engine
 
@@ -144,6 +147,25 @@ Clinical and research sources are listed per indicator in `orbit-indicators.json
 | TypeScript | Apache-2.0 |
 | Vitest | MIT |
 | oxlint | MIT |
+| Inter, Public Sans, DM Mono (via Fontsource) | SIL OFL 1.1 (fonts), MIT (Fontsource packages) |
+| NASA Horizon Design System tokens (colors, type roles) | CC0 1.0 |
+
+## Design
+
+The visual language follows the public (CC0) tokens of the
+[NASA Horizon Design System](https://github.com/nasa/hds-core): carbon neutrals, NASA blue and red, and the
+Inter / Public Sans / DM Mono typefaces (SIL OFL, bundled with the app so it looks the same offline).
+ORBIT uses no NASA insignia ("meatball"), logotype ("worm") or mission patch, does not use "NASA" in its
+name, and says in the footer that it is not affiliated with or endorsed by NASA.
+
+- Blue means "you can act on this" (links, buttons, the active tab). Red only means a red ORBIT state,
+  plus the pulse inside the logo. Status is always color + shape + word: ● green, ▲ yellow, ■ red, ○ no data.
+- Dark "Mission" theme by default (less glare in the cabin); the light "Day" theme is for projectors.
+- Wordmark: the logo ring is the O of ORBIT. The favicon and app icons use the ring alone.
+- The ORBIT state panel shows the O-R-B-I-T loop with today's letter: GREEN → **O**bserve; YELLOW and
+  EARLY_SIGNAL → **B**oost (then **I**terate in 24 h); RED_PHYSICAL and RED_PSYCH → **T**ransmit. Verbs stay in
+  English in both languages, with the Spanish gloss next to them.
+- Trend lines show the first and last day of the series under the line.
 
 ## Deploy
 
@@ -159,4 +181,8 @@ Required by the 2026 Project Submission Guide ("Code and data: must acknowledge 
   with assistance from Claude (Anthropic) and reviewed by the team.
 - The rules file and the data team's reference catalog were drafted with assistance from Claude; values marked
   `team_criterion` or "Extraído (revisar página)" stay unverified until a team member checks them.
-- No SI-generated images, audio or video. Any that are added must carry a visible "AI-generated" watermark and no NASA branding.
+- The UI redesign (design tokens, layout, wordmark) and the logo (`src/components/Logo.tsx`, `public/favicon.svg`,
+  `public/icons/`) were drawn with assistance from Claude from the team's brief, and reviewed by the team. The logo
+  is a vector drawing written as SVG code. Team decision (Nov 2026): it is declared here and in the SVG metadata
+  (`<desc>` in `public/favicon.svg`) instead of carrying a visible watermark. It contains no NASA branding.
+- No SI-generated photos, audio or video. Any that are added must carry a visible "AI-generated" watermark and no NASA branding.

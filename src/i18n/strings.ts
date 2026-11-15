@@ -367,6 +367,17 @@ const en = {
 
   'placeholder.next': 'Coming next',
   'placeholder.owner': 'Owner: {owner}',
+  // ORBIT loop on the state panel (verbs stay in English in both languages, like the name)
+  'orbit.label': 'ORBIT loop',
+  'orbit.today': 'ORBIT today',
+  'orbit.observe': 'Observe',
+  'orbit.read': 'Read',
+  'orbit.boost': 'Boost',
+  'orbit.iterate': 'Iterate',
+  'orbit.transmit': 'Transmit',
+  'orbit.heading.observe': 'Observe: keep logging, everything is in your range.',
+  'orbit.heading.boost': 'Boost, then Iterate: act on board and check again in 24 h.',
+  'orbit.heading.transmit': 'Transmit: a person needs to know today.',
 
   // Redesign: home centered on the body (short texts on purpose).
   "home.state.GREEN": "All good",
@@ -845,6 +856,17 @@ const es: Record<StringKey, string> = {
 
   'placeholder.next': 'Lo que sigue',
   'placeholder.owner': 'Responsable: {owner}',
+  // Ciclo ORBIT en el panel de estado (los verbos quedan en inglés, como el nombre)
+  'orbit.label': 'Ciclo ORBIT',
+  'orbit.today': 'ORBIT hoy',
+  'orbit.observe': 'Observe (observar)',
+  'orbit.read': 'Read (leer)',
+  'orbit.boost': 'Boost (impulsar)',
+  'orbit.iterate': 'Iterate (volver a medir)',
+  'orbit.transmit': 'Transmit (transmitir)',
+  'orbit.heading.observe': 'Observe (observar): sigue registrando, todo está en tu rango.',
+  'orbit.heading.boost': 'Boost e Iterate (impulsar y volver a medir): actúa a bordo y revisa de nuevo en 24 h.',
+  'orbit.heading.transmit': 'Transmit (transmitir): hoy una persona necesita saberlo.',
 
   // Rediseño: inicio centrado en el cuerpo (textos cortos a propósito).
   "home.state.GREEN": "Todo bien",

@@ -752,3 +752,25 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .button.danger { background: var(--act); color: #fff; border: 0; }
 .button.danger:hover { filter: brightness(1.1); }
 .reset-row { border-top: 1px solid var(--line); padding-top: 0.8rem; }
+
+/* ORBIT loop on the state panel: today's letter of Observe, Read, Boost, Iterate, Transmit.
+   The current letter takes the state's color; the rest stay quiet. */
+.overline {
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted); margin: 0;
+}
+.orbit-strip { list-style: none; margin: 0.35rem 0; padding: 0; display: flex; gap: 0.3rem; }
+.orbit-strip li {
+  width: 2.1rem; height: 2.1rem; display: grid; place-items: center; border-radius: 6px;
+  border: 1px solid var(--line); color: var(--muted); background: transparent;
+  font-family: var(--font-title); font-weight: 700; font-size: 0.95rem;
+}
+.orbit-strip li[aria-current='step'] { background: var(--status); border-color: var(--status); color: var(--bg); }
+.orbit-heading { margin: 0 0 0.35rem; font-family: var(--font-title); font-weight: 600; font-size: 0.9rem; }
+
+/* Trend lines: first and last day under the line. */
+.spark { display: flex; flex-direction: column; gap: 2px; }
+.spark-axis { position: relative; height: 0.8rem; font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted); }
+.spark-axis span { position: absolute; top: 0; white-space: nowrap; }
+.spark-axis .first { left: 0; }
+.spark-axis .last { right: 0; }
