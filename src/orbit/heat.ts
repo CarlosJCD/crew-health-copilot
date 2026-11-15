@@ -15,6 +15,7 @@ import {
   zoneOf,
   type BodySide,
   type BodyView,
+  type FigureKind,
   type BrushSize,
   type PainLog,
   type Slug,
@@ -74,6 +75,8 @@ export interface DotHeat {
   y: number
   size: BrushSize
   warmth: number
+  /** Figure the stroke was painted on (older strokes: the female one). */
+  figure?: FigureKind
 }
 
 export interface HeatMap {
@@ -116,10 +119,14 @@ export function heatOn(day: number, view: BodyView, pain: PainLog, symptoms: Sym
       for (const s of e.strokes) {
         // Painted strokes belong to the view they were painted on; whole zones show on any view that draws them.
         if (s.dots.length && s.view !== view) continue
-        for (const what of labels) for (const z of s.zones) warm(zoneOf(z), d, e.intensity, what)
+        // Only the half she painted gets warm (strokes saved before sides were kept warm the whole zone).
+        for (const what of labels) {
+          if (s.parts?.length) for (const p of s.parts) warm(zoneOf(p.zone), d, e.intensity, what, p.side)
+          else for (const z of s.zones) warm(zoneOf(z), d, e.intensity, what)
+        }
         const w = warmth(e.intensity, day - d)
         if (s.view === view && w >= HEAT.minWarmth) {
-          s.dots.forEach(([x, y], i) => dots.push({ key: `${e.id}-${s.id}-${i}`, x, y, size: s.size, warmth: w }))
+          s.dots.forEach(([x, y], i) => dots.push({ key: `${e.id}-${s.id}-${i}`, x, y, size: s.size, warmth: w, ...(s.figure ? { figure: s.figure } : {}) }))
         }
       }
       // Eyes and skin have no zone on the figure.

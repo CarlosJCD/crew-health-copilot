@@ -91,6 +91,9 @@ describe('a pain report', () => {
     const both = toggleMuscle(left, { slug: 'biceps', side: 'right', view: 'front' })
     expect(whereOf(both, [], []).side).toBe('both')
     expect(whereOf([], [{ id: 's', view: 'front', size: 'm', dots: [[0.5, 0.3]], zones: ['chest'] }], ['skin'])).toEqual({ regions: ['chest', 'skin'] })
+    // Painted on one half only: that side, even when the dots sit near the middle of the figure.
+    const knee = { id: 'k', view: 'front' as const, size: 'm' as const, dots: [[0.49, 0.7]] as [number, number][], zones: ['knees' as const], parts: [{ zone: 'knees' as const, side: 'right' as const }] }
+    expect(whereOf([], [knee], [])).toEqual({ regions: ['leg'], side: 'right' })
     expect(toggleMuscle(left, left[0])).toEqual([])
   })
 

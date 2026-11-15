@@ -342,7 +342,7 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .pain-mode { min-width: 0; }
 .pain-figure { position: relative; width: min(100%, 260px); margin: 0.4rem auto; }
 .pain-figure svg { width: 100%; height: auto; display: block; }
-.pain-figure.paintable { touch-action: none; cursor: crosshair; }
+.pain-figure.paintable { cursor: crosshair; }
 .pain-figure.paintable svg path { cursor: crosshair !important; }
 .paint-layer { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; }
 .paint-dot { position: absolute; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); opacity: 0.85; }
@@ -454,7 +454,7 @@ h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
 .segmented button { border: 0; background: transparent; color: var(--muted); font: inherit; font-family: var(--font-title); font-weight: 600;
   font-size: 0.88rem; min-height: 36px; min-width: 88px; padding: 0 0.9rem; border-radius: 999px; cursor: pointer; }
 .segmented button[aria-pressed='true'] { background: var(--panel-2); color: var(--text); }
-.figure { position: relative; z-index: 1; height: clamp(280px, calc(100dvh - 470px), 660px); aspect-ratio: 0.5; max-width: 92vw; margin-top: 0.4rem; }
+.figure { position: relative; z-index: 1; height: clamp(380px, calc(100dvh - 330px), 860px); aspect-ratio: 0.5; max-width: 92vw; margin-top: 0.4rem; }
 .figure svg { width: 100%; height: 100%; display: block; cursor: pointer; }
 .figure svg path { transition: fill 0.4s ease; }
 .figure .spot-layer { position: absolute; inset: 0; pointer-events: none; }
@@ -527,7 +527,7 @@ h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
 @media (max-width: 520px) {
   .home-actions { flex-wrap: nowrap; width: 100%; }
   .home-actions .button.big { flex: 1; padding: 0.6rem 0.7rem; font-size: 0.95rem; }
-  .figure { height: clamp(280px, calc(100dvh - 470px), 560px); }
+  .figure { height: clamp(380px, calc(100dvh - 330px), 640px); }
   .topbar { gap: 0.4rem; }
   .demo-tag { display: none; }
 }
@@ -551,3 +551,7 @@ h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
 .segmented .warm-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 0.4rem; vertical-align: middle; background: var(--orange); }
 .paint-tools { display: flex; gap: 0.5rem; }
 .paint-tools .button { flex: 1; }
+.paintable { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.figure-controls { position: relative; z-index: 1; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+.segmented.compact button { min-width: 64px; padding: 0 0.7rem; }
+@media (max-width: 520px) { .figure-controls .segmented button { min-width: 0; padding: 0 0.75rem; } }

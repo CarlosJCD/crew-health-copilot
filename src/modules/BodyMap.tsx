@@ -12,6 +12,7 @@ import type { Checkins } from '../orbit/checkin'
 import type { PulseSession } from '../orbit/pulse'
 import type { CareSummary } from '../orbit/care'
 import { useI18n } from '../i18n/context'
+import { useFigure } from '../lib/figure'
 import { PainPanel } from '../components/PainPanel'
 import { PaintSurface } from '../components/PainPainter'
 import { Sheet } from '../components/Sheet'
@@ -53,6 +54,7 @@ export function BodyMap(props: Props) {
   const fig = theme === 'light' ? FIGURE_LIGHT : FIGURE
   const { t } = useI18n()
   const [view, setView] = useState<BodyView>('front')
+  const [figure, setFigure] = useFigure()
   const [strokes, setStrokes] = useState<PaintStroke[]>([])
   const [painOpen, setPainOpen] = useState(false)
   const { data } = demo
@@ -96,18 +98,27 @@ export function BodyMap(props: Props) {
       </section>
 
       <section className="figure-stage" aria-label={t('home.figure')}>
-        <div className="segmented" role="group" aria-label={t('home.view')}>
-          {(['front', 'back'] as const).map((v) => (
-            <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}>
-              {sideName(v)}
-              {v !== view && otherWarm > 0 && <span className="warm-dot" aria-label={t('home.warmThere', { n: otherWarm })} />}
-            </button>
-          ))}
+        <div className="figure-controls">
+          <div className="segmented" role="group" aria-label={t('home.view')}>
+            {(['front', 'back'] as const).map((v) => (
+              <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}>
+                {sideName(v)}
+                {v !== view && otherWarm > 0 && <span className="warm-dot" aria-label={t('home.warmThere', { n: otherWarm })} />}
+              </button>
+            ))}
+          </div>
+          <div className="segmented compact" role="group" aria-label={t('home.figureKind')}>
+            {(['female', 'male'] as const).map((k) => (
+              <button key={k} type="button" aria-pressed={figure === k} onClick={() => setFigure(k)}>
+                {t(k === 'female' ? 'home.woman' : 'home.man')}
+              </button>
+            ))}
+          </div>
         </div>
         <p className="paint-hint">{t('home.paintHint')}</p>
 
         <PaintSurface
-          key={`${view}-${theme}`}
+          key={`${view}-${theme}-${figure}`}
           className="figure"
           view={view}
           size="m"

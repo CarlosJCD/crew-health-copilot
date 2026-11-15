@@ -93,4 +93,12 @@ describe('symptom heat map', () => {
     const log: PainLog = { 125: { events: [{ id: 'y', muscles: [], strokes: [], regions: ['eyes'], qualities: [], intensity: 4, contexts: [], alarms: [], pain: false, symptoms: ['eye irritation'] }] } }
     expect(heatOn(125, 'front', log, {}).noPlace).toEqual([{ symptom: 'eye irritation', day: 125 }])
   })
+  it('a stroke painted on one half warms only that half', () => {
+    const log = painted(120, ['knees'])
+    log[120].events[0].strokes[0].parts = [{ zone: 'knees', side: 'left' }]
+    expect(heatOn(120, 'front', log, {}).zones.find((z) => z.zone === 'knees')?.side).toBe('left')
+    const both = painted(120, ['knees'])
+    both[120].events[0].strokes[0].parts = [{ zone: 'knees', side: 'left' }, { zone: 'knees', side: 'right' }]
+    expect(heatOn(120, 'front', both, {}).zones.find((z) => z.zone === 'knees')?.side).toBeUndefined()
+  })
 })
