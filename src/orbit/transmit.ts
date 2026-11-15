@@ -1,4 +1,4 @@
-// Transmit (ORBIT stage T): what Orbit would send, to whom, and when it arrives given the delay.
+// Transmit (ORBIT stage T): what ORBIT would send, to whom, and when it arrives given the delay.
 // Privacy rule (phase 4, section 9; NASA-STD-3001 medical communication is private):
 //  - Body status and red physical safety rails always go to the crew medical officer (agreed before the mission).
 //  - Mind and Crew go out only if she switches them on.
@@ -71,7 +71,7 @@ export function cmoShare(result: DayResult, share: ShareSettings): PacketDraft {
     to: 'crew_medical_officer',
     day: result.day,
     title: `Day ${result.day} status, shared by the astronaut`,
-    lines: [`Orbit state: ${STATE_EN[result.state]}`, ...domainLines(result, share), privacyLine(share)],
+    lines: [`ORBIT state: ${STATE_EN[result.state]}`, ...domainLines(result, share), privacyLine(share)],
   }
 }
 

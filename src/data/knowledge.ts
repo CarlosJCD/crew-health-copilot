@@ -1,5 +1,5 @@
 // Reference catalog from the data-science team: src/data/knowledge.json (their datos_nasav1.json,
-// copied unchanged). Orbit's alert colors come from orbit-indicators.json (see src/orbit); this
+// copied unchanged). ORBIT's alert colors come from orbit-indicators.json (see src/orbit); this
 // catalog is reference material: plausible ranges used to check demo-data.json, NASA sources and
 // mission physics. To update it, replace the JSON file; `npm test` checks it still fits this contract.
 //

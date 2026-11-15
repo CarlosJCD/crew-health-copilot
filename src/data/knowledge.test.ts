@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { KNOWLEDGE, KNOWLEDGE_ERRORS, parseKnowledge } from './knowledge'
 
-// Guards the data team's reference catalog (src/data/knowledge.json). Orbit reads its plausible
+// Guards the data team's reference catalog (src/data/knowledge.json). ORBIT reads its plausible
 // ranges to check demo-data.json; alert colors come from orbit-indicators.json.
 
 describe('knowledge.json', () => {

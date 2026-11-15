@@ -95,7 +95,7 @@ describe('rules outside the demo story', () => {
     expect(lastDay(withDays({ screen: { phq2: 3, gad2: 0 } })).indicators.screen.color).toBe('yellow')
   })
 
-  it('after two positive weekly checks in a row, Orbit offers an earlier private conference (never red)', () => {
+  it('after two positive weekly checks in a row, ORBIT offers an earlier private conference (never red)', () => {
     const week = (phq2: number, day: number): DayRecord => ({ ...base, events: [], day, screen: { phq2, gad2: 0 } })
     const one = { ...BUILT_IN_DEMO, days: [week(1, 300), week(3, 307)] }
     const two = { ...BUILT_IN_DEMO, days: [week(3, 300), week(4, 307)] }

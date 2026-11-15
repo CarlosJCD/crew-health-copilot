@@ -1,6 +1,6 @@
 {
-  "name": "Orbit",
-  "short_name": "Orbit",
+  "name": "ORBIT",
+  "short_name": "ORBIT",
   "description": "Catch the early signals. Act onboard. Offline health companion for astronauts (synthetic data, not a diagnostic tool).",
   "start_url": "./",
   "scope": "./",

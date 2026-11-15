@@ -3,7 +3,7 @@ import { STATE_ESCALATION, type DayResult } from '../orbit/engine'
 import { useI18n } from '../i18n/context'
 import type { StringKey } from '../i18n/strings'
 
-/** Today's ORBIT state, what Orbit says, who sees it, and what reaches Earth given the delay. */
+/** Today's ORBIT state, what ORBIT says, who sees it, and what reaches Earth given the delay. */
 export function StatePanel({ result, scenario }: { result: DayResult; scenario: Scenario }) {
   const { t, lang } = useI18n()
   const esc = RULES.escalation[STATE_ESCALATION[result.state]]

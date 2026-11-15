@@ -1,17 +1,17 @@
-# Orbit
+# ORBIT
 
 **Catch the early signals. Act onboard.**
 
-Orbit is an offline health companion for astronauts on long missions. It reads body, mind and crew life
+ORBIT is an offline health companion for astronauts on long missions. It reads body, mind and crew life
 against each astronaut's own baseline, flags an early cross-domain signal when two domains stay yellow
 for two days, and helps the astronaut choose a protective action before escalating, at the pace the
 communication delay allows. NASA Space Apps Challenge 2026, challenge "Create Health Monitoring Software
 for Astronauts on Space Missions".
 
-- App: https://carlosjcd.github.io/crew-health-copilot/ (public, no sign-in, works offline after the first visit)
-- Repository: https://github.com/CarlosJCD/crew-health-copilot
+- App: https://carlosjcd.github.io/orbit/ (public, no sign-in, works offline after the first visit)
+- Repository: https://github.com/CarlosJCD/orbit
 
-> **Synthetic data, not a diagnostic tool.** Orbit supports decisions; it does not diagnose.
+> **Synthetic data, not a diagnostic tool.** ORBIT supports decisions; it does not diagnose.
 > The demo follows a fictional astronaut, Lena Ortiz, on days 121 to 128 of a Mars transit.
 
 ## Run
@@ -68,6 +68,7 @@ Thresholds marked `team_criterion` in the JSON are design choices pending valida
 To change a rule, edit the JSON and run `npm test`: the acceptance table must still pass.
 
 Open points for P1:
+- The app is named ORBIT; texts in `orbit-indicators.json` still say "Orbit" (13 times). Update them in the next version.
 - `contact.yellow_drop_fraction_vs_14d` is read as "mean of the last 14 days vs the 14 days before". Comparing
   shorter windows with the previous 14 days would turn day 122 or 127 yellow, against the acceptance table.
 - `screen.offer_conference_if_weeks_gte` is implemented (offer only, never red). `pulse.practice_sessions` is used by
@@ -135,7 +136,7 @@ builds and publishes to GitHub Pages. It also runs daily at 12:00 UTC.
 
 Required by the 2026 Project Submission Guide ("Code and data: must acknowledge SI generation in descriptive text and metadata").
 
-- The concept (ORBIT model, Orbit product, demo story, games) came from the team.
+- The concept (ORBIT model and product, demo story, games) came from the team.
 - Code in this repository (app, ORBIT engine, tests, service worker, DONKI script, built-in demo data) was written
   with assistance from Claude (Anthropic) and reviewed by the team.
 - The rules file and the data team's reference catalog were drafted with assistance from Claude; values marked

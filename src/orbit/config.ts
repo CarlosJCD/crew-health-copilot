@@ -1,4 +1,4 @@
-// Orbit's single source of rules, sources and texts: orbit-indicators.json (from Psychology 1 and 2,
+// ORBIT's single source of rules, sources and texts: orbit-indicators.json (from Psychology 1 and 2,
 // copied unchanged). Nobody changes thresholds outside that file; P1 approves changes.
 // Replace the JSON to update rules or texts, then run `npm test`: RULES_ERRORS lists anything the
 // engine can no longer read.

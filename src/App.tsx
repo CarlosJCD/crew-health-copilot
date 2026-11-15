@@ -13,7 +13,7 @@ import { Today } from './modules/Today'
 import { Transmit } from './modules/Transmit'
 import { DEFAULT_MODULE, MODULES } from './modules/registry'
 
-export const APP_NAME = 'Orbit'
+export const APP_NAME = 'ORBIT'
 
 /** Route from the hash: `#/today?day=125&why=temp` (deep links for the deck and the demo). */
 function readRoute(): { id: string; day?: number; why?: string } {

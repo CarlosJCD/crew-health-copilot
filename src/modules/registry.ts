@@ -1,4 +1,4 @@
-// Module list drives the navigation (Orbit product structure, phase 4 and handoff section 1).
+// Module list drives the navigation (ORBIT product structure, phase 4 and handoff section 1).
 // Each planned module names its owner so the team can work in parallel.
 // Text fields are { en, es }: keep both in sync when editing.
 import type { Localized } from '../i18n/strings'

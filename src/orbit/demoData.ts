@@ -121,7 +121,7 @@ const EVENTS: Record<number, string[]> = {
   123: ['Shift change'],
   125: ['Early signal. She chooses a protected sleep window and a puzzle video for her family'],
   126: ['Reply from her family arrives'],
-  127: ['Orbit asks what helped'],
+  127: ['ORBIT asks what helped'],
   128: ['Weekly check: PHQ-2 = 1, GAD-2 = 2. Weekly summary sent to Earth'],
 }
 

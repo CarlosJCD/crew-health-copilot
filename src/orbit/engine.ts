@@ -19,7 +19,7 @@ export interface IndicatorResult {
   color: Color
   /** Short, plain explanation of why it has this color (English, app text). */
   reason: string
-  /** Something Orbit offers her (never imposes): an earlier private psychological conference. */
+  /** Something ORBIT offers her (never imposes): an earlier private psychological conference. */
   offer?: 'earlier_conference'
 }
 
@@ -110,13 +110,13 @@ const RULE_FNS: Record<string, Rule> = {
     const limit = num('screen', 'yellow_gte')
     const positive = (d: DayRecord) => !!d.screen && (d.screen.phq2 >= limit || d.screen.gad2 >= limit)
     if (!positive(latest)) return res('green', `PHQ-2 ${phq2}, GAD-2 ${gad2} (day ${latest.day}).`)
-    // No red: after N weeks in a row with a positive check, Orbit offers an earlier private conference.
+    // No red: after N weeks in a row with a positive check, ORBIT offers an earlier private conference.
     const weeks = num('screen', 'offer_conference_if_weeks_gte')
     const checks = h.filter((d) => d.screen && d.day <= latest.day).slice(-weeks)
     const inARow = checks.length === weeks && checks.every(positive) &&
       checks.every((d, i) => i === 0 || d.day - checks[i - 1].day <= 7)
     return inARow
-      ? { ...res('yellow', `PHQ-2 ${phq2}, GAD-2 ${gad2}, ${weeks} weeks in a row: Orbit offers an earlier private conference.`), offer: 'earlier_conference' }
+      ? { ...res('yellow', `PHQ-2 ${phq2}, GAD-2 ${gad2}, ${weeks} weeks in a row: ORBIT offers an earlier private conference.`), offer: 'earlier_conference' }
       : res('yellow', `PHQ-2 ${phq2}, GAD-2 ${gad2}: worth talking to someone (not a diagnosis).`)
   },
 

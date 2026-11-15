@@ -1,4 +1,4 @@
-// UI strings. English is the default: Orbit is presented in English (handoff) and judges review it
+// UI strings. English is the default: ORBIT is presented in English (handoff) and judges review it
 // in English. Rule texts ("Why?", rule, action) come from orbit-indicators.json, in English only.
 // To add a language: add it to LANGS, then add a dictionary with every key of `en`
 // (TypeScript fails the build if a key is missing) and the matching field in every `Localized` value.
@@ -15,7 +15,7 @@ const en = {
   'net.online': 'Online',
   'net.offline': 'Offline mode',
   'nav.label': 'Modules',
-  'footer': 'Prototype for NASA Space Apps Challenge 2026. Synthetic data, not a diagnostic tool. Orbit supports decisions; it does not diagnose.',
+  'footer': 'Prototype for NASA Space Apps Challenge 2026. Synthetic data, not a diagnostic tool. ORBIT supports decisions; it does not diagnose.',
 
   'scenario.label': 'Mission',
   'scenario.delay': 'Signal delay to Earth: {delay}',
@@ -53,7 +53,7 @@ const en = {
   'state.ground': 'A packet goes to Earth and arrives in {delay}. A reply takes {reply} or more.',
   'state.groundLive': 'Ground support is available in near real time.',
   'state.boost': 'Open Boost',
-  'state.disclaimer': 'Orbit supports decisions; it does not diagnose.',
+  'state.disclaimer': 'ORBIT supports decisions; it does not diagnose.',
 
   'card.why': 'Why?',
   'card.hide': 'Hide',
@@ -129,7 +129,7 @@ const en = {
   'mind.saved': 'Saved on this device. Today now uses these answers.',
   'mind.seeToday': 'See Today',
   'mind.talkTitle': 'I want to talk to someone today',
-  'mind.talkIntro': 'Orbit marks today red and you choose who. Nothing goes out without you.',
+  'mind.talkIntro': 'ORBIT marks today red and you choose who. Nothing goes out without you.',
   'mind.talkChosen': 'You asked to talk today with:',
   'mind.talk.crew_medical_officer': 'My crew medical officer',
   'mind.talk.psych_conference': 'An earlier private psychological conference',
@@ -159,7 +159,7 @@ const es: Record<StringKey, string> = {
   'net.online': 'En línea',
   'net.offline': 'Sin conexión',
   'nav.label': 'Módulos',
-  'footer': 'Prototipo para el NASA Space Apps Challenge 2026. Datos sintéticos, no es una herramienta de diagnóstico. Orbit apoya decisiones; no diagnostica.',
+  'footer': 'Prototipo para el NASA Space Apps Challenge 2026. Datos sintéticos, no es una herramienta de diagnóstico. ORBIT apoya decisiones; no diagnostica.',
 
   'scenario.label': 'Misión',
   'scenario.delay': 'Retraso de señal a la Tierra: {delay}',
@@ -197,7 +197,7 @@ const es: Record<StringKey, string> = {
   'state.ground': 'Sale un paquete a la Tierra y llega en {delay}. La respuesta tarda {reply} o más.',
   'state.groundLive': 'Hay apoyo de Tierra casi en tiempo real.',
   'state.boost': 'Abrir Boost',
-  'state.disclaimer': 'Orbit apoya decisiones; no diagnostica.',
+  'state.disclaimer': 'ORBIT apoya decisiones; no diagnostica.',
 
   'card.why': '¿Por qué?',
   'card.hide': 'Ocultar',
@@ -273,7 +273,7 @@ const es: Record<StringKey, string> = {
   'mind.saved': 'Guardado en este dispositivo. Hoy ya usa estas respuestas.',
   'mind.seeToday': 'Ver Hoy',
   'mind.talkTitle': 'Quiero hablar con alguien hoy',
-  'mind.talkIntro': 'Orbit marca el día en rojo y tú eliges con quién. Nada sale sin ti.',
+  'mind.talkIntro': 'ORBIT marca el día en rojo y tú eliges con quién. Nada sale sin ti.',
   'mind.talkChosen': 'Pediste hablar hoy con:',
   'mind.talk.crew_medical_officer': 'Mi oficial médico de la tripulación',
   'mind.talk.psych_conference': 'Una conferencia psicológica privada adelantada',

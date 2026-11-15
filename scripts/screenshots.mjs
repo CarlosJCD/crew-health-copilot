@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const BASE = (process.argv[2] ?? 'https://carlosjcd.github.io/crew-health-copilot/').replace(/\/?$/, '/')
+const BASE = (process.argv[2] ?? 'https://carlosjcd.github.io/orbit/').replace(/\/?$/, '/')
 const CHROME = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../screenshots')
 
