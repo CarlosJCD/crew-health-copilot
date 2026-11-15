@@ -1300,3 +1300,29 @@ div.tx-share-row { cursor: default; }
   .intro-buttons .button { min-width: 5.5rem; }
 }
 @media (prefers-reduced-motion: reduce) { .intro, .intro-backdrop { animation: none; } }
+
+/* Today: the whole block (state line to fine print) is centered between the header and the bottom of the page,
+   so the space above and below it is the same. Nothing inside stretches: spare height goes evenly above and
+   below the block, not around the body. On desktops the navigation is a side rail: no room is kept at the
+   bottom for a bottom bar. If the block is taller than the screen (a red day, a notice), it starts at the top
+   and Today scrolls as before. */
+.app.route-body .home { flex: 0 0 auto; margin-block: auto; }
+.app.route-body .home-main, .app.route-body .figure-stage { flex: 0 0 auto; }
+.app.route-body .figure { margin-block: 0.1rem 0; }
+@media (min-width: 1024px) { .app.route-body { padding-bottom: 0.15rem; } }
+
+/* Earth Window: "View image" opens the photo of Earth in a pop-up, as big as the screen allows. */
+.earth-modal-backdrop { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 1rem;
+  background: rgba(0, 0, 0, 0.82); animation: fade 0.18s ease-out; }
+.earth-modal { width: min(100%, 78dvh, 760px); display: grid; gap: 0.5rem; padding: 0.6rem 0.9rem 1rem; border-radius: 24px;
+  border: 1px solid var(--line); background: #050507; color: #f4f4f6; animation: rise 0.22s ease-out; }
+.earth-modal:focus { outline: none; }
+.earth-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.earth-modal-head h2 { margin: 0; font-size: 1.1rem; }
+.earth-modal .icon-btn { color: #f4f4f6; }
+.earth-modal .icon-btn:hover { background: rgba(255, 255, 255, 0.1); }
+.earth-photo.large { width: 100%; max-width: none; margin: 0; }
+.earth-photo.large img, .earth-photo.large .earth-wait { border-radius: 50%; }
+.earth-photo.large figcaption { margin-top: 0.6rem; font-size: 0.8rem; color: #b8b8bf; }
+.earth-offline { margin: 1.5rem 0; text-align: center; color: #b8b8bf; font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .earth-modal, .earth-modal-backdrop { animation: none; } }
