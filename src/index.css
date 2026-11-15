@@ -1143,3 +1143,16 @@ div.tx-share-row { cursor: default; }
 .transmit .tx-reply { color: var(--muted); font-size: 0.82rem; }
 .tx-reply svg { flex: none; margin-top: 0.15rem; }
 .tx-link-label { transform: translateY(-0.75rem); }
+
+/* The silhouette keeps one size on every day: its height depends only on the screen, never on how long the
+   texts above it are. When something extra appears (the medical officer card on a red day, a notice), Today
+   scrolls instead of shrinking the body. */
+.app.route-body { --fig-h: clamp(200px, calc(100dvh - 426px), 560px); }
+.app.route-body > main { overflow-y: auto; overscroll-behavior: contain; }
+.app.route-body .home, .app.route-body .home-main, .app.route-body .figure-stage { flex: 1 0 auto; }
+.app.route-body .figure { flex: none; height: var(--fig-h); min-height: 0; }
+@media (min-width: 720px) { .app.route-body { --fig-h: clamp(240px, calc(100dvh - 520px), 640px); } }
+@media (min-width: 1024px) { .app.route-body { --fig-h: clamp(240px, calc(100dvh - 462px), 640px); } }
+/* When Today scrolls (a red day, a notice), the main button stays in sight at the bottom. */
+.app.route-body .home-actions { position: sticky; bottom: 0; z-index: 5; padding-top: 0.5rem;
+  background: linear-gradient(to top, var(--bg) 75%, transparent); }

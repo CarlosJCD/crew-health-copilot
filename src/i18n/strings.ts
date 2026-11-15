@@ -420,7 +420,7 @@ const en = {
 
   // Redesign: home centered on the body (short texts on purpose).
   "home.state.GREEN": "All good",
-  "home.state.YELLOW": "Take care today",
+  "home.state.YELLOW": "Take care",
   "home.state.EARLY_SIGNAL": "Early signal",
   "home.state.RED_PHYSICAL": "Medical officer first",
   "home.state.RED_PSYCH": "You asked to talk",
@@ -461,7 +461,6 @@ const en = {
   "home.and": "and",
   "home.share": "Share with my medical officer",
   "home.contactCmo": "Contact my medical officer",
-  "home.cta.pulse": "Pulse mode",
   "home.cta.help": "Did it help?",
   "home.cta.painAgain": "How is the pain today?",
   "home.cta.safety": "Answer the safety question",
@@ -956,7 +955,7 @@ const es: Record<StringKey, string> = {
 
   // Rediseño: inicio centrado en el cuerpo (textos cortos a propósito).
   "home.state.GREEN": "Todo bien",
-  "home.state.YELLOW": "Cuídate hoy",
+  "home.state.YELLOW": "Cuídate",
   "home.state.EARLY_SIGNAL": "Señal temprana",
   "home.state.RED_PHYSICAL": "Primero tu oficial médico",
   "home.state.RED_PSYCH": "Pediste hablar",
@@ -997,7 +996,6 @@ const es: Record<StringKey, string> = {
   "home.and": "y",
   "home.share": "Compartir con mi oficial médico",
   "home.contactCmo": "Contactar a mi oficial médico",
-  "home.cta.pulse": "Modo pulso",
   "home.cta.help": "¿Te ayudó?",
   "home.cta.painAgain": "¿Cómo sigue el dolor?",
   "home.cta.safety": "Responder la pregunta de seguridad",

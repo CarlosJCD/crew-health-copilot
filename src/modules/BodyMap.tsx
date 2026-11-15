@@ -11,7 +11,7 @@ import { boostPlan, CARDS, DISPLAY, downrankedCards, type BoostLog } from '../or
 import type { Checkins } from '../orbit/checkin'
 import type { PulseSession } from '../orbit/pulse'
 import { TANK_SIZE, type CareSummary } from '../orbit/care'
-import { remindersFor, type Reminder } from '../orbit/plan'
+import { mainReminder, remindersFor, type Reminder } from '../orbit/plan'
 import { useI18n } from '../i18n/context'
 import type { StringKey } from '../i18n/strings'
 import { useFigure } from '../lib/figure'
@@ -48,13 +48,15 @@ const CTA: Record<Exclude<OrbitState, 'GREEN'>, { text: StringKey; href: string 
   RED_PSYCH: { text: 'home.cta.RED_PSYCH', href: '#/mind?focus=talk' },
 }
 
-/** On a green day the main button is the next thing still pending, or "All done for today". */
+/**
+ * On a green day the main button is the next thing still pending, or "All done for today". Pulse mode is
+ * never the main button: it stays a reminder in "For today" (see `mainReminder`).
+ */
 function greenAction(reminders: Reminder[]): { text: StringKey; href?: string; pain?: boolean } {
-  const next = reminders[0]
+  const next = mainReminder(reminders)
   if (!next) return { text: 'home.cta.done' }
   if (next.id === 'safety') return { text: 'home.cta.safety', href: '#/boost' }
   if (next.id === 'checkin') return { text: 'home.cta.GREEN', href: '#/mind' }
-  if (next.id === 'pulse') return { text: 'home.cta.pulse', href: '#/mind?focus=pulse' }
   if (next.id === 'did_it_help') return { text: 'home.cta.help', href: '#/boost' }
   return { text: 'home.cta.painAgain', pain: true }
 }
@@ -301,11 +303,18 @@ export function BodyMap(props: Props) {
   )
 }
 
+/** Indicators named in the state line of Today; the rest show as "+N more". */
+const SUB_NAMES = 2
+
 /** The state line with real data: which indicators moved, which domains changed. */
 function subLine(result: DayResult, t: ReturnType<typeof useI18n>['t']): string {
   const and = t('home.and')
   if (result.state === 'YELLOW' && result.flagged.length) {
-    return t('home.sub.YELLOW2', { what: result.flagged.map((id) => t(`ind.${id}` as StringKey)).join(' · ') })
+    // At most two names, so the line stays short and the body keeps its size; Metrics lists them all.
+    const names = result.flagged.map((id) => t(`ind.${id}` as StringKey))
+    const shown = names.slice(0, SUB_NAMES).join(' · ')
+    const what = names.length > SUB_NAMES ? `${shown} · ${t('home.more', { n: names.length - SUB_NAMES })}` : shown
+    return t('home.sub.YELLOW2', { what })
   }
   if (result.state === 'EARLY_SIGNAL' && result.flaggedDomains.length) {
     const domains = listText(result.flaggedDomains.map((d: DomainId) => t(`domain.${d}`)), and)

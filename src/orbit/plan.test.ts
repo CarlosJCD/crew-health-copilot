@@ -3,7 +3,7 @@ import { boostPlan, CARDS, TRIGGERS, type BoostPlan } from './boost'
 import { BUILT_IN_DEMO } from './demoData'
 import { evaluateDay } from './engine'
 import { CONTEXTS, type PainEvent, type PainLog } from './pain'
-import { PAIN_CONTEXT_TRIGGERS, painSuggestions, remindersFor, todaySuggestions, triggerLabel } from './plan'
+import { mainReminder, PAIN_CONTEXT_TRIGGERS, painSuggestions, remindersFor, todaySuggestions, triggerLabel } from './plan'
 
 const event = (patch: Partial<PainEvent>): PainEvent => ({
   id: 'e',
@@ -119,5 +119,15 @@ describe('pulse reminder', () => {
   it('clears with a practice session too, since she did the task', () => {
     const r = remindersFor({ day: 27, checkins: {}, boostLog: {}, painLog: {}, plan: empty, pulseSessions: [{ id: 'p', day: 27, at: 0, practice: true, result: {} as never }] })
     expect(r.some((x) => x.id === 'pulse')).toBe(false)
+  })
+})
+
+describe('main button of Today on a green day', () => {
+  it('pushes the check-in, never pulse mode, which stays a reminder in "For today"', () => {
+    expect(mainReminder([{ id: 'checkin' }, { id: 'pulse' }])?.id).toBe('checkin')
+    expect(mainReminder([{ id: 'pulse' }, { id: 'did_it_help', cards: ['breathe'] }])?.id).toBe('did_it_help')
+    // Only pulse left: the main button says "All done for today".
+    expect(mainReminder([{ id: 'pulse' }])).toBeUndefined()
+    expect(mainReminder([])).toBeUndefined()
   })
 })

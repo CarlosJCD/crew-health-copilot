@@ -117,6 +117,13 @@ interface ReminderInput {
  * safety question of Boost, "Did it help?" for yesterday's choices, and pain from the last days that
  * she has not logged again (it cools down on the heat map unless she does).
  */
+/**
+ * The reminder the main button of Today pushes on a green day: the first one that is not pulse mode. Pulse
+ * is a 3-minute task due every other day, so it stays a reminder in "For today" and never becomes the
+ * main action (team decision, Nov 15). Undefined: nothing left for the main button ("All done for today").
+ */
+export const mainReminder = (reminders: Reminder[]): Reminder | undefined => reminders.find((r) => r.id !== 'pulse')
+
 export function remindersFor({ day, checkins, pulseSessions, boostLog, painLog, plan }: ReminderInput): Reminder[] {
   const out: Reminder[] = []
   if (plan.safetyQuestion && !boostLog[day]?.safety) out.push({ id: 'safety' })
