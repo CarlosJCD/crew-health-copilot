@@ -6,10 +6,11 @@ import { useI18n } from '../i18n/context'
 const API_TIMEOUT_MS = 6000
 
 /**
- * The photo of the Earth Window card, shown once she chooses it: the newest EPIC photo of Earth, or a fixed
- * EPIC photo if the list does not arrive. If the photo itself cannot load (no network), the card shows none.
+ * The photo of the Earth Window card: the newest EPIC photo of Earth, or a fixed EPIC photo if the list does not
+ * arrive. `large` is the pop-up of "View image": the photo as big as the screen allows, and a line instead of
+ * nothing when the photo cannot load (no network).
  */
-export function EarthPhoto() {
+export function EarthPhoto({ large = false }: { large?: boolean }) {
   const { t } = useI18n()
   const [photo, setPhoto] = useState<EpicImage | null>(null)
   const [broken, setBroken] = useState(false)
@@ -33,10 +34,10 @@ export function EarthPhoto() {
     }
   }, [])
 
-  if (broken) return null
+  if (broken) return large ? <p className="earth-offline">{t('earth.offline')}</p> : null
   const when = photo?.date.slice(0, 16)
   return (
-    <figure className="earth-photo">
+    <figure className={`earth-photo${large ? ' large' : ''}`}>
       {photo ? (
         <img
           key={photo.image}

@@ -17,7 +17,7 @@ import { evaluateDay } from '../orbit/engine'
 import { useI18n } from '../i18n/context'
 import { CardWhy } from '../components/BoostCardBody'
 import { CareIcon } from '../components/CareIcon'
-import { EarthPhoto } from '../components/EarthPhoto'
+import { ViewEarth } from '../components/EarthView'
 import { Icon } from '../components/Icon'
 import { InfoTip } from '../components/InfoTip'
 import { PrivateNoteSheet, type Notes } from '../components/PrivateNote'
@@ -79,6 +79,8 @@ export function Boost({ demo, day, log, onLogChange, care, notes, onNotesChange,
       <button type="button" className="button wide" onClick={() => setNoteOpen(true)}>
         <Icon name="note" size={18} /> {notes[day] ? t('note.edit') : t('note.open')}
       </button>
+    ) : c.id === 'earth_window' ? (
+      <ViewEarth title={c.title_en} />
     ) : c.id === 'crew_game' ? (
       <button type="button" className="button wide" onClick={() => setGameOpen(true)}>
         <Icon name="stars" size={18} /> {t('game.open')}
@@ -384,7 +386,6 @@ function CareTile({ card, mode, chosen = false, disabled = false, onToggle, help
       {(showWhat || act) && (
         <div className="care-tile-body">
           {showWhat && <p lang="en">{card.what_en}</p>}
-          {card.id === 'earth_window' && chosen && <EarthPhoto />}
           {info && <CardWhy card={card} />}
           {act}
           {mode === 'pick' && chosen && onRate && (

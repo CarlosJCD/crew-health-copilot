@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { DISPLAY, type BoostCard } from '../orbit/boost'
 import { useI18n } from '../i18n/context'
-import { EarthPhoto } from './EarthPhoto'
+import { ViewEarth } from './EarthView'
 
 /**
  * A Boost card as Psychology wrote it: title, time, what to do, and on demand why and sources. Once she
- * chooses Earth Window, the card shows the photo of Earth.
+ * chooses Earth Window, the card shows "View image", which opens the photo of Earth in a pop-up.
  * `time={false}` hides the time line (the medical-officer card has no time to spend).
  */
 export function BoostCardBody({ card, time = true, chosen = false }: { card: BoostCard; time?: boolean; chosen?: boolean }) {
@@ -21,7 +21,7 @@ export function BoostCardBody({ card, time = true, chosen = false }: { card: Boo
         </p>
       )}
       <p lang="en">{card.what_en}</p>
-      {card.id === 'earth_window' && chosen && <EarthPhoto />}
+      {card.id === 'earth_window' && chosen && <ViewEarth title={card.title_en} />}
       <button type="button" className="link" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {open ? t('card.hide') : t('card.why')}
       </button>
