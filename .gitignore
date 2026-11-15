@@ -28,3 +28,6 @@ public/data/space-weather.json
 
 # Deck screenshots (scripts/screenshots.mjs)
 screenshots/
+
+# Engine bundle for the data team simulator (scripts/build-engine-bundle.mjs)
+dist-engine/

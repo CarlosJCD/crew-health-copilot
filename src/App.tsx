@@ -6,6 +6,7 @@ import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbi
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { applyPulse, type PulseSession } from './orbit/pulse'
 import { applySymptoms, type SymptomLog } from './orbit/body'
+import { careSummary } from './orbit/care'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { useStoredJson } from './hooks/useStoredJson'
@@ -78,6 +79,10 @@ export default function App() {
     () => ({ ...loaded, data: applySymptoms(applyPulse(applyCheckins(loaded.data, checkins), pulseSessions), symptomLog) }),
     [loaded, checkins, pulseSessions, symptomLog],
   )
+  const care = useMemo(
+    () => careSummary({ checkins, boostLog, pulseSessions, boardsDone }),
+    [checkins, boostLog, pulseSessions, boardsDone],
+  )
   const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS.find((s) => s.id === DEFAULT_SCENARIO_ID)!
   const active = MODULES.find((m) => m.id === route.id) ?? MODULES[0]
 
@@ -105,7 +110,7 @@ export default function App() {
 
       <main>
         {active.id === 'today' ? (
-          <Today demo={demo} day={day} onDayChange={setDay} scenario={scenario} openWhy={route.why} />
+          <Today demo={demo} day={day} onDayChange={setDay} scenario={scenario} openWhy={route.why} care={care} />
         ) : active.id === 'transmit' ? (
           <Transmit
             demo={demo}
@@ -129,7 +134,7 @@ export default function App() {
             initialSolved={route.solved}
           />
         ) : active.id === 'boost' ? (
-          <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} />
+          <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} careActions={care.actions} />
         ) : active.id === 'mind' ? (
           <Mind
             demo={demo}

@@ -282,3 +282,13 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .solved-group p { margin: 0.2rem 0; font-size: 0.88rem; }
 .tiles-line { font-weight: 600; }
 @media (max-width: 520px) { .tile { font-size: 0.85rem; min-height: 3rem; } }
+
+/* ORBIT: care tank (gamification without punishment) */
+.care { display: flex; gap: 1rem; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1.25rem; }
+.care p { margin: 0.2rem 0; }
+.care h2 { margin-bottom: 0.2rem; }
+.tank { width: 44px; flex: none; }
+.tank-shell { fill: var(--panel-2); stroke: var(--line); stroke-width: 2; }
+.tank-fill { fill: var(--accent); }
+.progress { height: 8px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--accent); }

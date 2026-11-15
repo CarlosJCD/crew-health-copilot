@@ -25,6 +25,7 @@ npm test         # Vitest: ORBIT engine acceptance tests, rules file, data check
 node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (no key needed)
 node scripts/fetch-sep-replay.mjs     # refresh the May 2024 SEP replay file (committed)
 node scripts/screenshots.mjs [url]    # deck screenshots with headless Chrome into screenshots/
+node scripts/build-engine-bundle.mjs  # engine as one ES module for the data team simulator (dist-engine/)
 ```
 
 Deep links open a module on a given day, and optionally a card's "Why?":
@@ -42,6 +43,7 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `public/data/demo-data.json` | Data team's demo data (days 107 to 128), loaded by the app; `src/orbit/demoFile.test.ts` checks it against the acceptance table | Data science |
 | `src/orbit/constellations.json`, `src/orbit/constellations.ts`, `src/modules/Play.tsx` | Constellations free mode: 2 boards of 16 tiles with NASA planetary data, hint, fact and source per group. No timer, no score | Psychology 1 (content), Engineering |
 | `src/orbit/body.ts`, `src/modules/BodyMap.tsx` | Body map: 6 systems with state, what ORBIT watches, HRP risk and the fixed symptom vocabulary | Engineering |
+| `src/orbit/care.ts`, `src/components/CareTank.tsx` | Gamification without punishment: the "protective factors used" tank (check-ins, Boost actions and ratings, pulse sessions, Constellations boards). Only fills up; no performance points, no comparison, nothing resets | Engineering |
 | `src/orbit/scenarios.json` | Four scenarios: one-way delay, estimated dose, first responder, ground contact (handoff 2.2) | Psychology + Data science |
 | `src/orbit/config.ts` | Typed reader for both files; lists every param the engine needs | Engineering |
 | `src/orbit/engine.ts` | ORBIT engine: one rule per indicator, Body / Mind / Crew roll-up, state (GREEN, YELLOW, EARLY_SIGNAL, RED_PHYSICAL, RED_PSYCH) | Data science + Engineering |

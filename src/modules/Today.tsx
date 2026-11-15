@@ -6,6 +6,8 @@ import { useI18n } from '../i18n/context'
 import { DomainRing } from '../components/DomainRing'
 import { OrbitCard } from '../components/OrbitCard'
 import { StatePanel } from '../components/StatePanel'
+import { CareTank } from '../components/CareTank'
+import type { CareSummary } from '../orbit/care'
 import { SpaceWeatherPanel } from '../components/SpaceWeatherPanel'
 
 interface Props {
@@ -15,10 +17,11 @@ interface Props {
   scenario: Scenario
   /** Indicator whose "Why?" opens on load (deep link `why=`). */
   openWhy?: string
+  care: CareSummary
 }
 
 /** Today: three rings, the ORBIT state and one card per indicator, replaying the demo story. */
-export function Today({ demo, day, onDayChange, scenario, openWhy }: Props) {
+export function Today({ demo, day, onDayChange, scenario, openWhy, care }: Props) {
   const { t } = useI18n()
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
@@ -72,6 +75,8 @@ export function Today({ demo, day, onDayChange, scenario, openWhy }: Props) {
       </div>
 
       <StatePanel result={result} scenario={scenario} />
+
+      <CareTank care={care} />
 
       {DOMAIN_IDS.map((d) => (
         <section key={d} className="domain" aria-labelledby={`domain-${d}`}>

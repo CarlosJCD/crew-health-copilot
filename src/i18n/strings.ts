@@ -213,6 +213,16 @@ const en = {
   'play.done': 'Board complete. Take a moment before going back to work.',
   'play.other': 'Play the other board',
 
+  'care.actions': '{n} care actions',
+  'care.actionOne': '1 care action',
+  'care.days': '{n} days you looked after yourself',
+  'care.dayOne': '1 day you looked after yourself',
+  'care.empty': 'Your tank fills each time you check in, choose a Boost action, say whether it helped, do pulse mode or play Constellations.',
+  'care.level': 'This tank: {n} of {size}',
+  'care.tanks': 'Tanks filled: {n}',
+  'care.helped': 'What helped you:',
+  'care.exercise': 'Exercise done today: {pct}% of your plan',
+
   'placeholder.next': 'Coming next',
   'placeholder.owner': 'Owner: {owner}',
 }
@@ -422,6 +432,16 @@ const es: Record<StringKey, string> = {
   'play.source': 'Fuente: NASA',
   'play.done': 'Tablero completo. Tómate un momento antes de volver al trabajo.',
   'play.other': 'Jugar el otro tablero',
+
+  'care.actions': '{n} acciones de cuidado',
+  'care.actionOne': '1 acción de cuidado',
+  'care.days': '{n} días en que te cuidaste',
+  'care.dayOne': '1 día en que te cuidaste',
+  'care.empty': 'Tu tanque se llena cada vez que haces el check-in, eliges una acción de Boost, dices si te ayudó, haces el modo pulso o juegas Constellations.',
+  'care.level': 'Este tanque: {n} de {size}',
+  'care.tanks': 'Tanques llenos: {n}',
+  'care.helped': 'Lo que te ayudó:',
+  'care.exercise': 'Ejercicio de hoy: {pct} % de tu plan',
 
   'placeholder.next': 'Lo que sigue',
   'placeholder.owner': 'Responsable: {owner}',
