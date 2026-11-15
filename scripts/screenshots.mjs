@@ -12,7 +12,7 @@ const BASE = (process.argv[2] ?? 'https://carlosjcd.github.io/orbit/').replace(/
 const CHROME = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../screenshots')
 
-// Handoff, 08:00 list. Add the body map and free mode here once they exist.
+// Capture list of Psychology's demo script (guion-demo.md, Nov 14 20:25).
 const SHOTS = [
   { name: '01-today-day125-early-signal', hash: '#/today?day=125' },
   { name: '02-today-day121-why-temperature', hash: '#/today?day=121&why=temp' },
@@ -21,6 +21,8 @@ const SHOTS = [
   { name: '04b-transmit-day125-delay', hash: '#/transmit?day=125' },
   { name: '05-mind-day125-checkin-and-pulse', hash: '#/mind?day=125' },
   { name: '06-today-day128-green', hash: '#/today?day=128' },
+  { name: '07-body-map-day124', hash: '#/body?day=124' },
+  { name: '08-constellations-solved', hash: '#/play?board=1&solved=1' },
 ]
 
 mkdirSync(OUT, { recursive: true })

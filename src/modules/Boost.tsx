@@ -31,7 +31,7 @@ function CardBody({ card }: { card: BoostCard }) {
       <h3 lang="en">{card.title_en}</h3>
       <p className="muted">
         {card.minutes > 0 ? t('boost.minutes', { n: card.minutes }) : t('boost.instant')}
-        {card.priority && ` · ${card.priority}`}
+        {card.priority && !DISPLAY.hide_priority_label_in_ui && ` · ${card.priority}`}
       </p>
       <p lang="en">{card.what_en}</p>
       <button type="button" className="link" aria-expanded={open} onClick={() => setOpen((o) => !o)}>

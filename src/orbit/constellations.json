@@ -1,0 +1,82 @@
+[
+  {
+    "board": "Moon families",
+    "intro_en": "Group the 16 moons by the planet they orbit. No timer, no score.",
+    "groups": [
+      {
+        "name_en": "Moons of Jupiter",
+        "tiles": ["Io", "Europa", "Ganymede", "Callisto"],
+        "fact_en": "Ganymede, Jupiter's largest moon, is bigger than the planet Mercury.",
+        "hint_en": "The four moons Galileo saw in 1610.",
+        "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/galileanfact_table.html",
+        "more_sources": ["https://www.jpl.nasa.gov/images/pia01400-the-galilean-satellites"]
+      },
+      {
+        "name_en": "Moons of Saturn",
+        "tiles": ["Titan", "Enceladus", "Mimas", "Rhea"],
+        "fact_en": "Enceladus sprays plumes of water ice and vapor from cracks near its south pole.",
+        "hint_en": "The Cassini spacecraft studied them up close.",
+        "source": "https://science.nasa.gov/saturn/moons/facts/",
+        "more_sources": []
+      },
+      {
+        "name_en": "Moons of Uranus",
+        "tiles": ["Miranda", "Ariel", "Titania", "Oberon"],
+        "fact_en": "Titania and Oberon, the two largest, were both discovered by William Herschel in 1787.",
+        "hint_en": "Careful: Titania is not Titan.",
+        "source": "https://science.nasa.gov/uranus/moons/facts",
+        "more_sources": []
+      },
+      {
+        "name_en": "Moons of Neptune",
+        "tiles": ["Triton", "Nereid", "Proteus", "Larissa"],
+        "fact_en": "Nereid takes about 360 days to go once around Neptune, almost an Earth year.",
+        "hint_en": "Their planet is the farthest from the Sun.",
+        "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptuniansatfact.html",
+        "more_sources": []
+      }
+    ]
+  },
+  {
+    "board": "Worlds and visitors",
+    "intro_en": "Planets, dwarf planets and the spacecraft that visited them. No timer, no score.",
+    "groups": [
+      {
+        "name_en": "Planets with two moons or fewer",
+        "tiles": ["Mercury", "Venus", "Earth", "Mars"],
+        "fact_en": "On Mercury, one day from sunrise to sunrise lasts about 176 Earth days, twice its 88-day year.",
+        "hint_en": "The rocky planets closest to the Sun.",
+        "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+        "more_sources": []
+      },
+      {
+        "name_en": "Planets with rings",
+        "tiles": ["Jupiter", "Saturn", "Uranus", "Neptune"],
+        "fact_en": "Saturn's average density is 687 kg per cubic meter, lower than water's.",
+        "hint_en": "All four giants have a ring system.",
+        "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+        "more_sources": []
+      },
+      {
+        "name_en": "Dwarf planets",
+        "tiles": ["Ceres", "Pluto", "Haumea", "Eris"],
+        "fact_en": "Ceres is the only dwarf planet in the inner solar system.",
+        "hint_en": "One of them was called a planet until 2006.",
+        "source": "https://science.nasa.gov/dwarf-planets",
+        "more_sources": []
+      },
+      {
+        "name_en": "NASA spacecraft",
+        "tiles": ["Juno", "Cassini", "New Horizons", "Dawn"],
+        "fact_en": "Each one visited a world on this board: Juno reached Jupiter's orbit in 2016, Cassini orbited Saturn, New Horizons flew past Pluto and Dawn orbited Ceres.",
+        "hint_en": "Look for the explorers, not the places.",
+        "source": "https://science.nasa.gov/mission/juno/",
+        "more_sources": [
+          "https://science.nasa.gov/mission/cassini/science/overview/",
+          "https://www.jpl.nasa.gov/news/nasa-sails-full-speed-ahead-in-solar-system-exploration/",
+          "https://webarchive.library.unt.edu/web/20121014020432mp_/http://www.nasa.gov/missions/current/index.html"
+        ]
+      }
+    ]
+  }
+]

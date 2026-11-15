@@ -13,10 +13,11 @@ describe('body systems', () => {
     for (const s of SYSTEMS) for (const id of s.indicators) expect(ids.has(id), `${s.id}: ${id}`).toBe(true)
   })
 
-  it('use fixed symptom buttons: the red flags of the rules file plus dizziness', () => {
-    expect(FIXED_SYMPTOMS).toContain('dizziness')
-    for (const s of SYSTEMS) for (const sym of s.symptoms) expect(FIXED_SYMPTOMS).toContain(sym)
-    expect(isRedFlag('shortness of breath')).toBe(true)
+  it('use the fixed vocabulary of the rules file: 15 buttons, every system has some, 5 alarm signs', () => {
+    expect(FIXED_SYMPTOMS).toHaveLength(15)
+    for (const s of SYSTEMS) expect(s.symptoms.length, s.id).toBeGreaterThan(0)
+    expect(SYSTEMS.flatMap((s) => s.symptoms).sort()).toEqual([...FIXED_SYMPTOMS].sort())
+    expect(FIXED_SYMPTOMS.filter(isRedFlag).sort()).toEqual(['chest pain', 'fainting', 'severe headache', 'shortness of breath', 'vision change'])
     expect(isRedFlag('dizziness')).toBe(false)
   })
 

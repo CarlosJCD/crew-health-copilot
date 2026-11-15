@@ -82,7 +82,7 @@ export const MODULES: ModuleInfo[] = [
       es: 'Modo libre: agrupar 16 fichas en 4 grupos con datos del Planetary Fact Sheet de NASA. Nunca puntúa.',
     },
     owner: { en: 'Engineering (content: Psychology 1)', es: 'Ingeniería (contenido: Psicología 1)' },
-    planned: [{ en: 'Two boards of 16 tiles', es: 'Dos tableros de 16 fichas' }],
+    planned: [{ en: 'Crew mode and family puzzle (roadmap)', es: 'Modo tripulación y acertijo con la familia (hoja de ruta)' }],
   },
 ]
 

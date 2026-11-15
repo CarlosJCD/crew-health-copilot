@@ -1,7 +1,7 @@
 // Body map (phase 4: six clickable systems). Each system groups indicators from
 // orbit-indicators.json, so its state, "how it is measured" and HRP risk all come from that file.
-// Symptoms are logged with fixed buttons (the red_flags of the rules file plus "dizziness", as
-// Psychology asked), so the engine never depends on free text for an alarm. Grouping = app design.
+// Symptoms are logged with the fixed vocabulary of the rules file (symptoms.params.vocabulary, v0.3:
+// 15 buttons, 5 alarm signs), so the engine never depends on free text for an alarm.
 import { getIndicator, list, type Color } from './config'
 import type { DemoData } from './demoData'
 import { worstColor, type DayResult } from './engine'
@@ -12,25 +12,44 @@ export interface BodySystem {
   id: SystemId
   /** Indicators the system shows, by id in orbit-indicators.json. */
   indicators: string[]
-  /** Fixed symptom buttons (alarm signs go straight to the crew medical officer). */
+  /** Fixed symptom buttons from the vocabulary (alarm signs go straight to the crew medical officer). */
   symptoms: string[]
   /** HRP risk names that apply even without an indicator of their own (eyes: SANS). */
   extraRisks: string[]
 }
 
+interface VocabularyItem {
+  text: string
+  system: string
+  red_flag: boolean
+}
+
+export const VOCABULARY = (getIndicator('symptoms').params.vocabulary ?? []) as VocabularyItem[]
+
+/** System key used in the vocabulary of the rules file. */
+const VOCAB_SYSTEM: Record<SystemId, string> = {
+  brain: 'brain_mood',
+  eyes: 'eyes',
+  heart: 'heart_vessels',
+  musculoskeletal: 'bone_muscle',
+  immune: 'immune_skin',
+  gut: 'gut',
+}
+
+const vocab = (id: SystemId) => VOCABULARY.filter((v) => v.system === VOCAB_SYSTEM[id]).map((v) => v.text)
 const SANS = 'Risk of Spaceflight Associated Neuro-ocular Syndrome (SANS)'
 
 export const SYSTEMS: BodySystem[] = [
-  { id: 'brain', indicators: ['sleep', 'checkin', 'pulse', 'screen'], symptoms: ['severe headache', 'dizziness', 'fainting'], extraRisks: [] },
-  { id: 'eyes', indicators: [], symptoms: ['vision change'], extraRisks: [SANS] },
-  { id: 'heart', indicators: ['hr', 'bp'], symptoms: ['chest pain', 'shortness of breath'], extraRisks: [] },
-  { id: 'musculoskeletal', indicators: ['exercise'], symptoms: [], extraRisks: [] },
-  { id: 'immune', indicators: ['temp'], symptoms: [], extraRisks: [] },
-  { id: 'gut', indicators: ['glucose'], symptoms: [], extraRisks: [] },
+  { id: 'brain', indicators: ['sleep', 'checkin', 'pulse', 'screen'], symptoms: vocab('brain'), extraRisks: [] },
+  { id: 'eyes', indicators: [], symptoms: vocab('eyes'), extraRisks: [SANS] },
+  { id: 'heart', indicators: ['hr', 'bp'], symptoms: vocab('heart'), extraRisks: [] },
+  { id: 'musculoskeletal', indicators: ['exercise'], symptoms: vocab('musculoskeletal'), extraRisks: [] },
+  { id: 'immune', indicators: ['temp'], symptoms: vocab('immune'), extraRisks: [] },
+  { id: 'gut', indicators: ['glucose'], symptoms: vocab('gut'), extraRisks: [] },
 ]
 
-/** Every fixed symptom button: the rules file's red flags plus "dizziness" (Psychology, answer of Nov 14). */
-export const FIXED_SYMPTOMS = [...new Set([...list('symptoms', 'red_flags'), 'dizziness'])]
+/** Every fixed symptom button (the vocabulary of the rules file). */
+export const FIXED_SYMPTOMS = VOCABULARY.map((v) => v.text)
 
 export const isRedFlag = (symptom: string) => list('symptoms', 'red_flags').includes(symptom.toLowerCase())
 
@@ -39,10 +58,14 @@ export function systemRisks(system: BodySystem): string[] {
   return [...new Set([...system.indicators.map((id) => getIndicator(id).hrp_risk), ...system.extraRisks])]
 }
 
-/** A system's color: worst of its indicators, red if one of its alarm symptoms was logged that day. */
+/**
+ * A system's color: worst of its indicators; red if one of its alarm signs was logged that day;
+ * yellow if one of its symptoms has lasted long enough to turn the symptoms rule yellow.
+ */
 export function systemColor(system: BodySystem, result: DayResult, symptomsToday: string[]): Color {
   const own = symptomsToday.filter((s) => system.symptoms.includes(s.toLowerCase()))
-  const fromSymptoms: Color = own.some(isRedFlag) ? 'red' : own.length ? 'yellow' : 'green'
+  const lasting = own.length > 0 && result.indicators.symptoms?.color === 'yellow'
+  const fromSymptoms: Color = own.some(isRedFlag) ? 'red' : lasting ? 'yellow' : 'green'
   const colors = system.indicators.map((id) => result.indicators[id]?.color ?? 'none')
   return worstColor([...colors, system.indicators.length || own.length ? fromSymptoms : 'green'])
 }

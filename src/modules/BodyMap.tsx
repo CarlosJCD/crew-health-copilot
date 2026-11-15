@@ -27,7 +27,6 @@ const SPOTS: Record<SystemId, { x: number; y: number; r: number }> = {
 export function BodyMap({ demo, day, log, onLogChange }: Props) {
   const { t } = useI18n()
   const [selected, setSelected] = useState<SystemId>('heart')
-  const [other, setOther] = useState('')
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
   const record = data.days.find((d) => d.day === day)
@@ -143,7 +142,7 @@ export function BodyMap({ demo, day, log, onLogChange }: Props) {
 
         <h3>{t('body.log')}</h3>
         {system.symptoms.length > 0 && (
-          <div className="actions">
+          <div className="actions symptom-buttons">
             {system.symptoms.map((s) => (
               <button
                 key={s}
@@ -159,20 +158,6 @@ export function BodyMap({ demo, day, log, onLogChange }: Props) {
             ))}
           </div>
         )}
-        <form
-          className="other-symptom"
-          onSubmit={(e) => {
-            e.preventDefault()
-            add(other)
-            setOther('')
-          }}
-        >
-          <label htmlFor="other-symptom">{t('body.other')}</label>
-          <input id="other-symptom" value={other} onChange={(e) => setOther(e.target.value)} placeholder={t('body.otherHint')} />
-          <button type="submit" className="button secondary" disabled={!other.trim()}>
-            {t('body.add')}
-          </button>
-        </form>
         <p className="muted">{t('body.alarmNote')}</p>
 
         {logged.length > 0 && (

@@ -14,14 +14,15 @@ import { Boost } from './modules/Boost'
 import { BodyMap } from './modules/BodyMap'
 import { Mind } from './modules/Mind'
 import { Placeholder } from './modules/Placeholder'
+import { Play } from './modules/Play'
 import { Today } from './modules/Today'
 import { Transmit } from './modules/Transmit'
 import { DEFAULT_MODULE, MODULES } from './modules/registry'
 
 export const APP_NAME = 'ORBIT'
 
-/** Route from the hash: `#/today?day=125&why=temp` (deep links for the deck and the demo). */
-function readRoute(): { id: string; day?: number; why?: string } {
+/** Route from the hash: `#/today?day=125&why=temp`, `#/play?board=2&solved=1` (deep links for the deck and the demo). */
+function readRoute(): { id: string; day?: number; why?: string; board?: number; solved?: boolean } {
   const [path, query = ''] = window.location.hash.replace(/^#\/?/, '').split('?')
   const params = new URLSearchParams(query)
   const day = Number(params.get('day'))
@@ -29,6 +30,8 @@ function readRoute(): { id: string; day?: number; why?: string } {
     id: MODULES.some((m) => m.id === path) ? path : DEFAULT_MODULE,
     day: params.has('day') && Number.isInteger(day) ? day : undefined,
     why: params.get('why') ?? undefined,
+    board: params.has('board') ? Number(params.get('board')) - 1 : undefined,
+    solved: params.get('solved') === '1',
   }
 }
 
@@ -46,6 +49,7 @@ export default function App() {
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
   const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
   const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
+  const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
 
   useEffect(() => {
     const onHash = () => {
@@ -116,6 +120,14 @@ export default function App() {
           />
         ) : active.id === 'body' ? (
           <BodyMap demo={demo} day={day} log={symptomLog} onLogChange={setSymptomLog} />
+        ) : active.id === 'play' ? (
+          <Play
+            key={`${route.board ?? 0}-${route.solved}`}
+            completed={boardsDone}
+            onComplete={() => setBoardsDone((n) => n + 1)}
+            initialBoard={route.board}
+            initialSolved={route.solved}
+          />
         ) : active.id === 'boost' ? (
           <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} />
         ) : active.id === 'mind' ? (

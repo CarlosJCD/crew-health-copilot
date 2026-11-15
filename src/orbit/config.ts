@@ -39,6 +39,8 @@ export interface OrbitRules {
   disclaimer_en: string
   domains: Record<DomainId, string[]>
   convergence: { min_yellow_domains: number; consecutive_days: number; label_en: string; team_criterion: boolean }
+  /** "In a row" = consecutive records, with at most this many days without data between them (v0.3, question 19). */
+  consecutive_rule?: { counts: string; max_gap_days_without_data: number; text_en: string }
   escalation: Record<EscalationKey, { en: string; to: string; offer_share_with?: string; ground_packet?: boolean }>
   indicators: OrbitIndicator[]
 }
@@ -67,7 +69,7 @@ export const REQUIRED_PARAMS: Record<string, string[]> = {
     'practice_sessions', 'yellow_sd_above_baseline', 'yellow_sessions_needed', 'yellow_window_sessions',
     'duration_s', 'isi_s', 'false_start_lt_ms', 'lapse_gte_ms',
   ],
-  bp: ['green_sys_lt', 'green_dia_lt', 'red_sys_gte', 'red_dia_gte', 'red_needs_confirmation'],
+  bp: ['green_sys_lt', 'green_dia_lt', 'red_sys_gte', 'red_dia_gte', 'red_needs_confirmation', 'convergence_requires_consecutive_readings'],
   hr: ['yellow_above_baseline_bpm', 'red_gt', 'red_low_lt_with_symptoms'],
   temp: ['yellow_above_inflight_baseline_gt', 'red_gte', 'red_above_inflight_baseline_gt', 'red_requires_symptoms'],
   glucose: ['green_min', 'green_max', 'yellow_low_min', 'red_high_gte', 'red_high_occasions', 'red_low_lt'],

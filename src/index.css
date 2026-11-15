@@ -266,3 +266,19 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .other-symptom input { flex: 1; min-width: 10rem; padding: 0.35rem 0.5rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; }
 .chip { margin: 0 0.25rem 0.25rem 0; padding: 0.1rem 0.5rem; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); cursor: pointer; font: inherit; font-size: 0.82rem; }
 @media (max-width: 720px) { .bodymap { grid-template-columns: 1fr; } }
+
+/* ORBIT: Constellations */
+.play section, .solved-group { margin-bottom: 0.9rem; }
+.play-head, .play-done { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.9rem 1rem; }
+.play-head p { margin: 0.3rem 0; }
+.tile-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; margin: 0.5rem 0; }
+.tile {
+  min-height: 3.4rem; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text);
+  font: inherit; font-weight: 600; cursor: pointer; padding: 0.4rem; overflow-wrap: anywhere;
+}
+.tile[aria-pressed='true'] { background: color-mix(in srgb, var(--accent) 35%, var(--panel-2)); border-color: var(--accent); }
+.solved-group { background: color-mix(in srgb, var(--nominal) 14%, var(--panel)); border: 1px solid var(--nominal); border-radius: var(--radius); padding: 0.6rem 0.9rem; }
+.solved-group h3 { margin-bottom: 0.2rem; }
+.solved-group p { margin: 0.2rem 0; font-size: 0.88rem; }
+.tiles-line { font-weight: 600; }
+@media (max-width: 520px) { .tile { font-size: 0.85rem; min-height: 3rem; } }
