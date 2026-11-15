@@ -92,6 +92,11 @@ export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, class
     }
   }, [])
 
+  // The library names its drawing after the model ("female-body-front"); the box carries the real label.
+  useEffect(() => {
+    box.current?.querySelector('svg')?.setAttribute('aria-hidden', 'true')
+  })
+
   /** Her side of a body path: the figure draws each two-sided zone as a left and a right path. */
   const sideOf = (path: SVGPathElement): BodySide | undefined => {
     const same = [...box.current!.querySelectorAll<SVGPathElement>(`path[id="${path.id}"]`)]
@@ -121,7 +126,17 @@ export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, class
   }
 
   const start = (e: PointerEvent<HTMLDivElement>) => {
-    const p = partAt(e.clientX, e.clientY)
+    let p = partAt(e.clientX, e.clientY)
+    // On the thin line between two muscles: take the nearest part within half a brush.
+    if (!p) {
+      const r = (box.current!.getBoundingClientRect().width * BRUSH[size]) / 2
+      search: for (const k of [0.5, 1]) {
+        for (let a = 0; a < 8; a++) {
+          p = partAt(e.clientX + Math.cos((a * Math.PI) / 4) * r * k, e.clientY + Math.sin((a * Math.PI) / 4) * r * k)
+          if (p) break search
+        }
+      }
+    }
     if (!p || strokes.length >= MAX_STROKES) return
     e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -183,6 +198,7 @@ export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, class
       onPointerMove={move}
       onPointerUp={end}
       onPointerCancel={end}
+      role="img"
       aria-label={label}
     >
       <Body gender={figure} side={view} scale={scale} data={[...bySlug.values()]} defaultFill={fill} border={border} />
@@ -225,7 +241,7 @@ export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, class
  * She is not sure what hurts: she paints the area with her finger or the mouse.
  * Keyboard path: choose a zone and paint it whole.
  */
-export function PainPainter({ view, size, strokes, onChange }: Props) {
+export function PainPainter({ view, size, strokes, onChange, brush = true }: Props & { brush?: boolean }) {
   const { t } = useI18n()
   const [picked, setZone] = useState<Slug>(VIEW_PARTS[view][0])
   const zone = VIEW_PARTS[view].includes(picked) ? picked : VIEW_PARTS[view][0]
@@ -236,14 +252,18 @@ export function PainPainter({ view, size, strokes, onChange }: Props) {
 
   return (
     <div className="pain-mode">
-      <p className="muted">{t('pain.paintHint')}</p>
-      <PaintSurface
-        view={view}
-        size={size}
-        strokes={strokes}
-        onChange={onChange}
-        label={t('pain.figure', { view: t(view === 'front' ? 'pain.front' : 'pain.back') })}
-      />
+      {brush && (
+        <>
+          <p className="muted">{t('pain.paintHint')}</p>
+          <PaintSurface
+            view={view}
+            size={size}
+            strokes={strokes}
+            onChange={onChange}
+            label={t('pain.figure', { view: t(view === 'front' ? 'pain.front' : 'pain.back') })}
+          />
+        </>
+      )}
       <div className="actions">
         <label htmlFor="pain-zone">{t('pain.zone')}</label>
         <select id="pain-zone" value={zone} onChange={(e) => setZone(e.target.value as Slug)}>

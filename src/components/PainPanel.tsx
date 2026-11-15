@@ -41,9 +41,13 @@ interface Props {
   painted?: PaintStroke[]
   /** Called once a report is saved (the home figure clears its new paint). */
   onSaved?: () => void
+  /** "Done" after saving: closes the panel. */
+  onDone?: () => void
+  /** The brush lives on the home figure: here the area is picked from a list instead (no second brush). */
+  brush?: boolean
 }
 
-type Step = 'where' | 'what' | 'details' | 'safety'
+type Step = 'where' | 'what' | 'details' | 'safety' | 'done'
 
 /** Id of a new report (wall clock, read only in event handlers). */
 const newEventId = () => `ev-${Date.now()}`
@@ -54,7 +58,7 @@ type Mode = 'exact' | 'area'
  * side, front or back), then what it feels like, how strong, when, what was happening and whether moving or
  * pressing makes it worse. Pain in the head, eyes or chest asks the alarm question before saving.
  */
-export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted = [], onSaved }: Props) {
+export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted = [], onSaved, onDone, brush = true }: Props) {
   const { t, lang } = useI18n()
   const [step, setStep] = useState<Step>(painted.length ? 'what' : 'where')
   const [mode, setMode] = useState<Mode | null>(painted.length ? 'area' : null)
@@ -89,6 +93,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
     const event: PainEvent = { id: newEventId(), muscles, strokes, ...where, ...described, alarms: confirmed, pain: feels.pain, symptoms: feels.symptoms }
     onChange({ events: [...today.events, event] })
     reset()
+    setStep('done')
     onSaved?.()
   }
 
@@ -106,7 +111,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
               {t('pain.muscle')}
             </button>
             <button type="button" className="button secondary" aria-pressed={mode === 'area'} onClick={() => setMode('area')}>
-              {t('pain.paint')}
+              {t(brush ? 'pain.paint' : 'pain.zonePick')}
             </button>
           </div>
           <div className="actions" role="group" aria-label={t('pain.offFigure')}>
@@ -134,7 +139,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
                     </button>
                   ))}
                 </div>
-                {mode === 'area' && (
+                {mode === 'area' && brush && (
                   <div className="actions" role="group" aria-label={t('pain.brush')}>
                     {(Object.keys(BRUSH) as BrushSize[]).map((s) => (
                       <button key={s} type="button" className="button secondary" aria-pressed={size === s} onClick={() => setSize(s)}>
@@ -147,7 +152,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
               {mode === 'exact' ? (
                 <MuscleSelector view={view} marks={muscles} onChange={setMuscles} />
               ) : (
-                <PainPainter view={view} size={size} strokes={strokes} onChange={setStrokes} />
+                <PainPainter view={view} size={size} strokes={strokes} onChange={setStrokes} brush={brush} />
               )}
             </div>
           )}
@@ -185,7 +190,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
                 onClick={() => setFeels((f) => ({ ...f, symptoms: f.symptoms.includes(s) ? f.symptoms.filter((x) => x !== s) : [...f.symptoms, s] }))}
                 lang="en"
               >
-                {s}
+                {cap(s)}
               </button>
             ))}
           </div>
@@ -205,7 +210,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
         <>
           <p>
             <strong>{t('pain.whereIs', { where: whereText(where) })}</strong>
-            {feels.symptoms.length > 0 && <span lang="en"> · {feels.symptoms.join(', ')}</span>}
+            {feels.symptoms.length > 0 && <span lang="en"> · {feels.symptoms.map(cap).join(', ')}</span>}
           </p>
           <PainDetails value={details} onChange={setDetails} pain={feels.pain} />
           <div className="actions">
@@ -235,7 +240,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
                 lang="en"
               >
                 <span aria-hidden="true">■ </span>
-                {s}
+                {cap(s)}
               </button>
             ))}
           </div>
@@ -250,6 +255,24 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
         </div>
       )}
 
+      {step === 'done' && (
+        <div className="pain-done">
+          <p role="status">
+            <strong>✓ {t('pain.savedOk')}</strong>
+          </p>
+          <div className="actions">
+            {onDone && (
+              <button type="button" className="button" onClick={onDone}>
+                {t('pain.done')}
+              </button>
+            )}
+            <button type="button" className="button secondary" onClick={() => setStep('where')}>
+              {t('pain.another')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {today.events.length > 0 && (
         <div role="status" className="pain-summary">
           <p>
@@ -258,7 +281,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
           <ul className="pain-events">
             {today.events.map((e, i) => {
               const label = `${whereText(e)} · ${e.intensity}/10 ${t(`pain.level.${verbalLabel(e.intensity)}`)}`
-              const words = [...e.qualities.map((q) => qualityLabel(q, lang)), ...(e.symptoms ?? [])].join(', ')
+              const words = [...e.qualities.map((q) => qualityLabel(q, lang)), ...(e.symptoms ?? []).map(cap)].join(', ')
               const kind = isPain(e) ? '' : `${t('pain.symptomOnly')} · `
               return (
                 <li key={e.id}>
@@ -306,6 +329,9 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
     </section>
   )
 }
+
+/** Symptom words of the vocabulary are lower case; shown with a capital first letter. */
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 /** Right after she logs a pain: the self-care that matches it, or what to do if there is none. */
 function PainSuggestions({ event, chosen, onToggle }: { event: PainEvent; chosen: string[]; onToggle: (id: string) => void }) {

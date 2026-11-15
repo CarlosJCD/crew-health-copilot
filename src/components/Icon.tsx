@@ -11,6 +11,8 @@ const PATHS = {
   play: 'M8 5.5v13l10-6.5-10-6.5Z',
   pause: 'M9 6v12M15 6v12',
   close: 'M6 6l12 12M18 6 6 18',
+  signal: 'M5 18v-2M9.5 18v-5M14 18v-8M18.5 18V6',
+  nosignal: 'M5 18v-2M9.5 18v-5M14 18v-3M18.5 18v-3M4 4l16 16',
 } as const
 
 export type IconName = keyof typeof PATHS

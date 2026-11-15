@@ -16,6 +16,7 @@ import { CareTank } from './components/CareTank'
 import { Logo } from './components/Logo'
 import { ThemeToggle } from './components/ThemeToggle'
 import { useTheme } from './lib/theme'
+import { useFigure } from './lib/figure'
 import { useStoredJson } from './hooks/useStoredJson'
 import { useI18n } from './i18n/context'
 import { Boost } from './modules/Boost'
@@ -71,12 +72,17 @@ export default function App() {
   const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
   const [moreOpen, setMoreOpen] = useState(false)
   const [theme, setTheme] = useTheme()
+  const [figure, setFigure] = useFigure()
   const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     const onHash = () => {
       const r = readRoute()
-      setRoute(r)
+      // A new screen opens at the top, not at the scroll position of the one before.
+      setRoute((prev) => {
+        if (prev.id !== r.id) window.scrollTo(0, 0)
+        return r
+      })
       if (r.day !== undefined) setDay(r.day)
     }
     const onOnline = () => setOnline(true)
@@ -129,10 +135,10 @@ export default function App() {
   return (
     <div className={`app route-${active.id}`}>
       <header className="topbar">
-        {/* Wordmark: the logo ring is the O of ORBIT (design proposal, variant V2). */}
+        {/* Wordmark: the symbol and the whole word, so it never reads "RBIT". */}
         <a className="wordmark" href="#/body" aria-label={APP_NAME} title={APP_EXPANSION}>
           <Logo />
-          <span aria-hidden="true">{APP_NAME.slice(1)}</span>
+          <span aria-hidden="true">{APP_NAME}</span>
         </a>
         <div className="day-stepper" role="group" aria-label={t('home.demo')}>
           <span className="demo-tag" title={inStory ? t('day.story', STORY_DAYS) : t('day.history', STORY_DAYS)}>
@@ -158,10 +164,17 @@ export default function App() {
             <Icon name={playing ? 'pause' : 'play'} size={18} />
           </button>
         </div>
-        <span className={`net ${online ? 'on' : 'off'}`} title={online ? t('net.online') : t('net.offline')}>
-          <span className="sr-only">{online ? t('net.online') : t('net.offline')}</span>
+        <span className={`net ${online ? 'on' : 'off'}`} title={online ? t('net.online') : t('net.offlineLong')} role="status">
+          <Icon name={online ? 'signal' : 'nosignal'} size={18} />
+          <span className={online ? 'sr-only' : 'net-text'}>{online ? t('net.online') : t('net.offlineLong')}</span>
         </span>
       </header>
+      {!online && <p className="offline-bar" role="status">{t('net.offlineLong')}</p>}
+      {playing && record && record.events.length > 0 && (
+        <p className="story-log" aria-live="polite">
+          <strong>{t('more.log', { n: day })}</strong> <span lang="en">{record.events.join(' · ')}</span>
+        </p>
+      )}
 
       <main>
         {active.id === 'today' ? (
@@ -253,6 +266,16 @@ export default function App() {
           </div>
           <div className="more-row">
             <span className="muted">{t('theme.label')}</span> <ThemeToggle theme={theme} onChange={setTheme} />
+          </div>
+          <div className="more-row">
+            <span className="muted">{t('more.figure')}</span>
+            <div className="segmented" role="group" aria-label={t('more.figure')}>
+              {(['female', 'male'] as const).map((k) => (
+                <button key={k} type="button" aria-pressed={figure === k} onClick={() => setFigure(k)}>
+                  {t(k === 'female' ? 'more.female' : 'more.male')}
+                </button>
+              ))}
+            </div>
           </div>
           <p className="muted small">{t('more.who', { name: demo.data.persona.name, role: demo.data.persona.role })}</p>
           {record && record.events.length > 0 && (
