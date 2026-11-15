@@ -12,6 +12,7 @@ const PATHS = {
   pause: 'M9 6v12M15 6v12',
   close: 'M6 6l12 12M18 6 6 18',
   check: 'm5 12.5 4.5 4.5L19 7.5',
+  clock: 'M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 4v4l2.5 1.5',
   info: 'M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 7.5V16m0-8h.01',
   signal: 'M5 18v-2M9.5 18v-5M14 18v-8M18.5 18V6',
   nosignal: 'M5 18v-2M9.5 18v-5M14 18v-3M18.5 18v-3M4 4l16 16',

@@ -12,7 +12,6 @@ import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { Icon, type IconName } from './components/Icon'
 import { Sheet } from './components/Sheet'
-import { CareTank } from './components/CareTank'
 import { Logo } from './components/Logo'
 import { ThemeToggle } from './components/ThemeToggle'
 import { useTheme } from './lib/theme'
@@ -235,10 +234,7 @@ export default function App() {
             initialSolved={route.solved}
           />
         ) : active.id === 'boost' ? (
-          <>
-            <CareTank care={care} />
-            <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} careActions={care.actions} />
-          </>
+          <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} care={care} />
         ) : active.id === 'mind' ? (
           <Mind
             demo={demo}
