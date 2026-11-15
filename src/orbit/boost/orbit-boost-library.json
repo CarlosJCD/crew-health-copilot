@@ -1,0 +1,987 @@
+{
+  "version": "0.1",
+  "date": "2026-11-14",
+  "disclaimer_en": "Orbit offers self-care options and routes concerns to people. It does not diagnose or give medication advice.",
+  "display_rules": {
+    "order": [
+      "safety_question",
+      "safety_first_cards",
+      "offered_cards",
+      "did_it_help"
+    ],
+    "max_cards_shown": 4,
+    "max_choices": 2,
+    "always_show_why": true,
+    "did_it_help": {
+      "options_en": [
+        "Yes",
+        "A little",
+        "No",
+        "Skip"
+      ],
+      "ask_after_minutes": 30,
+      "use": "Iterate: cards rated 'No' twice for the same trigger move down the list (team criterion)"
+    },
+    "red_overrides_self_care": true,
+    "offered_cards_order": "The first max_cards_shown cards of offered_cards are shown, after Iterate reordering",
+    "roadmap_cards_hidden_in_mvp": true,
+    "team_criterion": [
+      "max_cards_shown",
+      "ask_after_minutes",
+      "use"
+    ]
+  },
+  "design_basis": [
+    {
+      "cite": "Nahum-Shani et al., 2018 (JITAI)",
+      "url": "https://doi.org/10.1007/s12160-016-9830-8"
+    },
+    {
+      "cite": "Ryan, Rigby y Przybylski, 2006 (SDT and games)",
+      "url": "https://doi.org/10.1007/s11031-006-9051-8"
+    }
+  ],
+  "safety_questions": {
+    "hr_red_flags": {
+      "text_en": "Do you have chest pain or discomfort, shortness of breath, weakness, lightheadedness or have you fainted?",
+      "if_yes": "cmo_now",
+      "sources": [
+        {
+          "cite": "Mayo Clinic, Tachycardia: symptoms and causes",
+          "url": "https://mayoclinic.org/diseases-conditions/tachycardia/symptoms-causes/syc-20355127"
+        }
+      ]
+    }
+  },
+  "cards": [
+    {
+      "id": "cmo_now",
+      "kind": "escalate",
+      "status": "mvp",
+      "minutes": 0,
+      "title_en": "Contact your crew medical officer now",
+      "what_en": "Orbit has already notified your crew medical officer. Stay where you are, tell a crewmate, and do not exercise until you are checked.",
+      "why_en": "Some signs need a person, not an app.",
+      "es": "Escalamiento inmediato. Sin tarjetas de autocuidado antes de esta.",
+      "evidencia_es": "Señales de alarma de Mayo Clinic: dolor en el pecho, falta de aire, debilidad y desmayo requieren ayuda médica inmediata. Lista final pendiente de un médico.",
+      "tipo": "Guía clínica divulgativa",
+      "conf": "Alta (como regla de seguridad)",
+      "sources": [
+        {
+          "cite": "Mayo Clinic, Tachycardia: symptoms and causes",
+          "url": "https://mayoclinic.org/diseases-conditions/tachycardia/symptoms-causes/syc-20355127"
+        },
+        {
+          "cite": "NASA Human Research Program, risks",
+          "url": "https://www.nasa.gov/hrp/risks/"
+        }
+      ]
+    },
+    {
+      "id": "recheck_hr",
+      "kind": "check",
+      "status": "mvp",
+      "minutes": 6,
+      "title_en": "Re-check your heart rate at rest",
+      "what_en": "Rest quietly for 5 minutes, without talking or screens, at least 30 minutes after exercise or caffeine. Then measure again.",
+      "why_en": "Exercise, caffeine and stress raise heart rate for a while. A calm reading tells you whether the change is real.",
+      "es": "Volver a medir en reposo antes de interpretar.",
+      "evidencia_es": "La AHA pide evitar ejercicio, cafeína y tabaco 30 min antes de medir la presión porque suben la frecuencia cardiaca y la presión; la AMA pide 5 min de reposo. Aplicarlo a la frecuencia cardiaca es una extrapolación.",
+      "tipo": "Recomendación de sociedad médica (extrapolada)",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "AHA News, 2024: rules for measuring blood pressure",
+          "url": "https://heart.org/en/news/2024/06/25/the-rules-for-measuring-blood-pressure-and-why-they-exist"
+        },
+        {
+          "cite": "AMA, How to measure blood pressure at home, 2024",
+          "url": "https://map.ama-assn.org/sites/default/files/2024-05/How%20to%20measure%20blood%20pressure%20at%20home.pdf"
+        }
+      ]
+    },
+    {
+      "id": "recheck_bp",
+      "kind": "check",
+      "status": "mvp",
+      "minutes": 8,
+      "title_en": "Re-check your blood pressure the right way",
+      "what_en": "No exercise or caffeine for 30 minutes. Empty your bladder, rest 5 minutes in silence with your arm supported at heart level, then take 2 readings 1 minute apart.",
+      "why_en": "Small things, like an unsupported arm or a full bladder, can push a reading up.",
+      "es": "Repetir la medición con técnica correcta; la regla roja exige confirmar en una segunda lectura.",
+      "evidencia_es": "Guías de AHA y ACC: sin ejercicio, tabaco ni cafeína 30 min antes; brazo apoyado a la altura del corazón. Un brazo colgando puede subir la lectura hasta 20 mmHg. La AMA indica 2 lecturas con 1 min de diferencia. La postura en microgravedad es distinta: hay que seguir el protocolo médico de a bordo (sin verificar cómo se mide en la ISS).",
+      "tipo": "Recomendación de sociedad médica",
+      "conf": "Alta en Tierra; media en vuelo",
+      "sources": [
+        {
+          "cite": "AHA News, 2024: rules for measuring blood pressure",
+          "url": "https://heart.org/en/news/2024/06/25/the-rules-for-measuring-blood-pressure-and-why-they-exist"
+        },
+        {
+          "cite": "AMA, How to measure blood pressure at home, 2024",
+          "url": "https://map.ama-assn.org/sites/default/files/2024-05/How%20to%20measure%20blood%20pressure%20at%20home.pdf"
+        }
+      ]
+    },
+    {
+      "id": "context_check",
+      "kind": "check",
+      "status": "mvp",
+      "minutes": 1,
+      "title_en": "What might explain it?",
+      "what_en": "Tap what applies: exercised recently, caffeine, short sleep, feeling warm or unwell, stressed, thirsty. Orbit keeps this note with the reading.",
+      "why_en": "Most changes have an everyday explanation. Knowing it helps you and, if needed, your medical officer.",
+      "es": "Preguntas rápidas de contexto que quedan junto a la medición (sueño, cafeína, fiebre, estrés, ejercicio, hidratación).",
+      "evidencia_es": "Mayo Clinic: la taquicardia sinusal suele deberse a ejercicio o estrés; entre las causas de hábitos está la cafeína. La hidratación se incluye como inferencia del equipo.",
+      "tipo": "Guía clínica divulgativa",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Mayo Clinic, Tachycardia: symptoms and causes",
+          "url": "https://mayoclinic.org/diseases-conditions/tachycardia/symptoms-causes/syc-20355127"
+        }
+      ]
+    },
+    {
+      "id": "breathe",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 4,
+      "title_en": "Breathe",
+      "what_en": "Follow the orbit: breathe in for 4 seconds as it grows and out for 6 as it shrinks, about 6 breaths a minute, for 3 or 5 minutes.",
+      "why_en": "Slow breathing lowers arousal. Studies of guided breathing found less self-reported stress.",
+      "es": "Respiración guiada a unas 6 por minuto, 3 o 5 min.",
+      "evidencia_es": "Metaanálisis de 12 ensayos (785 adultos): menos estrés autorreportado, efectos pequeños a medianos (Fincham et al., 2023). Biorretroalimentación de variabilidad cardiaca: efectos pequeños a medianos en ansiedad y depresión (Lehrer et al., 2020). Mayo Clinic: las técnicas de manejo del estrés podrían ayudar a bajar la frecuencia cardiaca.",
+      "tipo": "Metaanálisis de ensayos aleatorizados",
+      "conf": "Media (terrestre)",
+      "sources": [
+        {
+          "cite": "Fincham et al., 2023",
+          "url": "https://doi.org/10.1038/s41598-022-27247-y"
+        },
+        {
+          "cite": "Lehrer et al., 2020",
+          "url": "https://doi.org/10.1007/s10484-020-09466-z"
+        },
+        {
+          "cite": "Mayo Clinic, Tachycardia: diagnosis and treatment",
+          "url": "https://www.mayoclinic.org/diseases-conditions/tachycardia/diagnosis-treatment/drc-20355132"
+        }
+      ]
+    },
+    {
+      "id": "sleep_window",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 1,
+      "title_en": "Protect tonight's sleep window",
+      "what_en": "Pick your sleep time now and keep it. Dim lights and screens in the last hour, make your quarters dark and quiet, and keep the same window tomorrow.",
+      "why_en": "On the ISS, nights under 6 hours went with slower reactions, more stress and higher workload.",
+      "es": "Fijar y proteger la ventana de sueño de hoy y de mañana.",
+      "evidencia_es": "Los astronautas duermen poco en vuelo (Barger et al., 2014); el desfase circadiano reduce el sueño (Flynn-Evans et al., 2016); dormir menos de 6 h se asoció con menor velocidad psicomotora, más estrés y más carga (Jones et al., 2022). La acción concreta es una inferencia del equipo.",
+      "tipo": "Estudios observacionales en vuelo",
+      "conf": "Media para el problema; baja a media para la acción",
+      "sources": [
+        {
+          "cite": "Barger et al., 2014",
+          "url": "https://doi.org/10.1016/S1474-4422(14)70122-X"
+        },
+        {
+          "cite": "Flynn-Evans et al., 2016",
+          "url": "https://doi.org/10.1038/npjmgrav.2015.19"
+        },
+        {
+          "cite": "Jones et al., 2022",
+          "url": "https://doi.org/10.1093/sleep/zsac006"
+        }
+      ]
+    },
+    {
+      "id": "caffeine_cutoff",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 0,
+      "title_en": "Caffeine cut-off",
+      "what_en": "No caffeine in the 6 hours before your sleep window. Orbit shows the cut-off time for today.",
+      "why_en": "In a study, a strong dose of caffeine 6 hours before bed still cut more than an hour of sleep, and people did not notice.",
+      "es": "Hora límite de cafeína: 6 h antes de dormir.",
+      "evidencia_es": "400 mg de cafeína 6 h antes de dormir redujeron el sueño total más de 1 h; los participantes no lo percibieron (Drake et al., 2013). Muestra de 12 personas y dosis alta.",
+      "tipo": "Ensayo cruzado con placebo (n = 12)",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Drake et al., 2013",
+          "url": "https://doi.org/10.5664/jcsm.3170"
+        }
+      ]
+    },
+    {
+      "id": "wind_down",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 10,
+      "title_en": "Wind down",
+      "what_en": "A 10-minute relaxation before sleep: slow breathing, then relaxing each muscle group from feet to head.",
+      "why_en": "Relaxation training is one of the recommended ways to improve sleep.",
+      "es": "Relajación antes de dormir.",
+      "evidencia_es": "La guía de la AASM da recomendación condicional a la relajación y fuerte a la terapia cognitivo-conductual para el insomnio (Edinger et al., 2021).",
+      "tipo": "Guía de práctica clínica (GRADE)",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Edinger et al., 2021 (AASM guideline)",
+          "url": "https://doi.org/10.5664/jcsm.8986"
+        }
+      ]
+    },
+    {
+      "id": "bed_is_for_sleep",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 0,
+      "title_en": "Your sleeping bag is for sleep",
+      "what_en": "Go to your sleeping bag only when sleepy. If you cannot fall asleep after about 20 minutes, get out, do something quiet in dim light, and come back when sleepy.",
+      "why_en": "This is stimulus control, a recommended part of behavioral treatment for insomnia.",
+      "es": "Control de estímulos. Solo si hubo problemas para conciliar el sueño.",
+      "evidencia_es": "Recomendación condicional de la AASM para el control de estímulos (Edinger et al., 2021). Los 20 min son el criterio habitual de esta técnica (sin verificar en esta sesión). La higiene del sueño sola no se recomienda como tratamiento.",
+      "tipo": "Guía de práctica clínica (GRADE)",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Edinger et al., 2021 (AASM guideline)",
+          "url": "https://doi.org/10.5664/jcsm.8986"
+        }
+      ]
+    },
+    {
+      "id": "strategic_nap",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 40,
+      "title_en": "Strategic nap",
+      "what_en": "If your schedule allows, take a planned rest of up to 40 minutes. Give yourself 15 to 20 minutes to fully wake up before any critical task.",
+      "why_en": "In a NASA study, pilots given a 40-minute rest slept about 26 minutes and were more alert and performed better afterwards.",
+      "es": "Siesta planeada de hasta 40 min cuando el modo pulso está lento o hay somnolencia; nunca justo antes de una tarea crítica.",
+      "evidencia_es": "Pilotos con oportunidad de 40 min durmieron 25.8 min en promedio y mejoraron alerta y desempeño, sin afectar el sueño posterior (Rosekind et al., NASA). La inercia del sueño suele pasar en 10 a 15 min; el estudio dejó 20 min tras despertar.",
+      "tipo": "Estudio de campo controlado (n = 21)",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Rosekind et al., 1994 (NASA TM, planned cockpit rest)",
+          "url": "https://ntrs.nasa.gov/citations/19950006379"
+        },
+        {
+          "cite": "Rosekind et al., naps as an alertness management strategy (NASA)",
+          "url": "https://ntrs.nasa.gov/api/citations/20020012539/downloads/20020012539.pdf"
+        }
+      ]
+    },
+    {
+      "id": "micro_break",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 5,
+      "title_en": "Micro-break",
+      "what_en": "Stop for 5 minutes: move, stretch, look out the window or at Earth Window.",
+      "why_en": "Short breaks during work increase energy and reduce fatigue.",
+      "es": "Pausa breve de hasta 10 min.",
+      "evidencia_es": "Metaanálisis: las micropausas aumentaron el vigor y redujeron la fatiga; los efectos fueron pequeños (Albulescu et al., 2022).",
+      "tipo": "Metaanálisis",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Albulescu et al., 2022",
+          "url": "https://doi.org/10.1371/journal.pone.0272460"
+        }
+      ]
+    },
+    {
+      "id": "music",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 10,
+      "title_en": "Music break",
+      "what_en": "Listen to music you choose for 10 minutes. Calm music if you want to slow down.",
+      "why_en": "Music interventions reduced both physical and felt stress in many studies.",
+      "es": "Música elegida por ella.",
+      "evidencia_es": "Metaanálisis: las intervenciones con música redujeron el estrés fisiológico y psicológico, con efectos pequeños a medianos (de Witte et al., 2020).",
+      "tipo": "Metaanálisis",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "de Witte et al., 2020",
+          "url": "https://doi.org/10.1080/17437199.2019.1627897"
+        }
+      ]
+    },
+    {
+      "id": "mindful_minute",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 5,
+      "title_en": "Five mindful minutes",
+      "what_en": "A guided 5-minute attention exercise: notice your breath, sounds and body without judging them.",
+      "why_en": "Meditation programs showed moderate benefits for anxiety and depression.",
+      "es": "Ejercicio breve de atención plena.",
+      "evidencia_es": "Metaanálisis: programas de meditación con evidencia moderada en ansiedad, depresión y dolor (Goyal et al., 2014). Eran programas de semanas; una sesión de 5 min es extrapolación.",
+      "tipo": "Revisión sistemática y metaanálisis",
+      "conf": "Baja a media (para la versión breve)",
+      "sources": [
+        {
+          "cite": "Goyal et al., 2014",
+          "url": "https://doi.org/10.1001/jamainternmed.2013.13018"
+        }
+      ]
+    },
+    {
+      "id": "one_valued_thing",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 2,
+      "title_en": "Plan one thing that matters to you",
+      "what_en": "Choose one small activity you value or enjoy for today, pick a time, and Orbit will ask later how it went.",
+      "why_en": "Scheduling meaningful activities is behavioral activation, an effective approach for low mood.",
+      "es": "Activación conductual: programar una actividad valiosa o placentera.",
+      "evidencia_es": "Metaanálisis de 26 ensayos: la activación conductual superó a los controles (DME de -0.74); la calidad de la mayoría de los estudios fue baja (Ekers et al., 2014). Es tratamiento para depresión; aquí se usa como prevención (extrapolación).",
+      "tipo": "Metaanálisis de ensayos aleatorizados",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Ekers et al., 2014",
+          "url": "https://doi.org/10.1371/journal.pone.0100100"
+        }
+      ]
+    },
+    {
+      "id": "move",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 20,
+      "title_en": "Move for your mood",
+      "what_en": "Do today's planned exercise, or the part you can, and rate your mood before and after.",
+      "why_en": "Exercise reduced depression symptoms across many trials, especially walking or running, yoga and strength work.",
+      "es": "Ejercicio con registro de ánimo antes y después. No cambia la prescripción.",
+      "evidencia_es": "Metaanálisis en red: el ejercicio redujo síntomas de depresión, sobre todo caminar o trotar, yoga y fuerza; certeza baja a moderada (Noetel et al., 2024).",
+      "tipo": "Metaanálisis en red",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Noetel et al., 2024",
+          "url": "https://doi.org/10.1136/bmj-2023-075847"
+        }
+      ]
+    },
+    {
+      "id": "earth_window",
+      "kind": "connect",
+      "status": "mvp",
+      "minutes": 2,
+      "title_en": "Earth Window",
+      "what_en": "Today's full-disk image of Earth from NASA's DSCOVR/EPIC camera, with the time at home.",
+      "why_en": "Astronauts describe seeing Earth as one of the most meaningful parts of spaceflight.",
+      "es": "Imagen diaria de la Tierra (API EPIC).",
+      "evidencia_es": "Relatos de asombro y autotrascendencia al ver la Tierra (Yaden et al., 2016); escenas naturales en realidad virtual redujeron el afecto negativo (Anderson et al., 2017). No está probado que una imagen en pantalla reproduzca el efecto.",
+      "tipo": "Cualitativo y experimental pequeño",
+      "conf": "Baja",
+      "sources": [
+        {
+          "cite": "Yaden et al., 2016 (overview effect)",
+          "url": "https://doi.org/10.1037/cns0000086"
+        },
+        {
+          "cite": "Anderson et al., 2017 (VR nature)",
+          "url": "https://doi.org/10.3357/AMHP.4747.2017"
+        }
+      ]
+    },
+    {
+      "id": "message_home",
+      "kind": "connect",
+      "status": "mvp",
+      "minutes": 5,
+      "title_en": "Send a message home",
+      "what_en": "Record or write a short message for someone at home. It goes with the next data window; their answer arrives later.",
+      "why_en": "Contact with family is part of NASA's psychological support for crews.",
+      "es": "Mensaje asíncrono a la familia o amistades.",
+      "evidencia_es": "NASA ofrece contactos con la familia, eventos especiales y paquetes de cuidado como apoyo psicológico (NASA, Space Psychology, 2023). Práctica operativa, no ensayo.",
+      "tipo": "Práctica operativa de NASA",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "NASA, Space Psychology (NTRS, 2023)",
+          "url": "https://ntrs.nasa.gov/api/citations/20230010798/downloads/071622%20CSP_Space%20Psychology.pdf"
+        }
+      ]
+    },
+    {
+      "id": "family_puzzle",
+      "kind": "connect",
+      "status": "mvp",
+      "minutes": 10,
+      "title_en": "Family puzzle",
+      "what_en": "Continue the shared Constellations board your family started; each side plays a turn when the message arrives.",
+      "why_en": "A game that works with the delay keeps a light, regular link with home.",
+      "es": "Acertijo asíncrono con la familia.",
+      "evidencia_es": "Inferencia del equipo a partir del apoyo social y la tolerancia al retraso; sin estudio directo.",
+      "tipo": "Inferencia del equipo",
+      "conf": "Baja",
+      "sources": [
+        {
+          "cite": "NASA, Space Psychology (NTRS, 2023)",
+          "url": "https://ntrs.nasa.gov/api/citations/20230010798/downloads/071622%20CSP_Space%20Psychology.pdf"
+        }
+      ]
+    },
+    {
+      "id": "crew_game",
+      "kind": "connect",
+      "status": "mvp",
+      "minutes": 10,
+      "title_en": "Play Constellations together",
+      "what_en": "Solve a board with a crewmate, taking turns on the same device. No scores against each other.",
+      "why_en": "Playing cooperatively increased trust and cooperation in lab studies.",
+      "es": "Modo tripulación cooperativo.",
+      "evidencia_es": "Jugar en equipo aumentó la cooperación, a través de la cohesión y la confianza (Greitemeyer y Cox, 2013). Efectos inmediatos de laboratorio.",
+      "tipo": "Experimentos de laboratorio",
+      "conf": "Baja a media",
+      "sources": [
+        {
+          "cite": "Greitemeyer y Cox, 2013",
+          "url": "https://doi.org/10.1002/ejsp.1940"
+        }
+      ]
+    },
+    {
+      "id": "crew_talk",
+      "kind": "connect",
+      "status": "mvp",
+      "minutes": 15,
+      "title_en": "Prepare a difficult conversation",
+      "what_en": "A short guide: what happened, what you need, one request. Use it before talking with a crewmate, or keep it private.",
+      "why_en": "A self-guided conflict module was tested in a Mars analog mission.",
+      "es": "Guía breve para conflictos, al estilo del módulo de la Virtual Space Station.",
+      "evidencia_es": "La Virtual Space Station, con módulo de manejo de conflictos, se evaluó en el análogo HI-SEAS (Anderson et al., 2016). Muestra pequeña; evidencia de factibilidad.",
+      "tipo": "Estudio de factibilidad en análogo",
+      "conf": "Baja",
+      "sources": [
+        {
+          "cite": "Anderson et al., 2016 (Virtual Space Station at HI-SEAS)",
+          "url": "https://doi.org/10.3357/AMHP.4676.2016"
+        }
+      ]
+    },
+    {
+      "id": "private_note",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 5,
+      "title_en": "Private note",
+      "what_en": "Write a few lines about your day. Only you can see it.",
+      "why_en": "ISS astronauts' journals show that writing helped them keep perspective.",
+      "es": "Diario privado.",
+      "evidencia_es": "Análisis de diarios de la ISS: escribir ayudó a mantener la perspectiva (Stuster, 2010). Cualitativo.",
+      "tipo": "Análisis cualitativo de diarios",
+      "conf": "Baja",
+      "sources": [
+        {
+          "cite": "Stuster, 2010 (ISS journals)",
+          "url": "https://ntrs.nasa.gov/citations/20100026549"
+        }
+      ]
+    },
+    {
+      "id": "talk_now",
+      "kind": "escalate",
+      "status": "mvp",
+      "minutes": 0,
+      "title_en": "Talk to someone today",
+      "what_en": "Choose who: your crew medical officer, an earlier private conference with your ground psychologist, a crewmate, or someone at home. Orbit only shares what you allow.",
+      "why_en": "You decide who hears what. Talking early is easier than waiting.",
+      "es": "Rojo psicológico: ella elige con quién hablar.",
+      "evidencia_es": "NASA ofrece conferencias psicológicas privadas y apoyo a la tripulación (NASA, Space Psychology, 2023). La elección por la astronauta es decisión de diseño del equipo.",
+      "tipo": "Práctica operativa de NASA",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "NASA, Space Psychology (NTRS, 2023)",
+          "url": "https://ntrs.nasa.gov/api/citations/20230010798/downloads/071622%20CSP_Space%20Psychology.pdf"
+        }
+      ]
+    },
+    {
+      "id": "fast_sugar",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 15,
+      "title_en": "Low glucose: 15-15",
+      "what_en": "If you are awake and able to swallow: take 15 g of fast sugar, wait 15 minutes, check again, and repeat if still under 70. Follow your onboard medical protocol.",
+      "why_en": "This is the standard first step for a low reading.",
+      "es": "Regla 15-15 para glucosa baja, solo si está consciente; el protocolo médico de a bordo manda.",
+      "evidencia_es": "ADA: 15 g de carbohidrato de acción rápida, revisar a los 15 min y repetir; solo si la persona está consciente. Nivel 2 (menos de 54) va también al médico de la tripulación.",
+      "tipo": "Guía clínica (ADA)",
+      "conf": "Alta",
+      "sources": [
+        {
+          "cite": "ADA, Hypoglycemia in diabetes (15-15 rule infographic)",
+          "url": "https://professional.diabetes.org/sites/dpro/files/2023-12/hypoglycemia_in_diabetes.pdf"
+        },
+        {
+          "cite": "ADA Standards of Care 2026, section 6",
+          "url": "https://doi.org/10.2337/dc26-S006"
+        }
+      ]
+    },
+    {
+      "id": "cool_down",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 0,
+      "title_en": "Cool down and check in",
+      "what_en": "Drink fluids, rest, log any symptoms, and measure again in a few hours. Ask your medical officer before changing today's exercise.",
+      "why_en": "In space your core temperature runs higher and rises faster during exercise than on Earth.",
+      "es": "Líquidos, descanso y registro de síntomas; no cambia el ejercicio sin el médico.",
+      "evidencia_es": "La temperatura central de los astronautas es más alta en vuelo largo y sube más y más rápido con el ejercicio (Stahn et al., 2017). Las acciones son inferencia del equipo.",
+      "tipo": "Estudio en vuelo",
+      "conf": "Media para el hallazgo; baja para la acción",
+      "sources": [
+        {
+          "cite": "Stahn et al., 2017",
+          "url": "https://doi.org/10.1038/s41598-017-15560-w"
+        }
+      ]
+    },
+    {
+      "id": "reschedule_exercise",
+      "kind": "self_care",
+      "status": "mvp",
+      "minutes": 1,
+      "title_en": "Fit your exercise back in",
+      "what_en": "Find a slot for the rest of today's session. Your progress bar fills with every block you complete.",
+      "why_en": "Exercise protects bone, muscle and heart in space, and it also helps your mood.",
+      "es": "Reprogramar el ejercicio con barra de avance (gamificación sin castigo).",
+      "evidencia_es": "La gamificación aumentó la actividad física con un efecto de pequeño a mediano en 16 ensayos; a largo plazo el efecto fue pequeño (Mazeas et al., 2022). Ejercicio y ánimo (Noetel et al., 2024); diseño según autonomía, competencia y relación (Ryan et al., 2006).",
+      "tipo": "Metaanálisis y teoría",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Mazeas et al., 2022 (gamification and physical activity)",
+          "url": "https://doi.org/10.2196/26779"
+        },
+        {
+          "cite": "Noetel et al., 2024",
+          "url": "https://doi.org/10.1136/bmj-2023-075847"
+        },
+        {
+          "cite": "Ryan, Rigby y Przybylski, 2006 (SDT and games)",
+          "url": "https://doi.org/10.1007/s11031-006-9051-8"
+        }
+      ]
+    },
+    {
+      "id": "shelter",
+      "kind": "escalate",
+      "status": "mvp",
+      "minutes": 0,
+      "title_en": "Solar particle event: follow the shelter procedure",
+      "what_en": "A solar particle event is active (NASA DONKI). Follow your vehicle's shelter procedure and flight director's instructions.",
+      "why_en": "Shelter is an operational decision. Orbit only shows the event and logs it with your day.",
+      "es": "Recordatorio del procedimiento de refugio; la decisión es operativa.",
+      "evidencia_es": "Riesgo de radiación espacial del Human Research Program; eventos de DONKI. No es una intervención de salud de Orbit.",
+      "tipo": "Procedimiento operativo",
+      "conf": "No aplica",
+      "sources": [
+        {
+          "cite": "NASA Human Research Program, risks",
+          "url": "https://www.nasa.gov/hrp/risks/"
+        }
+      ]
+    },
+    {
+      "id": "after_incident",
+      "kind": "self_care",
+      "status": "roadmap",
+      "minutes": 20,
+      "title_en": "After a hard event",
+      "what_en": "Within hours of a distressing event: a brief memory reminder followed by a visuospatial puzzle task, offered with a private conference.",
+      "why_en": "A single session like this reduced intrusive memories in emergency-department and health-worker trials.",
+      "es": "Hoja de ruta: tarea visoespacial que compite con las imágenes, siempre con conferencia privada.",
+      "evidencia_es": "Ensayos aleatorizados: menos recuerdos intrusivos tras accidentes de tránsito (Iyadurai et al., 2018) y en personal de salud (Iyadurai et al., 2023). Requiere protocolo y entrenamiento.",
+      "tipo": "Ensayos aleatorizados",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Iyadurai et al., 2018",
+          "url": "https://doi.org/10.1038/mp.2017.23"
+        },
+        {
+          "cite": "Iyadurai et al., 2023",
+          "url": "https://doi.org/10.1038/s41398-023-02578-0"
+        }
+      ]
+    },
+    {
+      "id": "three_good_things",
+      "kind": "self_care",
+      "status": "roadmap",
+      "minutes": 5,
+      "title_en": "Three good things",
+      "what_en": "Before sleep, write three things that went well today and why.",
+      "why_en": "Positive psychology exercises had small to moderate benefits for well-being.",
+      "es": "Hoja de ruta: diario de tres cosas buenas.",
+      "evidencia_es": "Efectos pequeños a medianos en bienestar, depresión, ansiedad y estrés, en programas de unas 10 sesiones (Carr et al., 2021).",
+      "tipo": "Metaanálisis",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Carr et al., 2021",
+          "url": "https://doi.org/10.1080/17439760.2020.1818807"
+        }
+      ]
+    },
+    {
+      "id": "time_capsule",
+      "kind": "connect",
+      "status": "roadmap",
+      "minutes": 3,
+      "title_en": "Time capsule from home",
+      "what_en": "A message your family recorded before launch, unlocked on a date that matters.",
+      "why_en": "The delay to Mars rules out live calls; planned messages keep key dates shared.",
+      "es": "Hoja de ruta: cápsulas de tiempo de la familia.",
+      "evidencia_es": "Extensión de los contactos familiares que NASA ya ofrece (NASA, Space Psychology, 2023). Inferencia del equipo.",
+      "tipo": "Inferencia del equipo",
+      "conf": "Baja",
+      "sources": [
+        {
+          "cite": "NASA, Space Psychology (NTRS, 2023)",
+          "url": "https://ntrs.nasa.gov/api/citations/20230010798/downloads/071622%20CSP_Space%20Psychology.pdf"
+        }
+      ]
+    },
+    {
+      "id": "hrv_breathe",
+      "kind": "self_care",
+      "status": "roadmap",
+      "minutes": 5,
+      "title_en": "Breathe with heart rhythm feedback",
+      "what_en": "Breathe with live heart rate variability feedback from a beat-to-beat sensor.",
+      "why_en": "Heart rate variability changes with stress and can be trained with slow breathing.",
+      "es": "Hoja de ruta: Breathe con variabilidad cardiaca.",
+      "evidencia_es": "La variabilidad cardiaca cambia con el estrés (Kim et al., 2018); biorretroalimentación con efectos pequeños a medianos (Lehrer et al., 2020).",
+      "tipo": "Revisión y metaanálisis",
+      "conf": "Media",
+      "sources": [
+        {
+          "cite": "Kim et al., 2018 (HRV and stress)",
+          "url": "https://doi.org/10.30773/pi.2017.08.17"
+        },
+        {
+          "cite": "Lehrer et al., 2020",
+          "url": "https://doi.org/10.1007/s10484-020-09466-z"
+        }
+      ]
+    }
+  ],
+  "triggers": [
+    {
+      "trigger": "hr.yellow",
+      "condition_es": "Frecuencia cardiaca en reposo 10 lpm o más sobre su línea base",
+      "safety_question": "hr_red_flags",
+      "safety_first_cards": [
+        "recheck_hr",
+        "context_check"
+      ],
+      "offered_cards": [
+        "breathe",
+        "caffeine_cutoff",
+        "sleep_window"
+      ],
+      "escalation_es": "Ella misma; Orbit revisa en 24 h"
+    },
+    {
+      "trigger": "hr.red",
+      "condition_es": "Más de 100 en reposo repetidamente, menos de 60 con mareo o desmayo, o cualquier señal de alarma",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "cmo_now"
+      ],
+      "escalation_es": "Médico de la tripulación de inmediato"
+    },
+    {
+      "trigger": "bp.yellow",
+      "condition_es": "Presión elevada (120 a 139 / 80 a 89)",
+      "safety_question": null,
+      "safety_first_cards": [
+        "recheck_bp",
+        "context_check"
+      ],
+      "offered_cards": [
+        "breathe",
+        "move",
+        "sleep_window"
+      ],
+      "escalation_es": "Ella misma; Orbit revisa en 24 h"
+    },
+    {
+      "trigger": "bp.red",
+      "condition_es": "140 o más, o 90 o más, confirmado en segunda lectura",
+      "safety_question": null,
+      "safety_first_cards": [
+        "recheck_bp"
+      ],
+      "offered_cards": [
+        "cmo_now"
+      ],
+      "escalation_es": "Médico de la tripulación"
+    },
+    {
+      "trigger": "temp.yellow",
+      "condition_es": "Más de 0.5 °C sobre su línea base en vuelo",
+      "safety_question": null,
+      "safety_first_cards": [
+        "context_check"
+      ],
+      "offered_cards": [
+        "cool_down",
+        "sleep_window"
+      ],
+      "escalation_es": "Ella misma; Orbit revisa en horas"
+    },
+    {
+      "trigger": "temp.red",
+      "condition_es": "38 °C o más y más de 0.5 °C sobre su base, con síntomas",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "cmo_now"
+      ],
+      "escalation_es": "Médico de la tripulación"
+    },
+    {
+      "trigger": "glucose.low_yellow",
+      "condition_es": "54 a 69 mg/dL (nivel 1)",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "fast_sugar"
+      ],
+      "escalation_es": "Ella misma; nueva lectura a los 15 min"
+    },
+    {
+      "trigger": "glucose.high_yellow",
+      "condition_es": "100 a 125 mg/dL",
+      "safety_question": null,
+      "safety_first_cards": [
+        "context_check"
+      ],
+      "offered_cards": [
+        "move"
+      ],
+      "escalation_es": "Ella misma"
+    },
+    {
+      "trigger": "glucose.red",
+      "condition_es": "Menos de 54 (nivel 2) o 126 o más en dos ocasiones",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "fast_sugar",
+        "cmo_now"
+      ],
+      "escalation_es": "Médico de la tripulación; nivel 3 (confusión): ayuda de la tripulación"
+    },
+    {
+      "trigger": "sleep.yellow",
+      "condition_es": "Menos de 7 h y más de 1 h bajo su línea base",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "sleep_window",
+        "caffeine_cutoff",
+        "wind_down",
+        "strategic_nap",
+        "bed_is_for_sleep"
+      ],
+      "escalation_es": "Ella misma"
+    },
+    {
+      "trigger": "sleep.red",
+      "condition_es": "5 h o menos tres noches seguidas",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "cmo_now",
+        "sleep_window"
+      ],
+      "escalation_es": "Médico de la tripulación"
+    },
+    {
+      "trigger": "pulse.yellow",
+      "condition_es": "Tiempo de reacción mediano más lento que su base + 2 DE en 2 de 3 sesiones",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "strategic_nap",
+        "micro_break",
+        "sleep_window",
+        "caffeine_cutoff"
+      ],
+      "escalation_es": "Ella misma; suma a la convergencia"
+    },
+    {
+      "trigger": "checkin.mood_yellow",
+      "condition_es": "Ánimo 2 puntos o más bajo su línea base",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "one_valued_thing",
+        "move",
+        "message_home",
+        "earth_window",
+        "music"
+      ],
+      "escalation_es": "Ella misma"
+    },
+    {
+      "trigger": "checkin.stress_yellow",
+      "condition_es": "Estrés 2 puntos o más sobre su línea base",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "breathe",
+        "micro_break",
+        "music",
+        "mindful_minute"
+      ],
+      "escalation_es": "Ella misma"
+    },
+    {
+      "trigger": "checkin.fatigue_yellow",
+      "condition_es": "Fatiga 2 puntos o más sobre su línea base",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "micro_break",
+        "strategic_nap",
+        "sleep_window"
+      ],
+      "escalation_es": "Ella misma"
+    },
+    {
+      "trigger": "checkin.red",
+      "condition_es": "Ella pide hablar con alguien hoy",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "talk_now",
+        "breathe"
+      ],
+      "escalation_es": "La persona que ella elija"
+    },
+    {
+      "trigger": "screen.yellow",
+      "condition_es": "Tamizaje semanal positivo (no es diagnóstico)",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "talk_now",
+        "one_valued_thing",
+        "breathe"
+      ],
+      "escalation_es": "Conversación privada si ella quiere; al médico solo con su permiso"
+    },
+    {
+      "trigger": "crew_climate.yellow",
+      "condition_es": "Clima de tripulación 2 puntos o más bajo su línea base",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "crew_game",
+        "crew_talk",
+        "private_note"
+      ],
+      "escalation_es": "Nada se comparte por defecto"
+    },
+    {
+      "trigger": "contact.yellow",
+      "condition_es": "3 días sin contacto o caída de 50 % o más",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "message_home",
+        "family_puzzle",
+        "earth_window"
+      ],
+      "escalation_es": "Ella misma"
+    },
+    {
+      "trigger": "exercise.yellow",
+      "condition_es": "Menos de 75 % de la prescripción del día",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "reschedule_exercise"
+      ],
+      "escalation_es": "Ella misma"
+    },
+    {
+      "trigger": "symptoms.yellow",
+      "condition_es": "Un síntoma por más de 2 días",
+      "safety_question": null,
+      "safety_first_cards": [
+        "context_check"
+      ],
+      "offered_cards": [
+        "cool_down"
+      ],
+      "escalation_es": "Ella misma; sugerir comentarlo al médico"
+    },
+    {
+      "trigger": "symptoms.red",
+      "condition_es": "Cualquier síntoma de alarma (lista pendiente de un médico)",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "cmo_now"
+      ],
+      "escalation_es": "Médico de la tripulación de inmediato"
+    },
+    {
+      "trigger": "radiation.yellow",
+      "condition_es": "Evento de partículas solares activo (DONKI)",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "shelter"
+      ],
+      "escalation_es": "Decisión operativa"
+    },
+    {
+      "trigger": "early_signal",
+      "condition_es": "Amarillo en 2 o más dominios dos días seguidos",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "sleep_window",
+        "message_home",
+        "move",
+        "breathe",
+        "micro_break",
+        "one_valued_thing"
+      ],
+      "escalation_es": "Ella elige hasta 2; Orbit ofrece compartir con el médico. Demo, día 125: se ven las 4 primeras y Lena elige las 2 primeras"
+    },
+    {
+      "trigger": "green",
+      "condition_es": "Todo dentro de su línea base",
+      "safety_question": null,
+      "safety_first_cards": [],
+      "offered_cards": [
+        "earth_window",
+        "crew_game",
+        "private_note"
+      ],
+      "escalation_es": "Ninguno; solo refuerzo positivo"
+    }
+  ]
+}

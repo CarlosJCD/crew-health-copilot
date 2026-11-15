@@ -114,13 +114,15 @@ const STORY: StoryRow[] = [
   [128, 6.6, 59, 112, 72, 37.9, 7, 4, 4, 7, 320, 2, 120],
 ]
 
-// Story events in English (app text). "Family" instead of "daughter" until P2 confirms the
-// persona's relatives are adults (2026 guide: no persons under 18 in project materials).
+// Story events in English (app text). Her sister (adult) replaces the daughter of the first
+// script (Psychology answer #9; 2026 guide: no persons under 18 in project materials).
 const EVENTS: Record<number, string[]> = {
   122: ["Notice: tomorrow's shift starts 3 h earlier"],
   123: ['Shift change'],
-  125: ['Early signal. She chooses a protected sleep window and a puzzle video for her family'],
-  126: ['Reply from her family arrives'],
+  125: [
+    "Early signal. She says she missed her sister's birthday call; she picks a protected sleep window and a video message with a puzzle for her sister.",
+  ],
+  126: ["Her sister's reply arrives."],
   127: ['ORBIT asks what helped'],
   128: ['Weekly check: PHQ-2 = 1, GAD-2 = 2. Weekly summary sent to Earth'],
 }

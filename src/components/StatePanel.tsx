@@ -39,6 +39,11 @@ export function StatePanel({ result, scenario }: { result: DayResult; scenario: 
           {t('state.boost')}
         </a>
       )}
+      {result.state === 'YELLOW' && (
+        <a className="button secondary" href="#/boost">
+          {t('state.boostYellow')}
+        </a>
+      )}
       {result.state === 'RED_PSYCH' && (
         <a className="button" href="#/mind">
           {t('state.choose')}
