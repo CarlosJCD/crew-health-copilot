@@ -2,20 +2,28 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { useI18n } from '../i18n/context'
 import { Icon } from './Icon'
 
-/** Bottom sheet (a side panel on wide screens): Escape or the backdrop closes it, focus moves into it. */
+/**
+ * Bottom sheet (a side panel on wide screens): Escape or the backdrop closes it, focus moves into it once,
+ * when it opens. The latest onClose is kept in a ref: a parent that passes a new function on every render
+ * (typing in a note saves on each key) must not move focus out of what she is typing in.
+ */
 export function Sheet({ title, onClose, children }: { title: ReactNode; onClose: () => void; children: ReactNode }) {
   const { t } = useI18n()
   const ref = useRef<HTMLDivElement>(null)
+  const close = useRef(onClose)
+  useEffect(() => {
+    close.current = onClose
+  }, [onClose])
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null
     ref.current?.focus()
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close.current()
     window.addEventListener('keydown', onKey)
     return () => {
       window.removeEventListener('keydown', onKey)
       prev?.focus?.()
     }
-  }, [onClose])
+  }, [])
   return (
     <div className="sheet-backdrop" onClick={onClose}>
       <div
