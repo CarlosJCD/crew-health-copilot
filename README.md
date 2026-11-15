@@ -35,6 +35,10 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | Path | What it is | Owner |
 |---|---|---|
 | `src/orbit/orbit-indicators.json` | **Single source of rules, sources and texts** (Psychology 1 and 2, unchanged). Nobody changes thresholds outside this file; P1 approves changes | Psychology 1 |
+| `src/orbit/boost/orbit-boost-library.json`, `src/orbit/boost/boost-cards.json` | Boost library (Psychology, unchanged): cards with sources and confidence, triggers per indicator, display rules, safety question | Psychology 2 |
+| `src/orbit/boost.ts`, `src/modules/Boost.tsx` | Boost: safety question, "check first", up to 4 cards, she chooses up to 2, "Did it help?", 24 h follow-up, protective-factor count | Engineering |
+| `src/orbit/pulse-spec.json` | Pulse mode spec (3-minute PVT-B-style task); the task itself is next | Psychology 1 |
+| `public/data/demo-data.json` | Data team's demo data (days 107 to 128), loaded by the app; `src/orbit/demoFile.test.ts` checks it against the acceptance table | Data science |
 | `src/orbit/scenarios.json` | Four scenarios: one-way delay, estimated dose, first responder, ground contact (handoff 2.2) | Psychology + Data science |
 | `src/orbit/config.ts` | Typed reader for both files; lists every param the engine needs | Engineering |
 | `src/orbit/engine.ts` | ORBIT engine: one rule per indicator, Body / Mind / Crew roll-up, state (GREEN, YELLOW, EARLY_SIGNAL, RED_PHYSICAL, RED_PSYCH) | Data science + Engineering |
@@ -67,10 +71,13 @@ heart rate, temperature, glucose). The day's state:
 Thresholds marked `team_criterion` in the JSON are design choices pending validation; the "Why?" panel lists them.
 To change a rule, edit the JSON and run `npm test`: the acceptance table must still pass.
 
+Rule interpretations approved by Psychology (answer of Nov 14, 17:30):
+- `contact.yellow_drop_fraction_vs_14d`: mean of the last 14 days vs the 14 days before (slow trend).
+- Blood pressure "confirmed on a second reading": the previous day's reading in the demo; roadmap: `sbp_2`/`dbp_2`.
+- Red temperature "with symptoms": any symptom. Yellow symptom: same text 3 days in a row.
+
 Open points for P1:
-- The app is named ORBIT; texts in `orbit-indicators.json` still say "Orbit" (13 times). Update them in the next version.
-- `contact.yellow_drop_fraction_vs_14d` is read as "mean of the last 14 days vs the 14 days before". Comparing
-  shorter windows with the previous 14 days would turn day 122 or 127 yellow, against the acceptance table.
+- The app is named ORBIT; texts in `orbit-indicators.json` v0.2 and the Boost library still say "Orbit". Update them in the next version.
 - `screen.offer_conference_if_weeks_gte` is implemented (offer only, never red). `pulse.practice_sessions` is used by
   `pulseBaseline()` for live sessions; the demo gives the baseline directly.
 

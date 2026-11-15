@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "date": "2026-11-14",
   "disclaimer_en": "Orbit supports decisions; it does not diagnose. Values marked team_criterion are design choices pending validation.",
   "baseline": {
@@ -31,7 +31,14 @@
     "consecutive_days": 2,
     "label_en": "Early cross-domain signal",
     "prevention_level": "secondary",
-    "team_criterion": true
+    "team_criterion": true,
+    "evidence_en": "On the ISS, sleep under 6 h was associated with slower psychomotor speed, more stress and higher workload (Jones et al., 2022).",
+    "sources": [
+      {
+        "cite": "Jones et al., 2022",
+        "url": "https://doi.org/10.1093/sleep/zsac006"
+      }
+    ]
   },
   "escalation": {
     "green": {
@@ -180,17 +187,32 @@
     },
     {
       "id": "pulse",
-      "label_en": "Pulse mode (reaction speed)",
+      "label_en": "Pulse mode (PVT-B-style alertness task)",
       "domain": "mind",
       "unit": "ms (median reaction time)",
-      "input": "60-90 s task",
+      "input": "3-minute PVT-B-style task (see pulse-spec.json)",
       "frequency": "daily or every other day",
       "params": {
         "practice_sessions": 5,
         "yellow_sd_above_baseline": 2,
         "yellow_sessions_needed": 2,
         "yellow_window_sessions": 3,
-        "can_be_red": false
+        "can_be_red": false,
+        "duration_s": 180,
+        "isi_s": [
+          1,
+          4
+        ],
+        "false_start_lt_ms": 100,
+        "lapse_gte_ms": 355,
+        "engine_metric": "median_rt_ms",
+        "reported_metrics": [
+          "median_rt_ms",
+          "response_speed",
+          "lapses",
+          "false_starts"
+        ],
+        "skippable": true
       },
       "team_criterion": [
         "practice_sessions",
@@ -198,17 +220,26 @@
         "yellow_sessions_needed",
         "yellow_window_sessions"
       ],
-      "rule_en": "Yellow: slower than baseline + 2 SD in 2 of the last 3 sessions. Never red on its own.",
+      "rule_en": "Yellow: median reaction time slower than baseline + 2 SD in 2 of the last 3 sessions. Never red on its own.",
       "action_en": "Check sleep and workload; counts toward the cross-domain signal.",
       "hrp_risk": "Risk of Behavioral Changes and Psychiatric Disorders",
       "hrp_url": "https://www.nasa.gov/hrp/risks/",
       "sources": [
         {
+          "cite": "Basner, Mollicone & Dinges, 2011 (PVT-B)",
+          "url": "https://doi.org/10.1016/j.actaastro.2011.07.015"
+        },
+        {
+          "cite": "Jones et al., 2022 (PVT-B on the ISS)",
+          "url": "https://doi.org/10.1093/sleep/zsac006"
+        },
+        {
           "cite": "Basner et al., 2015",
           "url": "https://doi.org/10.3357/AMHP.4343.2015"
         }
       ],
-      "why_en": "A quick check of your reaction speed against your own best days. It is not a test of your abilities and never raises an alarm by itself."
+      "why_en": "A 3-minute check of your alertness against your own best days. It is not a test of your abilities and never raises an alarm by itself.",
+      "note_en": "PVT-B-style task; our implementation is not a validated PVT-B."
     },
     {
       "id": "bp",
@@ -404,6 +435,7 @@
         "yellow_duration_days_gt": 2,
         "red_flags": [
           "chest pain",
+          "shortness of breath",
           "fainting",
           "vision change",
           "severe headache"
@@ -421,6 +453,10 @@
         {
           "cite": "Crucian et al., 2018",
           "url": "https://doi.org/10.3389/fimmu.2018.01437"
+        },
+        {
+          "cite": "Mayo Clinic, Tachycardia (chest pain, shortness of breath, weakness: seek immediate help)",
+          "url": "https://www.mayoclinic.org/health/tachycardia/DS00929"
         }
       ],
       "why_en": "Tap where you feel something. Some symptoms go straight to your medical officer because they need a person, not an app."
@@ -479,5 +515,11 @@
       "sources": [],
       "why_en": "These are the things that keep you well. Orbit counts them so you can see what works for you."
     }
+  ],
+  "changes_0_2": [
+    "Pulse mode: 3-minute PVT-B-style task (approved 16:54). Engine parameter names kept from v0.1; new keys only add task settings",
+    "Symptoms: 'shortness of breath' added to red_flags",
+    "Convergence: ISS evidence added (evidence_en, sources)",
+    "Boost content lives in boost-cards.json (P0) and orbit-boost-library.json (triggers and safety flow)"
   ]
 }

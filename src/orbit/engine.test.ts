@@ -1,28 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { RULES_ERRORS, type Color } from './config'
+import { RULES_ERRORS } from './config'
+import { ACCEPTANCE } from './acceptance'
 import { BUILT_IN_DEMO, type DayRecord, type DemoData } from './demoData'
-import { evaluateDay, pulseBaseline, type OrbitState } from './engine'
+import { evaluateDay, pulseBaseline } from './engine'
 
 describe('orbit-indicators.json', () => {
   it('has every rule, param and text the engine reads', () => {
     expect(RULES_ERRORS).toEqual([])
   })
 })
-
-// Handoff section 5: expected engine output for the demo story (checked by the team with a
-// reference simulation in Python). This table must pass before the demo.
-const G: Color = 'green'
-const Y: Color = 'yellow'
-const ACCEPTANCE: [day: number, state: OrbitState, body: Color, mind: Color, crew: Color, yellow: string[]][] = [
-  [121, 'GREEN', G, G, G, []],
-  [122, 'GREEN', G, G, G, []],
-  [123, 'YELLOW', Y, G, G, ['sleep']],
-  [124, 'YELLOW', Y, Y, Y, ['sleep', 'hr', 'checkin', 'pulse', 'contact']],
-  [125, 'EARLY_SIGNAL', Y, Y, Y, ['sleep', 'hr', 'checkin', 'pulse', 'contact']],
-  [126, 'YELLOW', G, Y, G, ['pulse']],
-  [127, 'GREEN', G, G, G, []],
-  [128, 'GREEN', G, G, G, []],
-]
 
 describe('acceptance: Lena, Mars transit, days 121 to 128 (handoff section 5)', () => {
   it.each(ACCEPTANCE)('day %i is %s', (day, state, body, mind, crew, yellow) => {

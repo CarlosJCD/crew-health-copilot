@@ -1,0 +1,41 @@
+{
+  "version": "0.1",
+  "date": "2026-11-14",
+  "name_en": "Pulse mode",
+  "label_en": "PVT-B-style alertness task (3 minutes)",
+  "duration_s": 180,
+  "stimulus_en": "A millisecond counter appears inside a box and starts counting. Tap anywhere as soon as you see it.",
+  "interval_ms": [1000, 4000],
+  "interval_distribution": "uniform random, re-drawn after every response",
+  "feedback_after_each_tap_en": "The counter stops and shows your time briefly before the box empties again.",
+  "feedback_display_ms": 1000,
+  "valid_response": "reaction time of 100 ms or more after the counter appears",
+  "false_start": "tap before the counter appears, or reaction time under 100 ms; counted, not used in the median",
+  "lapse_ms": 355,
+  "score": "median_rt_ms",
+  "score_rule": "median of all valid reaction times in the session, lapses included, false starts excluded",
+  "secondary_metrics": {
+    "response_speed": "mean of 1000/RT over valid responses (responses per second)",
+    "lapses": "count of valid responses of 355 ms or more",
+    "false_starts": "count of false starts"
+  },
+  "minimum_valid_responses": 20,
+  "if_below_minimum": "session saved but not scored (null), so it does not count in the 2-of-3 window",
+  "practice_sessions": 5,
+  "baseline_after_practice": "mean and SD of median_rt_ms over the first sessions after practice; for the demo, use persona.baseline.pulse_ms",
+  "skippable": true,
+  "blocked_during_quiet_hours": true,
+  "same_time_of_day_en": "Suggested right after the morning check-in.",
+  "intro_en": "Three minutes, tap when the counter appears. It shows how alert you are today compared with your own usual. It is not a test of your abilities.",
+  "after_practice_session_en": "Practice {n} of 5 done. Your personal range starts after practice.",
+  "after_session_en": "Saved. Today's median: {median_ms} ms. Your usual: {baseline_ms} ms. Slower days often follow short sleep or a heavy workload.",
+  "after_skip_en": "No problem. You can do it later or tomorrow.",
+  "never_show_en": ["good", "bad", "fail", "score", "rank"],
+  "team_criterion": ["feedback_display_ms", "minimum_valid_responses", "blocked_during_quiet_hours", "same_time_of_day_en"],
+  "sources": [
+    {"cite": "Basner, Mollicone & Dinges, 2011 (PVT-B: 3 min, 1-4 s intervals, lapse at 355 ms)", "url": "https://doi.org/10.1016/j.actaastro.2011.07.015"},
+    {"cite": "Jones et al., 2022 (PVT-B used on the ISS)", "url": "https://doi.org/10.1093/sleep/zsac006"},
+    {"cite": "Basner et al., 2015 (practice effects)", "url": "https://doi.org/10.3357/AMHP.4343.2015"}
+  ],
+  "note_en": "PVT-B-style task. Our implementation copies the format; it is not a validated PVT-B."
+}

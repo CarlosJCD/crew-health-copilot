@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DEFAULT_SCENARIO_ID, SCENARIOS } from './orbit/config'
+import type { BoostLog } from './orbit/boost'
 import { applyCheckins, type Checkins } from './orbit/checkin'
 import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
@@ -7,6 +8,7 @@ import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { useStoredJson } from './hooks/useStoredJson'
 import { useI18n } from './i18n/context'
+import { Boost } from './modules/Boost'
 import { Mind } from './modules/Mind'
 import { Placeholder } from './modules/Placeholder'
 import { Today } from './modules/Today'
@@ -38,6 +40,7 @@ export default function App() {
   const [share, setShare] = useStoredJson<ShareSettings>('orbit.share', DEFAULT_SHARE)
   const [outbox, setOutbox] = useStoredJson<Packet[]>('orbit.outbox', [])
   const [demoClock, setDemoClock] = useStoredJson('orbit.demoClock', true)
+  const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
 
   useEffect(() => {
     const onHash = () => {
@@ -103,6 +106,8 @@ export default function App() {
             demoClock={demoClock}
             onDemoClockChange={setDemoClock}
           />
+        ) : active.id === 'boost' ? (
+          <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} />
         ) : active.id === 'mind' ? (
           <Mind demo={demo} day={day} checkins={checkins} onCheckinsChange={setCheckins} />
         ) : (

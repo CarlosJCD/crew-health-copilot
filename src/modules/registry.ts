@@ -26,8 +26,8 @@ export const MODULES: ModuleInfo[] = [
     id: 'boost',
     label: { en: 'Boost', es: 'Boost' },
     summary: {
-      en: 'Protective actions: 8 cards with duration, evidence and the domains they touch. You choose up to two.',
-      es: 'Acciones protectoras: 8 tarjetas con duración, evidencia y dominios que tocan. Tú eliges hasta dos.',
+      en: 'Protective actions from the Psychology library: up to 4 cards for the day, with evidence and confidence. You choose up to two.',
+      es: 'Acciones protectoras de la biblioteca de Psicología: hasta 4 tarjetas por día, con evidencia y confianza. Tú eliges hasta dos.',
     },
     owner: { en: 'Engineering (texts: Psychology 2)', es: 'Ingeniería (textos: Psicología 2)' },
     planned: [

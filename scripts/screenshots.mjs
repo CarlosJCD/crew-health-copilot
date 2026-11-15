@@ -12,12 +12,13 @@ const BASE = (process.argv[2] ?? 'https://carlosjcd.github.io/orbit/').replace(/
 const CHROME = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../screenshots')
 
-// Handoff, 08:00 list. Add Boost, body map and free mode here once they exist.
+// Handoff, 08:00 list. Add the body map and free mode here once they exist.
 const SHOTS = [
   { name: '01-today-day125-early-signal', hash: '#/today?day=125' },
   { name: '02-today-day121-why-temperature', hash: '#/today?day=121&why=temp' },
   { name: '03-today-day123-sleep-only', hash: '#/today?day=123' },
-  { name: '04-transmit-day125-delay', hash: '#/transmit?day=125' },
+  { name: '04-boost-day125-choose-two', hash: '#/boost?day=125' },
+  { name: '04b-transmit-day125-delay', hash: '#/transmit?day=125' },
   { name: '05-mind-day125-checkin', hash: '#/mind?day=125' },
   { name: '06-today-day128-green', hash: '#/today?day=128' },
 ]
