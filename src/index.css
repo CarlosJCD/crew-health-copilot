@@ -1300,3 +1300,13 @@ div.tx-share-row { cursor: default; }
   .intro-buttons .button { min-width: 5.5rem; }
 }
 @media (prefers-reduced-motion: reduce) { .intro, .intro-backdrop { animation: none; } }
+
+/* Today: the whole block (state line to fine print) is centered between the header and the bottom of the page,
+   so the space above and below it is the same. Nothing inside stretches: spare height goes evenly above and
+   below the block, not around the body. On desktops the navigation is a side rail: no room is kept at the
+   bottom for a bottom bar. If the block is taller than the screen (a red day, a notice), it starts at the top
+   and Today scrolls as before. */
+.app.route-body .home { flex: 0 0 auto; margin-block: auto; }
+.app.route-body .home-main, .app.route-body .figure-stage { flex: 0 0 auto; }
+.app.route-body .figure { margin-block: 0.1rem 0; }
+@media (min-width: 1024px) { .app.route-body { padding-bottom: 0.15rem; } }
