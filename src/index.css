@@ -292,3 +292,25 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .tank-fill { fill: var(--accent); }
 .progress { height: 8px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; }
 .progress span { display: block; height: 100%; background: var(--accent); }
+
+/* ORBIT: home (body first) and "Does something hurt?" */
+.see-metrics { margin: -0.5rem 0 1rem; }
+.bodymap-detail .more { margin: 0.4rem 0; font-size: 0.88rem; }
+.bodymap-detail .more summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.pain { margin-top: 1rem; }
+.pain-work { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 1rem; align-items: start; }
+.pain-controls input[type='range'] { width: 100%; accent-color: var(--watch); }
+.pain-intensity { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; margin-top: 0.4rem; }
+.swatch { width: 1rem; height: 1rem; border-radius: 4px; border: 1px solid var(--line); flex: none; }
+.pain-mode { min-width: 0; }
+.pain-figure { position: relative; width: min(100%, 260px); margin: 0.4rem auto; }
+.pain-figure svg { width: 100%; height: auto; display: block; }
+.pain-figure.paintable { touch-action: none; cursor: crosshair; }
+.pain-figure.paintable svg path { cursor: crosshair !important; }
+.paint-layer { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; }
+.paint-dot { position: absolute; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); opacity: 0.85; }
+.part-list .button { font-size: 0.82rem; padding: 0.3rem 0.6rem; }
+.pain-summary p { margin: 0.3rem 0; }
+.alarm-text { color: var(--act); font-weight: 600; }
+.pain select { padding: 0.3rem 0.5rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; }
+@media (max-width: 720px) { .pain-work { grid-template-columns: 1fr; } }

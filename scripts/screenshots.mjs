@@ -14,6 +14,7 @@ const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../screenshots')
 
 // Capture list of Psychology's demo script (guion-demo.md, Nov 14 20:25).
 const SHOTS = [
+  { name: '00-home-body-day125', hash: '#/body?day=125' },
   { name: '01-today-day125-early-signal', hash: '#/today?day=125' },
   { name: '02-today-day121-why-temperature', hash: '#/today?day=121&why=temp' },
   { name: '03-today-day123-sleep-only', hash: '#/today?day=123' },

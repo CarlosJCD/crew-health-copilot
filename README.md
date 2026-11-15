@@ -42,14 +42,15 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `src/orbit/pulse-spec.json`, `src/orbit/pulse.ts`, `src/components/PulseTask.tsx` | Pulse mode: 3-minute PVT-B-style task (1 to 4 s waits, false start under 100 ms, lapse at 355 ms, median of valid responses, at least 20). A session replaces that day's value for the engine; a 30 s trial run saves nothing. Not a validated PVT-B | Psychology 1 (spec), Engineering |
 | `public/data/demo-data.json` | Data team's demo data (days 107 to 128), loaded by the app; `src/orbit/demoFile.test.ts` checks it against the acceptance table | Data science |
 | `src/orbit/constellations.json`, `src/orbit/constellations.ts`, `src/modules/Play.tsx` | Constellations free mode: 2 boards of 16 tiles with NASA planetary data, hint, fact and source per group. No timer, no score | Psychology 1 (content), Engineering |
-| `src/orbit/body.ts`, `src/modules/BodyMap.tsx` | Body map: 6 systems with state, what ORBIT watches, HRP risk and the fixed symptom vocabulary | Engineering |
+| `src/orbit/body.ts`, `src/modules/BodyMap.tsx` | **Home screen.** Today's state, the body map (6 systems, details folded) and the fixed symptom vocabulary. Astronauts have little medical background and little time, so the numbers are one tap away in Metrics | Engineering |
+| `src/orbit/pain.ts`, `src/components/PainPanel.tsx`, `MuscleSelector.tsx`, `PainPainter.tsx` | "Does something hurt?" If she is sure it is muscular she picks the muscle and side; if not, she paints the area. Intensity 1 to 10. Both map to the fixed vocabulary (zone-to-symptom table pending P1 review); chest pain stays an alarm. Figure: `react-muscle-highlighter` (MIT), female model | Engineering (mapping: Psychology 1) |
 | `src/orbit/care.ts`, `src/components/CareTank.tsx` | Gamification without punishment: the "protective factors used" tank (check-ins, Boost actions and ratings, pulse sessions, Constellations boards). Only fills up; no performance points, no comparison, nothing resets | Engineering |
 | `src/orbit/scenarios.json` | Four scenarios: one-way delay, estimated dose, first responder, ground contact (handoff 2.2) | Psychology + Data science |
 | `src/orbit/config.ts` | Typed reader for both files; lists every param the engine needs | Engineering |
 | `src/orbit/engine.ts` | ORBIT engine: one rule per indicator, Body / Mind / Crew roll-up, state (GREEN, YELLOW, EARLY_SIGNAL, RED_PHYSICAL, RED_PSYCH) | Data science + Engineering |
 | `src/orbit/engine.test.ts` | Acceptance table of the handoff (days 121 to 128) plus rules the story does not exercise | Data science + Engineering |
 | `src/orbit/demoData.ts` | `demo-data.json` contract, checks, and the built-in copy of the demo story | Data science |
-| `src/modules/Today.tsx` | Rings, state, cards with "Why?", day control, radiation context | Engineering |
+| `src/modules/Today.tsx` | **Metrics** tab (route `#/today`): rings, state, cards with "Why?", day control, radiation context | Engineering |
 | `src/orbit/transmit.ts`, `src/modules/Transmit.tsx` | Outbox with the scenario delay, privacy switches, packets (share with the crew medical officer, weekly summary, escalation) | Engineering |
 | `src/orbit/checkin.ts`, `src/modules/Mind.tsx` | Daily check-in (4 sliders) and "I want to talk to someone today"; answers replace that day's values on the device | Engineering (items: Psychology 2) |
 | `src/components/SepReplay.tsx`, `public/data/donki-sep-2024-05.json` | Replay of the real solar particle event of May 9, 2024 in the radiation layer | Engineering |

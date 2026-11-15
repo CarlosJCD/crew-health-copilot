@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { DOMAIN_IDS, RULES, type Scenario } from '../orbit/config'
-import { STORY_DAYS, type LoadedDemo } from '../orbit/demoData'
+import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay } from '../orbit/engine'
 import { useI18n } from '../i18n/context'
+import { DayControl } from '../components/DayControl'
 import { DomainRing } from '../components/DomainRing'
 import { OrbitCard } from '../components/OrbitCard'
 import { StatePanel } from '../components/StatePanel'
@@ -20,48 +21,15 @@ interface Props {
   care: CareSummary
 }
 
-/** Today: three rings, the ORBIT state and one card per indicator, replaying the demo story. */
+/** Metrics (route `today`): three rings, the ORBIT state and one card per indicator, replaying the demo story. */
 export function Today({ demo, day, onDayChange, scenario, openWhy, care }: Props) {
   const { t } = useI18n()
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
-  const record = data.days.find((d) => d.day === day)
-  const days = data.days.map((d) => d.day)
-  const first = Math.max(STORY_DAYS.first, Math.min(...days))
-  const last = Math.min(STORY_DAYS.last, Math.max(...days))
 
   return (
     <div className="today">
-      <p className="persona">
-        {t('persona.line', {
-          name: data.persona.name,
-          role: data.persona.role,
-          day,
-          length: data.persona.mission_length_days,
-        })}
-      </p>
-
-      <div className="day-control">
-        <label htmlFor="day">{t('day.label', { n: day })}</label>
-        <input id="day" type="range" min={first} max={last} value={day} onChange={(e) => onDayChange(Number(e.target.value))} />
-        <span className="hint">{demo.origin === 'file' ? t('day.hintFile') : t('day.hint')}</span>
-        {record && record.events.length > 0 && (
-          <p className="log" lang="en">
-            <strong>{t('day.log')}</strong> {record.events.join(' · ')}
-          </p>
-        )}
-      </div>
-
-      {demo.errors.length > 0 && (
-        <details className="data-issues">
-          <summary>{t('data.issues', { n: demo.errors.length })}</summary>
-          <ul>
-            {demo.errors.map((e) => (
-              <li key={e}>{e}</li>
-            ))}
-          </ul>
-        </details>
-      )}
+      <DayControl demo={demo} day={day} onDayChange={onDayChange} />
 
       <div className="rings">
         {DOMAIN_IDS.map((d) => (

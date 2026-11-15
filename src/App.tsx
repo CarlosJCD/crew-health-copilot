@@ -6,6 +6,7 @@ import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbi
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { applyPulse, type PulseSession } from './orbit/pulse'
 import { applySymptoms, type SymptomLog } from './orbit/body'
+import { applyPain, type PainDay, type PainLog } from './orbit/pain'
 import { careSummary } from './orbit/care'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
@@ -50,6 +51,7 @@ export default function App() {
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
   const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
   const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
+  const [painLog, setPainLog] = useStoredJson<PainLog>('orbit.pain', {})
   const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
 
   useEffect(() => {
@@ -74,10 +76,14 @@ export default function App() {
     }
   }, [])
 
-  // Her check-in answers, pulse sessions and logged symptoms replace that day's values, so every module sees the same data.
+  // Her check-in answers, pulse sessions, logged symptoms and pain replace or add to that day's values,
+  // so every module sees the same data.
   const demo = useMemo(
-    () => ({ ...loaded, data: applySymptoms(applyPulse(applyCheckins(loaded.data, checkins), pulseSessions), symptomLog) }),
-    [loaded, checkins, pulseSessions, symptomLog],
+    () => ({
+      ...loaded,
+      data: applyPain(applySymptoms(applyPulse(applyCheckins(loaded.data, checkins), pulseSessions), symptomLog), painLog),
+    }),
+    [loaded, checkins, pulseSessions, symptomLog, painLog],
   )
   const care = useMemo(
     () => careSummary({ checkins, boostLog, pulseSessions, boardsDone }),
@@ -124,7 +130,16 @@ export default function App() {
             onDemoClockChange={setDemoClock}
           />
         ) : active.id === 'body' ? (
-          <BodyMap demo={demo} day={day} log={symptomLog} onLogChange={setSymptomLog} />
+          <BodyMap
+            demo={demo}
+            day={day}
+            onDayChange={setDay}
+            scenario={scenario}
+            log={symptomLog}
+            onLogChange={setSymptomLog}
+            pain={painLog[day]}
+            onPainChange={(p: PainDay) => setPainLog((all) => ({ ...all, [day]: p }))}
+          />
         ) : active.id === 'play' ? (
           <Play
             key={`${route.board ?? 0}-${route.solved}`}
