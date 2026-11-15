@@ -9,6 +9,8 @@ import {
   OFF_FIGURE,
   painDay,
   painSymptoms,
+  symptomsFor,
+  isPain,
   verbalLabel,
   whereOf,
   type BodySide,
@@ -37,7 +39,7 @@ interface Props {
   onToggleCard: (cardId: string) => void
 }
 
-type Step = 'where' | 'details' | 'safety'
+type Step = 'where' | 'what' | 'details' | 'safety'
 
 /** Id of a new report (wall clock, read only in event handlers). */
 const newEventId = () => `ev-${Date.now()}`
@@ -59,6 +61,8 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) 
   const [extra, setExtra] = useState<string[]>([])
   const [details, setDetails] = useState<PainDetailsValue>(EMPTY_DETAILS)
   const [alarms, setAlarms] = useState<string[]>([])
+  /** What she feels in that zone: pain and/or the symptoms of the zone. */
+  const [feels, setFeels] = useState<{ pain: boolean; symptoms: string[] }>({ pain: false, symptoms: [] })
   const today = painDay(pain)
   const where = whereOf(muscles, strokes, extra)
   const checks = alarmCheckFor(where.regions)
@@ -74,9 +78,11 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) 
     setExtra([])
     setDetails(EMPTY_DETAILS)
     setAlarms([])
+    setFeels({ pain: false, symptoms: [] })
   }
   const save = (confirmed: string[]) => {
-    const event: PainEvent = { id: newEventId(), muscles, strokes, ...where, ...details, alarms: confirmed }
+    const described = feels.pain ? details : { ...details, qualities: [], worse: undefined }
+    const event: PainEvent = { id: newEventId(), muscles, strokes, ...where, ...described, alarms: confirmed, pain: feels.pain, symptoms: feels.symptoms }
     onChange({ events: [...today.events, event] })
     reset()
   }
@@ -143,8 +149,8 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) 
 
           {where.regions.length > 0 && <p role="status">{t('pain.whereIs', { where: whereText(where) })}</p>}
           <div className="actions">
-            <button type="button" className="button" disabled={!where.regions.length} onClick={() => setStep('details')}>
-              {t('pain.next')}
+            <button type="button" className="button" disabled={!where.regions.length} onClick={() => setStep('what')}>
+              {t('pain.nextWhat')}
             </button>
             {(muscles.length > 0 || strokes.length > 0 || extra.length > 0) && (
               <button type="button" className="button secondary" onClick={reset}>
@@ -155,14 +161,50 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) 
         </>
       )}
 
-      {step === 'details' && (
+      {step === 'what' && (
         <>
           <p>
             <strong>{t('pain.whereIs', { where: whereText(where) })}</strong>
           </p>
-          <PainDetails value={details} onChange={setDetails} />
+          <h3>{t('pain.what')}</h3>
+          <div className="actions part-list" role="group" aria-label={t('pain.what')}>
+            <button type="button" className="button secondary" aria-pressed={feels.pain} onClick={() => setFeels((f) => ({ ...f, pain: !f.pain }))}>
+              {t('pain.painOption')}
+            </button>
+            {symptomsFor(where.regions).map((s) => (
+              <button
+                key={s}
+                type="button"
+                className="button secondary"
+                aria-pressed={feels.symptoms.includes(s)}
+                onClick={() => setFeels((f) => ({ ...f, symptoms: f.symptoms.includes(s) ? f.symptoms.filter((x) => x !== s) : [...f.symptoms, s] }))}
+                lang="en"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <p className="hint">{t('pain.whatHint')}</p>
           <div className="actions">
             <button type="button" className="button secondary" onClick={() => setStep('where')}>
+              {t('pain.prev')}
+            </button>
+            <button type="button" className="button" disabled={!feels.pain && !feels.symptoms.length} onClick={() => setStep('details')}>
+              {t('pain.next')}
+            </button>
+          </div>
+        </>
+      )}
+
+      {step === 'details' && (
+        <>
+          <p>
+            <strong>{t('pain.whereIs', { where: whereText(where) })}</strong>
+            {feels.symptoms.length > 0 && <span lang="en"> · {feels.symptoms.join(', ')}</span>}
+          </p>
+          <PainDetails value={details} onChange={setDetails} pain={feels.pain} />
+          <div className="actions">
+            <button type="button" className="button secondary" onClick={() => setStep('what')}>
               {t('pain.prev')}
             </button>
             <button type="button" className="button" onClick={() => (checks.length ? setStep('safety') : save([]))}>
@@ -211,10 +253,12 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard }: Props) 
           <ul className="pain-events">
             {today.events.map((e, i) => {
               const label = `${whereText(e)} · ${e.intensity}/10 ${t(`pain.level.${verbalLabel(e.intensity)}`)}`
-              const words = e.qualities.map((q) => qualityLabel(q, lang)).join(', ')
+              const words = [...e.qualities.map((q) => qualityLabel(q, lang)), ...(e.symptoms ?? [])].join(', ')
+              const kind = isPain(e) ? '' : `${t('pain.symptomOnly')} · `
               return (
                 <li key={e.id}>
                   <span>
+                    {kind}
                     {label}
                     {words && ` · ${words}`}
                   </span>{' '}

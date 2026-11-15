@@ -14,10 +14,10 @@ export interface ModuleInfo {
 export const MODULES: ModuleInfo[] = [
   {
     id: 'body',
-    label: { en: 'Body map', es: 'Figura humana' },
+    label: { en: 'Today', es: 'Hoy' },
     summary: {
-      en: 'Home screen: today\'s state, the human figure with six systems, and where it hurts (pick the muscle or paint the area).',
-      es: 'Pantalla de inicio: el estado del día, la figura humana con seis sistemas y dónde duele (elegir el músculo o pintar el área).',
+      en: 'First screen: today\'s state, the protective-factors tank, the heat map of symptoms on the body with For today beside it, and logging what she feels where she feels it.',
+      es: 'Primera pantalla: el estado del día, el tanque de factores protectores, el mapa de calor de síntomas sobre el cuerpo con Para hoy al lado, y registrar lo que siente donde lo siente.',
     },
     owner: { en: 'Engineering', es: 'Ingeniería' },
     planned: [

@@ -15,6 +15,8 @@ import { useI18n } from '../i18n/context'
 
 interface Props {
   value: PainDetailsValue
+  /** She feels pain there: ask for the pain words and whether moving or pressing makes it worse. */
+  pain: boolean
   /** Each change starts from the latest value, so quick taps never undo each other. */
   onChange: (update: (value: PainDetailsValue) => PainDetailsValue) => void
 }
@@ -22,7 +24,7 @@ interface Props {
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id])
 
 /** Steps 2 to 6 of Psychology's report flow: what it feels like, how strong, when, what was happening, mechanics. */
-export function PainDetails({ value, onChange }: Props) {
+export function PainDetails({ value, onChange, pain }: Props) {
   const { t, lang } = useI18n()
   const set = (patch: Partial<PainDetailsValue>) => onChange((v) => ({ ...v, ...patch }))
   const pick = (key: 'qualities' | 'contexts', id: string, max = Infinity) =>
@@ -31,6 +33,7 @@ export function PainDetails({ value, onChange }: Props) {
 
   return (
     <div className="pain-details">
+      {pain && (
       <fieldset>
         <legend>{t('pain.feel', { n: MAX_QUALITIES })}</legend>
         <div className="actions part-list">
@@ -51,6 +54,7 @@ export function PainDetails({ value, onChange }: Props) {
           })}
         </div>
       </fieldset>
+      )}
 
       <fieldset>
         <legend>
@@ -107,6 +111,7 @@ export function PainDetails({ value, onChange }: Props) {
         <p className="hint">{t('pain.contextPrivate')}</p>
       </fieldset>
 
+      {pain && (
       <fieldset>
         <legend>{t('pain.worse')}</legend>
         <div className="actions">
@@ -118,6 +123,7 @@ export function PainDetails({ value, onChange }: Props) {
         </div>
         <p className="hint">{t('pain.forCmo')}</p>
       </fieldset>
+      )}
     </div>
   )
 }

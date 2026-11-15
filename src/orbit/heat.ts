@@ -7,6 +7,7 @@
 import type { SymptomLog } from './body'
 import {
   INTENSITY_COLORS,
+  isPain,
   OFF_FIGURE,
   painDay,
   regionSymptom,
@@ -109,11 +110,13 @@ export function heatOn(day: number, view: BodyView, pain: PainLog, symptoms: Sym
   for (let d = day - HEAT.windowDays + 1; d <= day; d++) {
     for (const e of painDay(pain[d]).events) {
       if (e.intensity <= 0) continue
-      for (const m of e.muscles) if (m.view === view) warm(m.slug, d, e.intensity, 'pain', m.side)
+      // What she felt there: "pain" and/or the symptoms of that zone.
+      const labels = [...(isPain(e) ? ['pain'] : []), ...(e.symptoms ?? [])]
+      for (const what of labels) for (const m of e.muscles) if (m.view === view) warm(m.slug, d, e.intensity, what, m.side)
       for (const s of e.strokes) {
         // Painted strokes belong to the view they were painted on; whole zones show on any view that draws them.
         if (s.dots.length && s.view !== view) continue
-        for (const z of s.zones) warm(zoneOf(z), d, e.intensity, 'pain')
+        for (const what of labels) for (const z of s.zones) warm(zoneOf(z), d, e.intensity, what)
         const w = warmth(e.intensity, day - d)
         if (s.view === view && w >= HEAT.minWarmth) {
           s.dots.forEach(([x, y], i) => dots.push({ key: `${e.id}-${s.id}-${i}`, x, y, size: s.size, warmth: w }))

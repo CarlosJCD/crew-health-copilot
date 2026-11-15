@@ -50,7 +50,7 @@ export default function App() {
   const [demoClock, setDemoClock] = useStoredJson('orbit.demoClock', true)
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
   const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
-  const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
+  const [symptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
   const [painLog, setPainLog] = useStoredJson<PainLog>('orbit.pain', {})
   const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
 
@@ -116,7 +116,7 @@ export default function App() {
 
       <main>
         {active.id === 'today' ? (
-          <Today demo={demo} day={day} onDayChange={setDay} scenario={scenario} openWhy={route.why} care={care} />
+          <Today demo={demo} day={day} onDayChange={setDay} scenario={scenario} openWhy={route.why} />
         ) : active.id === 'transmit' ? (
           <Transmit
             demo={demo}
@@ -137,7 +137,7 @@ export default function App() {
             onDayChange={setDay}
             scenario={scenario}
             log={symptomLog}
-            onLogChange={setSymptomLog}
+            care={care}
             painLog={painLog}
             onPainChange={(p: PainDay) => setPainLog((all) => ({ ...all, [day]: p }))}
             checkins={checkins}

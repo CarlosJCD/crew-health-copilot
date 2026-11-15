@@ -145,3 +145,27 @@ describe('pain for the crew medical officer', () => {
     expect(painPacketLines(day(e), true)[0]).toContain('stressful moment today')
   })
 })
+
+describe('symptoms logged where she feels them', () => {
+  it('offers only vocabulary symptoms that are neither pain words nor alarm signs, on real regions', async () => {
+    const { REGION_SYMPTOMS, symptomsFor, isAlarm } = await import('./pain')
+    const { FIXED_SYMPTOMS } = await import('./body')
+    const ids = new Set(REGIONS.map((r) => r.id))
+    for (const [r, words] of Object.entries(REGION_SYMPTOMS)) {
+      expect(ids.has(r), r).toBe(true)
+      for (const w of words) {
+        expect(FIXED_SYMPTOMS).toContain(w)
+        expect(isAlarm(w)).toBe(false)
+      }
+    }
+    expect(symptomsFor(['head', 'abdomen'])).toEqual(['dizziness', 'nausea'])
+    expect(symptomsFor(['leg'])).toEqual([])
+  })
+
+  it('a report can be a symptom without pain, and the engine sees the symptom itself', () => {
+    const nausea = event({ regions: ['abdomen'], pain: false, symptoms: ['nausea'] })
+    expect(painSymptoms(day(nausea))).toEqual(['nausea'])
+    expect(painSymptoms(day(event({ regions: ['head'], symptoms: ['dizziness'] })))).toEqual(['pain in head', 'dizziness'])
+    expect(painPacketLines(day(nausea), false)[0]).toMatch(/^Symptom: Belly, 6\/10 moderate; symptoms: nausea/)
+  })
+})

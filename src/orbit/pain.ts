@@ -147,6 +147,21 @@ export function regionOfZone(slug: Slug, view: BodyView): string {
   }
 }
 
+/**
+ * Symptoms of the fixed vocabulary (orbit-indicators.json) she can log where she feels them, besides pain.
+ * Pain words (headache, back pain, stomach pain...) are the pain itself; alarm signs come in the alarm
+ * question. Engineering mapping, team criterion pending Psychology 1 review.
+ */
+export const REGION_SYMPTOMS: Record<string, string[]> = {
+  head: ['dizziness'],
+  eyes: ['eye irritation'],
+  neck: ['sore throat or congestion'],
+  chest: ['palpitations'],
+  abdomen: ['nausea'],
+  skin: ['skin rash'],
+}
+export const symptomsFor = (regions: string[]) => [...new Set(regions.flatMap((r) => REGION_SYMPTOMS[r] ?? []))]
+
 /** Alarm signs (red flags of orbit-indicators.json) asked about before saving pain in these regions. */
 export const ALARM_CHECK: Record<string, string[]> = {
   head: ['severe headache', 'vision change'],
@@ -189,7 +204,13 @@ export interface PainEvent {
   worse?: Worse
   /** Alarm signs she confirmed in the safety question. */
   alarms: string[]
+  /** She feels pain or an ache there (reports before symptoms existed count as pain). */
+  pain?: boolean
+  /** Other symptoms she feels in that zone, from the fixed vocabulary (REGION_SYMPTOMS). */
+  symptoms?: string[]
 }
+
+export const isPain = (e: Pick<PainEvent, 'pain'>) => e.pain !== false
 
 export interface PainDay {
   events: PainEvent[]
@@ -265,7 +286,11 @@ export const painSystem = (symptom: string) => REGIONS.find((r) => regionSymptom
 /** Symptoms a day of pain stands for: one per region, plus the alarm signs she confirmed. */
 export function painSymptoms(day: PainDay | undefined): string[] {
   const events = painDay(day).events
-  return [...new Set(events.flatMap((e) => [...(e.intensity > 0 ? e.regions : []).map(regionSymptom), ...e.alarms]))]
+  return [
+    ...new Set(
+      events.flatMap((e) => [...(isPain(e) && e.intensity > 0 ? e.regions : []).map(regionSymptom), ...(e.symptoms ?? []), ...e.alarms]),
+    ),
+  ]
 }
 
 /** Adds the symptoms of the logged pain to each day's record, so the engine evaluates them. */
@@ -293,7 +318,8 @@ export function painPacketLines(day: PainDay | undefined, shareMind: boolean): s
       .filter((c): c is PainContext => !!c && (shareMind || c.domain !== 'mind'))
       .map((c) => c.label_en.toLowerCase())
     const parts = [
-      `Pain: ${where}, ${e.intensity}/10 ${verbalLabel(e.intensity)}`,
+      `${isPain(e) ? 'Pain' : 'Symptom'}: ${where}, ${e.intensity}/10 ${verbalLabel(e.intensity)}`,
+      e.symptoms?.length ? `symptoms: ${e.symptoms.join(', ')}` : '',
       words,
       [e.started && STARTED_EN[e.started], e.course && COURSE_EN[e.course]].filter(Boolean).join(', '),
       e.worse && `worse on move or press: ${e.worse.replace('_', ' ')}`,
