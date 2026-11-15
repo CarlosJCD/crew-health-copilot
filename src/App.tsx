@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DEFAULT_SCENARIO_ID, SCENARIOS } from './orbit/config'
 import type { BoostLog } from './orbit/boost'
 import { applyCheckins, type Checkins } from './orbit/checkin'
-import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
+import { BUILT_IN_DEMO, dayRange, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { applyPulse, type PulseSession } from './orbit/pulse'
 import { applySymptoms, type SymptomLog } from './orbit/body'
@@ -110,9 +110,9 @@ export default function App() {
   )
   const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS.find((s) => s.id === DEFAULT_SCENARIO_ID)!
   const active = MODULES.find((m) => m.id === route.id) ?? MODULES[0]
-  const allDays = demo.data.days.map((d) => d.day)
-  const first = Math.max(STORY_DAYS.first, Math.min(...allDays))
-  const last = Math.min(STORY_DAYS.last, Math.max(...allDays))
+  // The arrows reach every day of the file (her history before the story too); play replays the story.
+  const { first, last } = dayRange(demo.data)
+  const inStory = day >= STORY_DAYS.first && day <= STORY_DAYS.last
   const record = demo.data.days.find((d) => d.day === day)
   const closeMore = useCallback(() => setMoreOpen(false), [])
 
@@ -120,11 +120,11 @@ export default function App() {
   useEffect(() => {
     if (!playing) return
     const id = window.setTimeout(() => {
-      if (day >= last) setPlaying(false)
+      if (day >= STORY_DAYS.last) setPlaying(false)
       else setDay(day + 1)
     }, 2500)
     return () => window.clearTimeout(id)
-  }, [playing, day, last])
+  }, [playing, day])
 
   return (
     <div className={`app route-${active.id}`}>
@@ -135,7 +135,9 @@ export default function App() {
           <span aria-hidden="true">{APP_NAME.slice(1)}</span>
         </a>
         <div className="day-stepper" role="group" aria-label={t('home.demo')}>
-          <span className="demo-tag">{t('home.demo')}</span>
+          <span className="demo-tag" title={inStory ? t('day.story', STORY_DAYS) : t('day.history', STORY_DAYS)}>
+            {inStory ? t('home.demo') : t('home.before')}
+          </span>
           <button type="button" className="icon-btn" onClick={() => setDay(Math.max(first, day - 1))} disabled={day <= first} aria-label={t('home.prev')}>
             <Icon name="prev" size={20} />
           </button>
@@ -147,7 +149,7 @@ export default function App() {
             type="button"
             className="icon-btn"
             onClick={() => {
-              if (!playing && day >= last) setDay(first)
+              if (!playing && !(day >= STORY_DAYS.first && day < STORY_DAYS.last)) setDay(STORY_DAYS.first)
               setPlaying(!playing)
             }}
             aria-label={playing ? t('home.pause') : t('home.play')}
