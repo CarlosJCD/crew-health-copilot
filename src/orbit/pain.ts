@@ -176,6 +176,23 @@ export const ALARM_CHECK: Record<string, string[]> = {
 export const alarmCheckFor = (regions: string[]) => [...new Set(regions.flatMap((r) => ALARM_CHECK[r] ?? []))]
 export const isAlarm = (symptom: string) => list('symptoms', 'red_flags').includes(symptom.toLowerCase())
 
+/**
+ * Words (English and Spanish) that make a symptom she wrote herself sound like an alarm sign. They do not
+ * decide anything: they only add that alarm sign to the safety question, where she confirms it or not
+ * (team criterion, list pending physician review).
+ */
+export const ALARM_WORDS: Record<string, RegExp> = {
+  'chest pain': /\b(chest|thorax|pecho|t[oó]rax)\b/,
+  'shortness of breath': /breath|short of air|respir|\baire\b|ahog|asfix|disnea|dyspn/,
+  fainting: /faint|pass(ed)? out|black(ed)? ?out|syncop|desmay|perd[ií] (el )?conocimiento/,
+  'vision change': /vision|visual|blurr|sight|can'?t see|\bvista\b|visi[oó]n|borros/,
+  'severe headache': /headache|head ache|migraine|dolor de cabeza|cefalea|jaqueca|migra[ñn]a/,
+}
+
+/** Alarm signs that the symptoms she wrote in her own words may describe (asked, never assumed). */
+export const alarmsInText = (texts: string[]) =>
+  Object.keys(ALARM_WORDS).filter((flag) => texts.some((s) => ALARM_WORDS[flag].test(s.toLowerCase())))
+
 /** A muscle she pointed to. */
 export interface MuscleMark {
   slug: Slug
@@ -296,12 +313,20 @@ export const regionSymptom = (id: string) => `pain in ${(region(id)?.label_en ??
 /** Body system key of a pain symptom, or undefined if it is not one. */
 export const painSystem = (symptom: string) => REGIONS.find((r) => regionSymptom(r.id) === symptom)?.system
 
-/** Symptoms a day of pain stands for: one per region, plus the alarm signs she confirmed. */
+/**
+ * Symptoms a day of pain stands for: one per region, the other symptoms she felt, plus the alarm signs she
+ * confirmed. Only a confirmed alarm sign turns the day red: a symptom she wrote that happens to be an alarm
+ * sign ("chest pain") reaches the engine only if she confirmed it in the safety question.
+ */
 export function painSymptoms(day: PainDay | undefined): string[] {
   const events = painDay(day).events
   return [
     ...new Set(
-      events.flatMap((e) => [...(isPain(e) && e.intensity > 0 ? e.regions : []).map(regionSymptom), ...(e.symptoms ?? []), ...e.alarms]),
+      events.flatMap((e) => [
+        ...(isPain(e) && e.intensity > 0 ? e.regions : []).map(regionSymptom),
+        ...(e.symptoms ?? []).filter((s) => !isAlarm(s)),
+        ...e.alarms,
+      ]),
     ),
   ]
 }
@@ -331,7 +356,8 @@ export function painPacketLines(day: PainDay | undefined, shareMind: boolean): s
       .filter((c): c is PainContext => !!c && (shareMind || c.domain !== 'mind'))
       .map((c) => c.label_en.toLowerCase())
     const parts = [
-      `${isPain(e) ? 'Pain' : 'Symptom'}: ${where}, ${e.intensity}/10 ${verbalLabel(e.intensity)}`,
+      // A symptom without pain carries no intensity she chose.
+      isPain(e) ? `Pain: ${where}, ${e.intensity}/10 ${verbalLabel(e.intensity)}` : `Symptom: ${where}`,
       e.symptoms?.length ? `symptoms: ${e.symptoms.join(', ')}` : '',
       words,
       [e.started && STARTED_EN[e.started], e.course && COURSE_EN[e.course]].filter(Boolean).join(', '),

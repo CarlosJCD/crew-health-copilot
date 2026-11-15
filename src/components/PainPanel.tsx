@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { qualityLabel, regionLabel } from '../orbit/display'
 import {
   alarmCheckFor,
+  alarmsInText,
   BRUSH,
   CO2_SOURCE,
   EMPTY_DETAILS,
@@ -22,6 +23,7 @@ import {
   type PainEvent,
   type PaintStroke,
 } from '../orbit/pain'
+import { VOCABULARY } from '../orbit/body'
 import { CARDS, DISPLAY } from '../orbit/boost'
 import { painSuggestions } from '../orbit/plan'
 import { useI18n } from '../i18n/context'
@@ -86,7 +88,9 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
   }
   const today = painDay(pain)
   const where = whereOf(muscles, strokes, extra)
-  const checks = alarmCheckFor(where.regions)
+  // Alarm signs to ask about: those of the regions (head, eyes, chest) and those her own words may describe.
+  const typedAlarms = alarmsInText(feels.symptoms)
+  const checks = [...new Set([...alarmCheckFor(where.regions), ...typedAlarms])]
 
   const sideText = (side?: BodySide | 'both') => (side ? ` (${t(side === 'left' ? 'pain.left' : side === 'right' ? 'pain.right' : 'pain.both')})` : '')
   const whereText = (e: Pick<PainEvent, 'regions' | 'side'>) => e.regions.map((r) => regionLabel(r, lang)).join(', ') + sideText(e.side)
@@ -240,6 +244,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
               <input
                 id="pain-other"
                 type="text"
+                list="pain-vocabulary"
                 value={other}
                 maxLength={MAX_TYPED}
                 placeholder={t('pain.otherPlaceholder')}
@@ -250,6 +255,12 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
                 {t('pain.otherAdd')}
               </button>
             </div>
+            {/* The fixed vocabulary as she types, so the same symptom is written the same way every day. */}
+            <datalist id="pain-vocabulary">
+              {VOCAB_SUGGESTIONS.map((v) => (
+                <option key={v} value={v} />
+              ))}
+            </datalist>
           </form>
           <p className="hint">{t('pain.whatHint')}</p>
           <div className="actions">
@@ -295,6 +306,11 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
           <p id="pain-safety">
             <strong>{t('pain.safety')}</strong>
           </p>
+          {typedAlarms.length > 0 && (
+            <p className="hint">
+              {t('pain.safetyTyped', { s: feels.symptoms.filter((s) => alarmsInText([s]).length).map(cap).join(', ') })}
+            </p>
+          )}
           <div className="actions">
             {checks.map((s) => (
               <button
@@ -366,6 +382,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
           </div>
           <ul className="pain-events">
             {today.events.map((e, i) => {
+              // A symptom without pain has no intensity of her own: "Symptom" stands in its place.
               const label = `${whereText(e)} · ${strengthText(e)}`
               const words = wordsText(e)
               return (
@@ -395,11 +412,16 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
               )
             })}
           </ul>
-          <p className="hint">
-            {t('pain.loggedAs')} <span lang="en">{painSymptoms(today).join(', ')}</span>
-          </p>
+          {painSymptoms(today).length > 0 && (
+            <p className="hint">
+              {t('pain.loggedAs')} <span lang="en">{painSymptoms(today).join(', ')}</span>
+            </p>
+          )}
         </section>
       )}
+      <p className="pain-serious">
+        {t('pain.serious')} <a href="#/transmit">{t('pain.seriousLink')}</a>
+      </p>
       <p className="muted pain-private">{t('pain.private')}</p>
 
       {step === 'done' && (
@@ -420,6 +442,9 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
 
 /** Longest symptom she can write herself. */
 const MAX_TYPED = 60
+
+/** Suggestions while she writes: the vocabulary without the alarm signs (those are asked in the safety question). */
+const VOCAB_SUGGESTIONS = VOCABULARY.filter((v) => !v.red_flag).map((v) => v.text)
 
 /** Symptom words of the vocabulary are lower case; shown with a capital first letter. */
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BUILT_IN_DEMO, loadDemoData, validateDemoData } from './demoData'
+import { BUILT_IN_DEMO, dayRange, LEGACY_DAY_OFFSET, loadDemoData, resolveDay, STORY_DAYS, validateDemoData } from './demoData'
 
 const respond = (body: string, status = 200, type = 'application/json') =>
   (async () => new Response(body, { status, headers: { 'content-type': type } })) as unknown as typeof fetch
@@ -37,5 +37,28 @@ describe('loadDemoData', () => {
     const { dayRange, STORY_DAYS, BUILT_IN_DEMO } = await import('./demoData')
     expect(dayRange(BUILT_IN_DEMO)).toEqual({ first: 1, last: 30 })
     expect(STORY_DAYS).toEqual({ first: 23, last: 30 })
+  })
+})
+
+describe('resolveDay (the day a link asks for)', () => {
+  const range = dayRange(BUILT_IN_DEMO)
+
+  it('keeps a day of the file', () => {
+    expect(range).toEqual({ first: 1, last: 30 })
+    expect(resolveDay(27, range)).toEqual({ day: 27 })
+  })
+
+  it('sends links of the first numbering (story 121 to 128) to the same story day', () => {
+    expect(STORY_DAYS.first + LEGACY_DAY_OFFSET).toBe(121)
+    expect(resolveDay(121, range)).toEqual({ day: 23, moved: 'legacy' })
+    expect(resolveDay(125, range)).toEqual({ day: 27, moved: 'legacy' })
+    expect(resolveDay(128, range)).toEqual({ day: 30, moved: 'legacy' })
+    expect(resolveDay(107, range)).toEqual({ day: 9, moved: 'legacy' })
+  })
+
+  it('sends any other day outside the file to the nearest day it has', () => {
+    expect(resolveDay(0, range)).toEqual({ day: 1, moved: 'clamped' })
+    expect(resolveDay(400, range)).toEqual({ day: 30, moved: 'clamped' })
+    expect(resolveDay(31, range)).toEqual({ day: 30, moved: 'clamped' })
   })
 })

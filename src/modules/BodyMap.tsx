@@ -5,7 +5,7 @@ import { COLOR_SYMBOL, FIGURE, FIGURE_LIGHT, partKey } from '../orbit/display'
 import type { Theme } from '../lib/theme'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay, STATE_ESCALATION, worstColor, type DayResult, type OrbitState } from '../orbit/engine'
-import { heatColor, heatOn, type ZoneHeat } from '../orbit/heat'
+import { HEAT, heatColor, heatOn, type ZoneHeat } from '../orbit/heat'
 import { toViewerSide, type BodyView, type PainDay, type PainLog, type PaintStroke } from '../orbit/pain'
 import { boostPlan, CARDS, DISPLAY, downrankedCards, type BoostLog } from '../orbit/boost'
 import type { Checkins } from '../orbit/checkin'
@@ -16,6 +16,7 @@ import { useI18n } from '../i18n/context'
 import type { StringKey } from '../i18n/strings'
 import { useFigure } from '../lib/figure'
 import { CareTank } from '../components/CareTank'
+import { InfoTip } from '../components/InfoTip'
 import { PainPanel } from '../components/PainPanel'
 import { PaintSurface } from '../components/PainPainter'
 import { Sheet } from '../components/Sheet'
@@ -57,6 +58,9 @@ function greenAction(reminders: Reminder[]): { text: StringKey; href?: string; p
   if (next.id === 'did_it_help') return { text: 'home.cta.help', href: '#/boost' }
   return { text: 'home.cta.painAgain', pain: true }
 }
+
+/** Symptom words of the vocabulary are lower case; shown with a capital first letter. */
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 /** "a, b and c" in the current language. */
 const listText = (items: string[], and: string) => (items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} ${and} ${items.at(-1)}`)
@@ -131,7 +135,11 @@ export function BodyMap(props: Props) {
   const heatRows = heatByDay(heat.zones).map(({ day: d, zones }) =>
     t('home.heatRow', { zones: zoneList(zones, (z) => t(partKey(z.zone))), day: d, ago: ago(d) }),
   )
-  const summary = heatRows.length ? heatRows.join('; ') : t('home.heatNone')
+  // Eyes, skin and symptoms with no zone: they have no place on the figure, so they are listed under it
+  // (the most recent day of each).
+  const offFigure = [...new Map([...heat.noPlace].sort((a, b) => a.day - b.day).map((n) => [n.symptom, n])).values()].sort((a, b) => b.day - a.day)
+  const offText = offFigure.map((n) => `${cap(n.symptom)} (${ago(n.day)})`)
+  const summary = [...heatRows, ...(offText.length ? [`${t('heat.noPlace')} ${offText.join(', ')}`] : [])].join('; ') || t('home.heatNone')
 
   return (
     <div className={`home state-${state}`}>
@@ -164,7 +172,14 @@ export function BodyMap(props: Props) {
 
         <section className="figure-stage" aria-labelledby="figure-title">
           <h2 id="figure-title" className="sr-only">{t('home.figureTitle')}</h2>
-          <p className="paint-hint">{t('home.paintHint')}</p>
+          {/* Drawing is one way; the list is the other, for anyone who cannot or would rather not draw. */}
+          <p className="paint-hint">
+            {t('home.paintHint')} {t('home.or')}{' '}
+            <button type="button" className="link-btn" onClick={openPain}>
+              {t('home.pickList')}
+            </button>{' '}
+            <InfoTip label={t('home.heatHelp')}>{t('home.heatNote', { n: HEAT.halfLifeDays })}</InfoTip>
+          </p>
           <div className="today-strip">
             <button type="button" className="strip-btn" onClick={() => setPlanOpen(true)}>
               <strong>{t('plan.title')}</strong>
@@ -177,7 +192,11 @@ export function BodyMap(props: Props) {
                 <rect x="2.5" y={2.5 + 15 * (1 - care.level / TANK_SIZE)} width="7" height={15 * (care.level / TANK_SIZE)} rx="2" className="tank-fill" />
               </svg>
               <span className="long">{t('home.tank', { n: care.level, size: TANK_SIZE })}</span>
-              <span className="short" aria-hidden="true">{care.level}/{TANK_SIZE}</span>
+              <span className="short" aria-hidden="true">
+                <strong>{t('home.tankShort')}</strong>
+                <br />
+                {care.level}/{TANK_SIZE}
+              </span>
             </button>
           </div>
           <div className="segmented" role="group" aria-label={t('home.view')}>
@@ -203,6 +222,12 @@ export function BodyMap(props: Props) {
             fill={fig.fill}
             border={fig.border}
           />
+          {offText.length > 0 && (
+            <p className="also-logged" aria-hidden="true">
+              <span className="muted">{t('heat.noPlace')}</span> <span lang="en">{offText.slice(0, 3).join(' · ')}</span>
+              {offText.length > 3 && <span className="muted"> {t('home.more', { n: offText.length - 3 })}</span>}
+            </p>
+          )}
 
         </section>
 
@@ -236,10 +261,6 @@ export function BodyMap(props: Props) {
                   {t(cta.text)}
                 </span>
               )}
-              {/* Keyboard and screen-reader path to the same report (the figure is drawn with a finger or a mouse). */}
-              <button type="button" className="sr-only-focusable" onClick={() => setPainOpen(true)}>
-                {t('home.logList')}
-              </button>
             </>
           )}
         </div>

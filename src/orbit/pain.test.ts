@@ -6,6 +6,7 @@ import { evaluateDay } from './engine'
 import {
   ALARM_CHECK,
   alarmCheckFor,
+  alarmsInText,
   applyPain,
   CONTEXTS,
   EMPTY_PAIN,
@@ -169,7 +170,7 @@ describe('symptoms logged where she feels them', () => {
     const nausea = event({ regions: ['abdomen'], pain: false, symptoms: ['nausea'] })
     expect(painSymptoms(day(nausea))).toEqual(['nausea'])
     expect(painSymptoms(day(event({ regions: ['head'], symptoms: ['dizziness'] })))).toEqual(['pain in head', 'dizziness'])
-    expect(painPacketLines(day(nausea), false)[0]).toMatch(/^Symptom: Belly, 6\/10 moderate; symptoms: nausea/)
+    expect(painPacketLines(day(nausea), false)[0]).toMatch(/^Symptom: Belly; symptoms: nausea/)
   })
 
   it('a symptom she writes herself travels like the others: the engine logs it and the packet carries it', () => {
@@ -179,5 +180,27 @@ describe('symptoms logged where she feels them', () => {
     expect(r.color).toBe('green')
     expect(r.reason).toMatch(/tingling in the toes/)
     expect(painPacketLines(day(tingling), false)[0]).toMatch(/symptoms: tingling in the toes/)
+  })
+
+  it('a symptom she writes that is an alarm sign only turns the day red once she confirms it', () => {
+    // "chest pain" written on the belly, without confirming it in the safety question: not red.
+    const written = event({ regions: ['abdomen'], pain: false, symptoms: ['chest pain'] })
+    expect(painSymptoms(day(written))).toEqual([])
+    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 23: day(written) }), 23).indicators.symptoms.color).not.toBe('red')
+    // Confirmed in the safety question: red, as before.
+    const confirmed = { ...written, alarms: ['chest pain'] }
+    expect(painSymptoms(day(confirmed))).toEqual(['chest pain'])
+    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 23: day(confirmed) }), 23).indicators.symptoms.color).toBe('red')
+  })
+
+  it('her own words that sound like an alarm sign add it to the safety question, in English or Spanish', () => {
+    expect(alarmsInText(['severe chest pain'])).toEqual(['chest pain'])
+    expect(alarmsInText(["can't breathe well"])).toEqual(['shortness of breath'])
+    expect(alarmsInText(['passed out for a second'])).toEqual(['fainting'])
+    expect(alarmsInText(['blurry sight'])).toEqual(['vision change'])
+    expect(alarmsInText(['dolor de cabeza fuerte', 'me falta el aire'])).toEqual(['shortness of breath', 'severe headache'])
+    expect(alarmsInText(['tingling in the toes', 'itching'])).toEqual([])
+    // Every alarm sign the words point to is one of the engine's red flags.
+    for (const flag of alarmsInText(['chest', 'breath', 'faint', 'vision', 'headache'])) expect(list('symptoms', 'red_flags')).toContain(flag)
   })
 })
