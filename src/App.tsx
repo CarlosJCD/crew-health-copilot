@@ -61,9 +61,10 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand" title={APP_EXPANSION}>
+        {/* Wordmark V2: the logo ring is the O of ORBIT. */}
+        <div className="wordmark" role="img" aria-label={APP_NAME} title={APP_EXPANSION}>
           <Logo />
-          <span className="brand-name">{APP_NAME}</span>
+          <span aria-hidden="true">{APP_NAME.slice(1)}</span>
         </div>
         <MissionBar scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} day={day} />
         <div className="topbar-end">

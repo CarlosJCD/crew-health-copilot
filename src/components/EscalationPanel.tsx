@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { useI18n } from '../i18n/context'
-import type { EscalationPlan, Step } from '../lib/escalation'
+import type { EscalationPlan } from '../lib/escalation'
+import { ORBIT_STEPS, orbitStep } from '../lib/orbit'
 
 interface Props {
   plan: EscalationPlan
@@ -10,8 +11,9 @@ interface Props {
 }
 
 /**
- * Escalation ladder adapted to the communication delay of the selected mission. Exactly one step is
- * marked "You are here"; the ground step describes what happens with Earth instead of competing with it.
+ * "Next step": where the crew is in today's ORBIT loop (Observe, Read, Boost, Iterate, Transmit),
+ * what to do now, and what happens with the flight surgeons on Earth given the mission's signal delay.
+ * Exactly one letter is current: Nominal → O, Watch → B (self-care), Act → T (Crew Medical Officer).
  */
 export function EscalationPanel({ plan, shareText, children }: Props) {
   const { t } = useI18n()
@@ -19,8 +21,15 @@ export function EscalationPanel({ plan, shareText, children }: Props) {
   const [copied, setCopied] = useState<{ text: string; ok: boolean }>()
   const copyState = copied?.text === shareText ? (copied.ok ? 'done' : 'failed') : 'idle'
 
-  const current = (step: Step) => (plan.recommended === step ? ('step' as const) : undefined)
-  const here = (step: Step) => plan.recommended === step && <span className="here">{t('esc.now')}</span>
+  const step = orbitStep(plan.overall)
+  const action =
+    step === 'transmit'
+      ? t('next.transmit')
+      : step === 'boost'
+        ? t('next.boost')
+        : plan.overall === 'no-data'
+          ? t('next.observeNoData')
+          : t('next.observe')
   const ground = plan.notifyGround
     ? plan.groundMode === 'queued'
       ? t('esc.groundQueued', { n: plan.roundTripMin })
@@ -43,42 +52,29 @@ export function EscalationPanel({ plan, shareText, children }: Props) {
       <h2 id="esc-title" className="overline">
         {t('esc.title')}
       </h2>
-      <ol className="steps">
-        <li aria-current={current('self-care')}>
-          <span className="n">1</span>
-          <div>
-            <strong>
-              {t('esc.self')} {here('self-care')}
-            </strong>
-            <small>{t('esc.selfBody')}</small>
-          </div>
-        </li>
-        <li aria-current={current('crew-medical-officer')}>
-          <span className="n">2</span>
-          <div>
-            <strong>
-              {t('esc.cmo')} {here('crew-medical-officer')}
-            </strong>
-            <small>{t('esc.cmoBody')}</small>
-            {plan.recommended === 'crew-medical-officer' && (
-              <>
-                <button type="button" className="btn primary" onClick={copySummary}>
-                  {t('esc.copy')}
-                </button>
-                <small role="status">{copyState === 'done' ? t('esc.copied') : copyState === 'failed' ? t('esc.copyFailed') : ''}</small>
-              </>
-            )}
-          </div>
-        </li>
-        <li>
-          <span className="n">3</span>
-          <div>
-            <strong>{t('esc.ground')}</strong>
-            <small>{ground}</small>
-          </div>
-        </li>
+      <ol className="orbit-strip" aria-label={t('orbit.label')}>
+        {ORBIT_STEPS.map((s) => (
+          <li key={s} aria-current={s === step ? 'step' : undefined} title={t(`orbit.${s}`)}>
+            <span aria-hidden="true">{s[0].toUpperCase()}</span>
+            <span className="sr-only">{t(`orbit.${s}`)}</span>
+          </li>
+        ))}
       </ol>
-      {!plan.recommended && <p className="all-clear">{t('esc.allClear')}</p>}
+      <p className="next-action">
+        <strong>{t(`orbit.heading.${step}`)}</strong> {action}
+      </p>
+      {step === 'transmit' && (
+        <div className="next-share">
+          <button type="button" className="btn primary" onClick={copySummary}>
+            {t('esc.copy')}
+          </button>
+          <small role="status">{copyState === 'done' ? t('esc.copied') : copyState === 'failed' ? t('esc.copyFailed') : ''}</small>
+        </div>
+      )}
+      <p className="ground">
+        <span className="overline">{t('esc.ground')}</span>
+        {ground}
+      </p>
       <p className="disclaimer">{t('esc.disclaimer')}</p>
       {children}
     </section>

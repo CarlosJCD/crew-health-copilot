@@ -83,10 +83,12 @@ button { font: inherit; }
   display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: center;
   margin: 0 -1rem; padding: 0.7rem 1rem; background: var(--head); border-bottom: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: 0.6rem; color: var(--text); }
-.brand .logo { width: 30px; height: 30px; flex: none; }
-.brand-name { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; letter-spacing: 0.12em; }
-.brand-sub { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); }
+/* Wordmark: the logo ring stands in for the O, sized so the ring matches the cap height. */
+.wordmark {
+  display: inline-flex; align-items: center; color: var(--text); line-height: 1;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.45rem; letter-spacing: 0.12em;
+}
+.wordmark .logo { width: 0.95em; height: 0.95em; flex: none; margin-right: 0.08em; position: relative; top: -0.02em; }
 .logo-arc { stroke: currentColor; }
 .logo-pulse { stroke: var(--brand-red); }
 
@@ -194,23 +196,18 @@ button { font: inherit; }
 .btn.primary { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
 
 /* Next step (escalation) */
-.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 0.65rem; position: relative; padding-bottom: 0.8rem; }
-.steps li:not(:last-child)::before { content: ''; position: absolute; left: 13px; top: 28px; bottom: 0; width: 2px; background: var(--line); }
-.steps .n {
-  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg);
-  display: grid; place-items: center; font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);
+/* ORBIT strip: today's letter of Observe, Read, Boost, Iterate, Transmit */
+.orbit-strip { list-style: none; margin: 0; padding: 0; display: flex; gap: 0.3rem; }
+.orbit-strip li {
+  width: 2.1rem; height: 2.1rem; display: grid; place-items: center; border-radius: 6px;
+  border: 1px solid var(--line); color: var(--muted); font-family: var(--font-display); font-weight: 700; font-size: 0.95rem;
 }
-.steps li[aria-current='step'] .n { background: var(--text); color: var(--bg); border-color: var(--text); }
-.steps strong { display: block; font-family: var(--font-display); font-size: 0.9rem; font-weight: 600; color: var(--muted); }
-.steps li[aria-current='step'] strong { color: var(--text); }
-.steps small { display: block; color: var(--muted); font-size: 0.8rem; }
-.steps .btn { margin-top: 0.5rem; }
-.here {
-  display: inline-block; margin-left: 0.4rem; padding: 0.1rem 0.35rem; border-radius: 3px; vertical-align: 1px;
-  background: var(--text); color: var(--bg); font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
-}
-.all-clear { font-size: 0.85rem; color: var(--nominal); }
+.orbit-strip li[aria-current='step'] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.next-action { font-size: 0.9rem; }
+.next-action strong { font-family: var(--font-display); }
+.next-share { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+.next-share small { color: var(--muted); font-size: 0.78rem; }
+.ground { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.82rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 0.7rem; }
 .disclaimer { color: var(--muted); font-size: 0.75rem; }
 
 /* Space weather (compact, context only) */

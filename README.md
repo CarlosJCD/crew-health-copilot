@@ -36,6 +36,7 @@ node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (NASA_AP
 | `src/components/StatusSummary.tsx` | Top of Today: overall status, counts per domain, early signal | Engineering |
 | `src/components/IndicatorCard.tsx`, `DetailsPanel.tsx` | Indicator card, compact list of nominal indicators, details panel with numbers and sources | Engineering |
 | `src/lib/summary.ts` | Counts per status and domain, card order, plain-text summary for the Crew Medical Officer | Engineering |
+| `src/lib/orbit.ts` | The ORBIT loop (Observe, Read, Boost, Iterate, Transmit) and today's step from the overall status | Engineering |
 | `src/modules/*.tsx` | One file per module | See registry |
 | `public/sw.js` | Offline service worker | Engineering |
 | `src/data/validate.ts` | Checks `public/data/synthetic.json` row by row; problems appear in a notice on Today | Engineering |
@@ -112,6 +113,13 @@ name, and says in the footer that it is not affiliated with or endorsed by NASA.
 - Dark "Mission" theme by default (less glare in the cabin); the light "Day" theme is for projectors.
 - Today puts the summary first: overall status, counts per domain and the next escalation step.
   Indicators at Act or Watch get a full card; nominal ones share a compact list.
+- Wordmark: the logo ring is the O of ORBIT. The favicon and app icons use the ring alone.
+- "Next step" shows the ORBIT loop with today's letter highlighted: Nominal → **O**bserve,
+  Watch → **B**oost (self-care, then **I**terate: re-measure tomorrow), Act → **T**ransmit (Crew Medical
+  Officer, and the summary queued for the ground). The verbs stay in English in both languages, as part of the
+  name, with the Spanish gloss next to them.
+- The five HRP hazards are stored per indicator (`hazards` in `src/data/indicators.ts`) but not shown in the UI
+  yet (team decision, Nov 2026).
 
 ## Rules for thresholds
 
