@@ -11,6 +11,7 @@ import { careSummary } from './orbit/care'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { Icon, type IconName } from './components/Icon'
+import { Intro } from './components/Intro'
 import { PrivateNoteSheet, type Notes } from './components/PrivateNote'
 import { Sheet } from './components/Sheet'
 import { Logo } from './components/Logo'
@@ -82,6 +83,14 @@ export default function App() {
   const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
   const [notes, setNotes] = useStoredJson<Notes>('orbit.notes', {})
   const [notesOpen, setNotesOpen] = useState(false)
+  // The introduction opens on the first visit, but not on a deep link (a shared link or the deck screenshots
+  // go straight to what they show). More > About ORBIT opens it again.
+  const [introSeen, setIntroSeen] = useStoredJson('orbit.introSeen', false)
+  const [introOpen, setIntroOpen] = useState(() => !introSeen && !window.location.hash.includes('?'))
+  const closeIntro = useCallback(() => {
+    setIntroOpen(false)
+    setIntroSeen(true)
+  }, [setIntroSeen])
   const [moreOpen, setMoreOpen] = useState(false)
   /** Testing: "Reset my symptoms" asks once more before clearing. */
   const [confirmReset, setConfirmReset] = useState(false)
@@ -275,6 +284,8 @@ export default function App() {
         </button>
       </nav>
 
+      {introOpen && <Intro persona={demo.data.persona} onClose={closeIntro} />}
+
       {notesOpen && <PrivateNoteSheet day={day} notes={notes} onChange={setNotes} onClose={() => setNotesOpen(false)} />}
 
       {moreOpen && (
@@ -295,6 +306,16 @@ export default function App() {
               }}
             >
               {t('more.notes')}
+            </button>
+            <button
+              type="button"
+              className="button ghost wide"
+              onClick={() => {
+                closeMore()
+                setIntroOpen(true)
+              }}
+            >
+              {t('more.intro')}
             </button>
           </div>
           <div className="more-row">
