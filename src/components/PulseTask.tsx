@@ -166,13 +166,10 @@ export function PulseTask({ day, baselineMs, sessions, onSessionsChange }: Props
   return (
     <div className="pulse-intro">
       <p lang="en">{PULSE_SPEC.intro_en}</p>
-      <p className="muted" lang="en">
-        {PULSE_SPEC.same_time_of_day_en} {PULSE_SPEC.note_en}
-      </p>
-      <div className="actions">
-        <button type="button" className="button" onClick={() => (setMessage(undefined), setMode('running'))}>
-          {t('pulse.start')}
-        </button>
+      <button type="button" className="button wide" onClick={() => (setMessage(undefined), setMode('running'))}>
+        {t('pulse.start')}
+      </button>
+      <div className="pulse-alt">
         <button type="button" className="button secondary" onClick={() => (setMessage(undefined), setMode('trial'))}>
           {t('pulse.trial')}
         </button>
@@ -181,7 +178,7 @@ export function PulseTask({ day, baselineMs, sessions, onSessionsChange }: Props
         </button>
       </div>
       {message && (
-        <div role="status" lang="en">
+        <div role="status" lang="en" className="pulse-message">
           {message.lines.map((l) => (
             <p key={l}>{l}</p>
           ))}

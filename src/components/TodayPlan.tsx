@@ -20,7 +20,7 @@ interface Props {
 const REMINDER: Record<Exclude<Reminder['id'], 'pain_again'>, { text: StringKey; href: string }> = {
   safety: { text: 'plan.safety', href: '#/boost' },
   checkin: { text: 'plan.checkin', href: '#/mind' },
-  pulse: { text: 'plan.pulse', href: '#/mind' },
+  pulse: { text: 'plan.pulse', href: '#/mind?focus=pulse' },
   did_it_help: { text: 'plan.didItHelp', href: '#/boost' },
 }
 
