@@ -6,7 +6,6 @@ import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbi
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { applyPulse, type PulseSession } from './orbit/pulse'
 import { applySymptoms, type SymptomLog } from './orbit/body'
-import type { SymptomPlaces } from './orbit/regions'
 import { careSummary } from './orbit/care'
 import { LanguageToggle } from './components/LanguageToggle'
 import { Logo } from './components/Logo'
@@ -55,7 +54,6 @@ export default function App() {
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
   const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
   const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
-  const [symptomPlaces, setSymptomPlaces] = useStoredJson<SymptomPlaces>('orbit.symptomPlaces', {})
   const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
   const [theme, setTheme] = useTheme()
 
@@ -133,7 +131,7 @@ export default function App() {
             onDemoClockChange={setDemoClock}
           />
         ) : active.id === 'body' ? (
-          <BodyMap demo={demo} day={day} log={symptomLog} onLogChange={setSymptomLog} places={symptomPlaces} onPlacesChange={setSymptomPlaces} />
+          <BodyMap demo={demo} day={day} log={symptomLog} onLogChange={setSymptomLog} />
         ) : active.id === 'play' ? (
           <Play
             key={`${route.board ?? 0}-${route.solved}`}

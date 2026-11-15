@@ -1,22 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type KeyboardEvent } from 'react'
 import { isRedFlag, SYSTEMS, systemColor, systemRisks, type SymptomLog, type SystemId } from '../orbit/body'
 import { getIndicator, type Color } from '../orbit/config'
 import { COLOR_SYMBOL } from '../orbit/display'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay } from '../orbit/engine'
-import {
-  getRegion,
-  loggedIn,
-  logInRegion,
-  placesOf,
-  REGIONS,
-  regionColor,
-  symptomDays,
-  unlogInRegion,
-  type RegionId,
-  type SymptomPlaces,
-} from '../orbit/regions'
-import { AnatomyFigure, type Layer } from '../components/AnatomyFigure'
 import { useI18n } from '../i18n/context'
 
 interface Props {
@@ -24,108 +11,110 @@ interface Props {
   day: number
   log: SymptomLog
   onLogChange: (log: SymptomLog) => void
-  places: SymptomPlaces
-  onPlacesChange: (places: SymptomPlaces) => void
 }
 
-const LAYERS: Layer[] = ['status', 'bone', 'fluid', 'symptoms']
-const HRP_RISKS_URL = 'https://www.nasa.gov/hrp/risks/'
+/** Hotspot position of each system on the figure (viewBox 0 0 200 400). */
+const SPOTS: Record<SystemId, { x: number; y: number; r: number }> = {
+  brain: { x: 100, y: 34, r: 13 },
+  eyes: { x: 100, y: 62, r: 9 },
+  heart: { x: 114, y: 136, r: 14 },
+  immune: { x: 44, y: 186, r: 12 },
+  gut: { x: 100, y: 196, r: 15 },
+  musculoskeletal: { x: 82, y: 300, r: 13 },
+}
 
-/**
- * Body map: 17 regions, front and back, with four layers (status, muscle and bone, fluids, symptoms).
- * A region shows the state of its systems; context layers never change a state. Symptoms use the
- * fixed vocabulary of the rules file and remember the region where they were felt.
- */
-export function BodyMap({ demo, day, log, onLogChange, places, onPlacesChange }: Props) {
-  const { t, tr } = useI18n()
-  const [selected, setSelected] = useState<RegionId>('chest')
-  const [layer, setLayer] = useState<Layer>('status')
+/** Six-system human figure. Each system shows its state, what ORBIT watches, its HRP risk, and symptom buttons. */
+export function BodyMap({ demo, day, log, onLogChange }: Props) {
+  const { t } = useI18n()
+  const [selected, setSelected] = useState<SystemId>('heart')
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
-  const symptomsToday = data.days.find((d) => d.day === day)?.symptoms ?? []
+  const record = data.days.find((d) => d.day === day)
+  const symptomsToday = record?.symptoms ?? []
   const logged = log[day] ?? []
-  const systemColors = Object.fromEntries(SYSTEMS.map((s) => [s.id, systemColor(s, result, symptomsToday)])) as Record<SystemId, Color>
-  const colors = Object.fromEntries(REGIONS.map((g) => [g.id, regionColor(g, result, symptomsToday)])) as Record<RegionId, Color>
-  const counts = useMemo(() => symptomDays(data, places, day), [data, places, day])
-  const region = getRegion(selected)
-  const systems = SYSTEMS.filter((s) => region.systems.includes(s.id))
-  const indicators = [...new Set(systems.flatMap((s) => s.indicators))]
-  const risks = [...new Set(systems.flatMap(systemRisks))]
-  const notes = [...region.context, ...(region.fluid >= 2 && !region.context.includes('fluid') ? (['fluid'] as const) : [])]
-  const here = (s: string) => loggedIn(s, selected, day, log, places)
+  const colors = Object.fromEntries(SYSTEMS.map((s) => [s.id, systemColor(s, result, symptomsToday)])) as Record<SystemId, Color>
+  const system = SYSTEMS.find((s) => s.id === selected)!
+  const name = (id: SystemId) => t(`body.${id}`)
 
-  const apply = (next: { log: SymptomLog; places: SymptomPlaces }) => {
-    if (next.log !== log) onLogChange(next.log)
-    if (next.places !== places) onPlacesChange(next.places)
+  const add = (symptom: string) => {
+    const s = symptom.trim().toLowerCase()
+    if (s && !logged.includes(s)) onLogChange({ ...log, [day]: [...logged, s] })
   }
-  const toggle = (s: string) =>
-    apply(here(s) ? unlogInRegion(s, selected, day, log, places) : logInRegion(s, selected, day, log, places))
-  const removeAll = (s: string) => {
-    onLogChange({ ...log, [day]: logged.filter((x) => x !== s) })
-    const dayPlaces = { ...(places[day] ?? {}) }
-    delete dayPlaces[s]
-    onPlacesChange({ ...places, [day]: dayPlaces })
+  const remove = (symptom: string) => onLogChange({ ...log, [day]: logged.filter((s) => s !== symptom) })
+  const keyActivate = (id: SystemId) => (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      setSelected(id)
+    }
   }
-  const where = (s: string) =>
-    placesOf(s, day, places)
-      .map((g) => tr(getRegion(g).label))
-      .join(', ')
 
   return (
     <div className="bodymap">
-      <section className="bodymap-figure" aria-labelledby="body-title">
-        <div className="anat-head">
-          <h2 id="body-title">{t('body.title', { day })}</h2>
-          <div className="segmented" role="group" aria-label={t('body.layers')}>
-            {LAYERS.map((l) => (
-              <button key={l} type="button" aria-pressed={layer === l} onClick={() => setLayer(l)}>
-                {t(`body.layer.${l}`)}
-              </button>
-            ))}
-          </div>
-        </div>
-        <p className="systems-line" aria-label={t('body.systemsAria')}>
+      <section className="bodymap-figure" aria-label={t('body.title', { day })}>
+        <h2>{t('body.title', { day })}</h2>
+        <svg viewBox="0 0 200 400" className="figure" role="group" aria-label={t('body.figure')}>
+          <g className="silhouette" aria-hidden="true">
+            <circle cx="100" cy="46" r="32" />
+            <rect x="90" y="76" width="20" height="14" rx="4" />
+            <rect x="62" y="88" width="76" height="140" rx="26" />
+            <rect x="34" y="96" width="22" height="120" rx="11" />
+            <rect x="144" y="96" width="22" height="120" rx="11" />
+            <rect x="68" y="222" width="28" height="150" rx="13" />
+            <rect x="104" y="222" width="28" height="150" rx="13" />
+          </g>
+          {SYSTEMS.map((s) => {
+            const p = SPOTS[s.id]
+            const c = colors[s.id]
+            return (
+              <g
+                key={s.id}
+                className={`spot color-${c}${selected === s.id ? ' selected' : ''}`}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selected === s.id}
+                aria-label={`${name(s.id)}: ${t(`color.${c}`)}`}
+                onClick={() => setSelected(s.id)}
+                onKeyDown={keyActivate(s.id)}
+              >
+                <circle cx={p.x} cy={p.y} r={p.r} />
+                <text x={p.x} y={p.y + 4} textAnchor="middle" aria-hidden="true">
+                  {COLOR_SYMBOL[c]}
+                </text>
+              </g>
+            )
+          })}
+        </svg>
+        <ul className="system-list">
           {SYSTEMS.map((s) => (
-            <span key={s.id} className={`sys color-${systemColors[s.id]}`}>
-              <span aria-hidden="true">{COLOR_SYMBOL[systemColors[s.id]]}</span> {t(`body.${s.id}`)}
-            </span>
+            <li key={s.id}>
+              <button type="button" className={`system-btn color-${colors[s.id]}`} aria-pressed={selected === s.id} onClick={() => setSelected(s.id)}>
+                <span aria-hidden="true">{COLOR_SYMBOL[colors[s.id]]}</span> {name(s.id)} · {t(`color.${colors[s.id]}`)}
+              </button>
+            </li>
           ))}
-        </p>
-        <div className="anat-figs" aria-label={t('body.figure')}>
-          <AnatomyFigure view="front" layer={layer} colors={colors} selected={selected} onSelect={setSelected} counts={counts} />
-          <AnatomyFigure view="back" layer={layer} colors={colors} selected={selected} onSelect={setSelected} counts={counts} />
-        </div>
-        <p className="anat-legend">{t(`body.legend.${layer}`)}</p>
+        </ul>
       </section>
 
       <section className={`bodymap-detail card color-${colors[selected]}`} aria-live="polite">
         <header className="card-head">
-          <h2>{tr(region.label)}</h2>
+          <h2>{name(selected)}</h2>
           <span className="badge">
             <span aria-hidden="true">{COLOR_SYMBOL[colors[selected]]}</span> {t(`color.${colors[selected]}`)}
           </span>
         </header>
 
-        {systems.length > 0 ? (
-          <p className="muted">
-            {t('body.systems')} {systems.map((s) => t(`body.${s.id}`)).join(' · ')}
-          </p>
-        ) : (
-          <p className="muted">{t('body.noData')}</p>
-        )}
-
-        {indicators.length > 0 && (
+        {system.indicators.length > 0 ? (
           <>
             <h3>{t('body.watches')}</h3>
             <ul className="watch-list">
-              {indicators.map((id) => {
+              {system.indicators.map((id) => {
                 const def = getIndicator(id)
-                const res = result.indicators[id]
+                const r = result.indicators[id]
                 return (
                   <li key={id}>
-                    <strong lang="en">{def.label_en}</strong> · {t(`color.${res?.color ?? 'none'}`)}
+                    <strong lang="en">{def.label_en}</strong> · {t(`color.${r?.color ?? 'none'}`)}
                     <br />
-                    <span lang="en">{res?.reason}</span>
+                    <span lang="en">{r?.reason}</span>
                     <br />
                     <span className="muted">
                       {t('body.how')} <span lang="en">{def.input}</span>
@@ -135,67 +124,49 @@ export function BodyMap({ demo, day, log, onLogChange, places, onPlacesChange }:
               })}
             </ul>
           </>
+        ) : (
+          <p className="muted">{t('body.noIndicator')}</p>
         )}
 
-        {risks.length > 0 && (
-          <p>
-            <strong>{t('card.risk')}</strong>{' '}
-            {risks.map((risk, i) => (
-              <span key={risk}>
-                {i > 0 && ' · '}
-                <a href={HRP_RISKS_URL} target="_blank" rel="noreferrer" lang="en">
-                  {risk}
-                </a>
-              </span>
+        <p>
+          <strong>{t('card.risk')}</strong>{' '}
+          {systemRisks(system).map((risk, i) => (
+            <span key={risk}>
+              {i > 0 && ' · '}
+              <a href="https://www.nasa.gov/hrp/risks/" target="_blank" rel="noreferrer" lang="en">
+                {risk}
+              </a>
+            </span>
+          ))}
+        </p>
+
+        <h3>{t('body.log')}</h3>
+        {system.symptoms.length > 0 && (
+          <div className="actions symptom-buttons">
+            {system.symptoms.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className={`button secondary${isRedFlag(s) ? ' alarm' : ''}`}
+                aria-pressed={logged.includes(s)}
+                onClick={() => (logged.includes(s) ? remove(s) : add(s))}
+                lang="en"
+              >
+                {isRedFlag(s) && <span aria-hidden="true">■ </span>}
+                {s}
+              </button>
             ))}
-          </p>
-        )}
-
-        {notes.length > 0 && (
-          <div className="context-notes">
-            <h3>{t('body.context')}</h3>
-            <ul>
-              {notes.map((n) => (
-                <li key={n}>
-                  {t(`body.ctx.${n}`)} <span className="pending">{t('body.pending')}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         )}
-
-        {region.symptoms.length > 0 && (
-          <>
-            <h3>{t('body.logHere')}</h3>
-            <div className="actions symptom-buttons">
-              {region.symptoms.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`button secondary${isRedFlag(s) ? ' alarm' : ''}`}
-                  aria-pressed={here(s)}
-                  onClick={() => toggle(s)}
-                  lang="en"
-                >
-                  {isRedFlag(s) && <span aria-hidden="true">■ </span>}
-                  {s}
-                </button>
-              ))}
-            </div>
-            <p className="muted">{t('body.alarmNote')}</p>
-          </>
-        )}
+        <p className="muted">{t('body.alarmNote')}</p>
 
         {logged.length > 0 && (
           <div role="status">
             <p>
-              <strong>{t('body.logged', { day })}</strong>
-            </p>
-            <p>
+              <strong>{t('body.logged', { day })}</strong>{' '}
               {logged.map((s) => (
-                <button key={s} type="button" className="chip" onClick={() => removeAll(s)} aria-label={t('body.remove', { s })}>
-                  <span lang="en">{s}</span>
-                  {where(s) && <span className="muted"> · {where(s)}</span>} ✕
+                <button key={s} type="button" className="chip" onClick={() => remove(s)} aria-label={t('body.remove', { s })}>
+                  {s} ✕
                 </button>
               ))}
             </p>
@@ -206,18 +177,6 @@ export function BodyMap({ demo, day, log, onLogChange, places, onPlacesChange }:
             )}
           </div>
         )}
-      </section>
-      <section className="bodymap-list" aria-label={t('body.regionsList')}>
-        <ul className="system-list region-list">
-          {REGIONS.map((g) => (
-            <li key={g.id}>
-              <button type="button" className={`system-btn color-${colors[g.id]}`} aria-pressed={selected === g.id} onClick={() => setSelected(g.id)}>
-                <span aria-hidden="true">{COLOR_SYMBOL[colors[g.id]]}</span> {tr(g.label)}
-                {counts[g.id] ? <span className="muted"> · {t('body.symptomDays', { n: counts[g.id]! })}</span> : null}
-              </button>
-            </li>
-          ))}
-        </ul>
       </section>
     </div>
   )
