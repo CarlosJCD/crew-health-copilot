@@ -82,7 +82,7 @@ export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
           {plan.escalate.map((c) => (
             <article key={c.id} className="card color-red">
               <BoostCardBody card={c} />
-              <a className="button" href={c.id === 'talk_now' ? '#/mind' : '#/transmit'}>
+              <a className="button" href={c.id === 'talk_now' ? '#/mind?focus=talk' : '#/transmit'}>
                 {c.id === 'talk_now' ? t('state.choose') : t('boost.openTransmit')}
               </a>
             </article>

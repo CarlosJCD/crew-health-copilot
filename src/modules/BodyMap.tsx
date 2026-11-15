@@ -45,7 +45,7 @@ const CTA: Record<Exclude<OrbitState, 'GREEN'>, { text: StringKey; href: string 
   YELLOW: { text: 'home.cta.YELLOW', href: '#/boost' },
   EARLY_SIGNAL: { text: 'home.cta.EARLY_SIGNAL', href: '#/boost' },
   RED_PHYSICAL: { text: 'home.contactCmo', href: '#/transmit' },
-  RED_PSYCH: { text: 'home.cta.RED_PSYCH', href: '#/mind' },
+  RED_PSYCH: { text: 'home.cta.RED_PSYCH', href: '#/mind?focus=talk' },
 }
 
 /** On a green day the main button is the next thing still pending, or "All done for today". */
@@ -54,7 +54,7 @@ function greenAction(reminders: Reminder[]): { text: StringKey; href?: string; p
   if (!next) return { text: 'home.cta.done' }
   if (next.id === 'safety') return { text: 'home.cta.safety', href: '#/boost' }
   if (next.id === 'checkin') return { text: 'home.cta.GREEN', href: '#/mind' }
-  if (next.id === 'pulse') return { text: 'home.cta.pulse', href: '#/mind' }
+  if (next.id === 'pulse') return { text: 'home.cta.pulse', href: '#/mind?focus=pulse' }
   if (next.id === 'did_it_help') return { text: 'home.cta.help', href: '#/boost' }
   return { text: 'home.cta.painAgain', pain: true }
 }
