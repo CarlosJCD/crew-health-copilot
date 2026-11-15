@@ -607,13 +607,26 @@ h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
 
 /* Wide screens: the navigation is a floating island on the left instead of the bottom bar. */
 @media (min-width: 1024px) {
-  .app { max-width: 1100px; padding: 0 1.5rem 1.5rem calc(96px + 2rem); }
-  .bottom-nav { top: 50%; bottom: auto; left: 1rem; right: auto; transform: translateY(-50%); width: 84px; height: auto;
-    flex-direction: column; justify-content: center; gap: 0.35rem; padding: 0.6rem 0; border: 1px solid var(--line);
-    border-radius: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
-  .bottom-nav a, .bottom-nav button { flex: 0 0 auto; padding: 0.6rem 0; margin: 0 8px; border-radius: 18px; }
+  .app { max-width: 1100px; padding: 0 calc(180px + 1.5rem) 1.5rem calc(64px + 2rem); }
+  .bottom-nav { top: 50%; bottom: auto; left: 1rem; right: auto; transform: translateY(-50%); width: 60px; height: auto;
+    flex-direction: column; justify-content: center; gap: 0.25rem; padding: 0.45rem 0; border: 1px solid var(--line);
+    border-radius: 999px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+  .bottom-nav a, .bottom-nav button { flex: 0 0 auto; width: 50px; height: 50px; margin: 0 auto; padding: 0; border-radius: 50%;
+    gap: 0.05rem; font-size: 0.58rem; }
+  .bottom-nav svg { width: 20px; height: 20px; }
   .bottom-nav [aria-current='page'] { background: color-mix(in oklab, var(--accent) 14%, transparent); }
   .home-actions { bottom: 1rem; }
 }
 :root[data-theme='light'] .bottom-nav { box-shadow: 0 10px 30px rgba(23, 23, 27, 0.12); }
 .home-main { width: 100%; display: grid; justify-items: center; gap: 0.4rem; }
+
+/* "For today" and the tank: a small column on the right of the main view on wider screens. */
+@media (min-width: 720px) {
+  .today-strip { position: fixed; z-index: 25; right: 1rem; top: 50%; transform: translateY(-50%); flex-direction: column; align-items: stretch;
+    gap: 0.5rem; margin: 0; width: 168px; }
+  .today-strip .strip-btn { flex-direction: column; align-items: flex-start; gap: 0.15rem; border-radius: 20px; padding: 0.7rem 0.95rem;
+    text-align: left; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+  .today-strip .tank-mini { flex-direction: row; align-items: center; gap: 0.5rem; }
+  :root[data-theme='light'] .today-strip .strip-btn { box-shadow: 0 10px 30px rgba(23, 23, 27, 0.1); }
+}
+@media (min-width: 720px) and (max-width: 1023px) { .app { padding-right: calc(168px + 2rem); } }
