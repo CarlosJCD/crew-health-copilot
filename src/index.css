@@ -746,3 +746,5 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .pain-other .button { margin: 0; }
 
 .scale-all { margin: 0.4rem 0 0.2rem; font-size: 0.85rem; }
+/* The logo ring is the O: a little bigger than the letters. */
+.topbar .wordmark .logo { width: 1.18em; height: 1.18em; margin-right: 0.04em; top: 0; }
