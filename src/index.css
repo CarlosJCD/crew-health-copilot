@@ -1210,3 +1210,38 @@ div.tx-share-row { cursor: default; }
 .sheet .tile-grid { gap: 0.4rem; }
 .sheet .tile { padding-inline: 0.2rem; font-size: 0.8rem; overflow-wrap: normal; word-break: keep-all; }
 @media (max-width: 420px) { .sheet .tile { font-size: 0.74rem; } }
+
+/* ---- Today: a bigger body, everything around it smaller, so nothing scrolls. The top bar, the state line,
+   the main button and the fine print shrink; from tablets up "For today", the tank and Front / Back sit right
+   beside the body (placed from the body's own width, so they stay next to it) instead of in rows above it.
+   --fig-h is still set from the screen height only, calibrated on the busiest story day. ---- */
+.app.route-body { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 0.15rem); }
+.app.route-body .topbar { padding: 0.35rem 0; margin-bottom: 0.15rem; }
+.app.route-body .topbar .wordmark { font-size: 1.45rem; }
+.app.route-body .hero { margin-top: 0; }
+.app.route-body .hero-state { font-size: clamp(1.3rem, 3.4vw, 1.75rem); gap: 0.45rem; line-height: 1.15; }
+.app.route-body .hero-sub { margin-top: 0.05rem; font-size: 0.86rem; line-height: 1.3; }
+.app.route-body .hero-who { margin-top: 0.05rem; font-size: 0.8rem; }
+.app.route-body .home, .app.route-body .home-main { gap: 0.1rem; }
+.app.route-body .paint-hint { margin: 0.05rem 0 0; font-size: 0.8rem; }
+.app.route-body .figure { margin-top: 0.1rem; }
+.app.route-body .home-actions { margin-top: 0.1rem; padding-top: 0.25rem; }
+.app.route-body .home-actions .button.big { min-height: 46px; padding-block: 0.45rem; font-size: 0.98rem; }
+.app.route-body .fineprint { margin: 0.05rem 0 0; font-size: 0.68rem; }
+@media (min-width: 720px) {
+  .app.route-body .figure-stage { position: relative; width: 100%; }
+  .app.route-body .figure-stage > .segmented { position: absolute; z-index: 3; top: 1.8rem; left: auto; right: calc(50% + var(--fig-h) * 0.25 + 1rem);
+    flex-direction: column; border-radius: 22px; }
+  .app.route-body .figure-stage > .segmented button { min-width: 0; width: 88px; min-height: 44px; padding: 0 0.4rem; font-size: 0.85rem; }
+  .app.route-body .today-strip { order: 0; position: absolute; z-index: 3; top: 1.8rem; left: calc(50% + var(--fig-h) * 0.25 + 1rem); right: auto;
+    transform: none; margin: 0; width: 150px; flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .app.route-body .today-strip .strip-btn { min-width: 0; flex-direction: column; align-items: flex-start; gap: 0.1rem; padding: 0.55rem 0.8rem;
+    border-radius: 18px; text-align: left; }
+  .app.route-body .today-strip .tank-mini { flex-direction: row; align-items: center; gap: 0.45rem; }
+}
+/* Calibrated on the busiest story day in English and Spanish (days 23 to 30): phones keep 346 px for the rest
+   of the screen, tablets and desktops 318 px. On phones the side buttons may overlap the empty corners of the
+   body's box (beside the head), so the width limit is looser. */
+.app.route-body { --fig-h: clamp(220px, calc(100dvh - 346px), 620px); }
+@media (max-width: 719px) { .app.route-body .figure { max-height: calc((100vw - 2 * 56px) / var(--ar, 0.5)); } }
+@media (min-width: 720px) { .app.route-body { --fig-h: clamp(260px, calc(100dvh - 318px), 760px); } }
