@@ -12,6 +12,9 @@ export const partKey = (slug: Slug) => `part.${zoneOf(slug)}` as StringKey
  */
 export const FIGURE = { fill: '#454545', border: '#9aa6c3', outline: '#e8ecf6' }
 
+/** Fill of a system's zones on the figure: green is muted so yellow and red stand out. */
+export const STATUS_FILL: Record<Color, string> = { green: '#2f7d62', yellow: '#f2b84b', red: '#ef5a5a', none: FIGURE.fill }
+
 /** Shape that goes with each color so the traffic light reads without color. */
 export const COLOR_SYMBOL: Record<Color, string> = { green: '●', yellow: '▲', red: '■', none: '○' }
 

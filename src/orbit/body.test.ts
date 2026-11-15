@@ -51,3 +51,22 @@ describe('logging a symptom on the body map', () => {
     expect(applySymptoms(BUILT_IN_DEMO, {})).toBe(BUILT_IN_DEMO)
   })
 })
+
+describe('body systems on the anatomical figure', () => {
+  it('paint only zones drawn on the front view, each zone in one system at most', async () => {
+    const { VIEW_PARTS } = await import('./pain')
+    const front = new Set<string>([...VIEW_PARTS.front, 'hair'])
+    const all = SYSTEMS.flatMap((s) => s.zones)
+    for (const z of all) expect(front.has(z), z).toBe(true)
+    expect(new Set(all).size).toBe(all.length)
+  })
+
+  it('a tap on a zone selects its system; arms belong to none', async () => {
+    const { systemOfZone } = await import('./body')
+    expect(systemOfZone('chest')).toBe('heart')
+    expect(systemOfZone('hair')).toBe('brain')
+    expect(systemOfZone('abs')).toBe('gut')
+    expect(systemOfZone('quadriceps')).toBe('musculoskeletal')
+    expect(systemOfZone('biceps')).toBeUndefined()
+  })
+})

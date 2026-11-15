@@ -1,7 +1,8 @@
-import { useMemo, useState, type KeyboardEvent } from 'react'
-import { isRedFlag, SYSTEMS, systemColor, systemRisks, type SymptomLog, type SystemId } from '../orbit/body'
+import { useMemo, useState } from 'react'
+import Body, { type ExtendedBodyPart } from 'react-muscle-highlighter'
+import { isRedFlag, SYSTEMS, systemColor, systemOfZone, systemRisks, type SymptomLog, type SystemId } from '../orbit/body'
 import { getIndicator, type Color, type Scenario } from '../orbit/config'
-import { COLOR_SYMBOL } from '../orbit/display'
+import { COLOR_SYMBOL, FIGURE, STATUS_FILL } from '../orbit/display'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay } from '../orbit/engine'
 import type { PainDay } from '../orbit/pain'
@@ -21,14 +22,19 @@ interface Props {
   onPainChange: (pain: PainDay) => void
 }
 
-/** Hotspot position of each system on the figure (viewBox 0 0 200 400). */
-const SPOTS: Record<SystemId, { x: number; y: number; r: number }> = {
-  brain: { x: 100, y: 34, r: 13 },
-  eyes: { x: 100, y: 62, r: 9 },
-  heart: { x: 114, y: 136, r: 14 },
-  immune: { x: 44, y: 186, r: 12 },
-  gut: { x: 100, y: 196, r: 15 },
-  musculoskeletal: { x: 82, y: 300, r: 13 },
+/**
+ * Marker of each system as a fraction of the figure's box (female front model, measured on its zones):
+ * brain on top of the head, eyes at eye level, heart on her left chest, gut on the abdomen, bone and muscle
+ * on the thigh, immune system and skin on the forearm. The marker carries the shape (● ▲ ■ ○), so the
+ * state reads without color, and it is the keyboard path to each system.
+ */
+const SPOTS: Record<SystemId, { x: number; y: number }> = {
+  brain: { x: 0.505, y: 0.072 },
+  eyes: { x: 0.505, y: 0.128 },
+  heart: { x: 0.575, y: 0.271 },
+  gut: { x: 0.505, y: 0.39 },
+  musculoskeletal: { x: 0.396, y: 0.54 },
+  immune: { x: 0.77, y: 0.393 },
 }
 
 /**
@@ -53,12 +59,14 @@ export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pa
     if (s && !logged.includes(s)) onLogChange({ ...log, [day]: [...logged, s] })
   }
   const remove = (symptom: string) => onLogChange({ ...log, [day]: logged.filter((s) => s !== symptom) })
-  const keyActivate = (id: SystemId) => (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      setSelected(id)
-    }
-  }
+  // Each system paints its zones with its state; the selected one gets an outline.
+  const zones: ExtendedBodyPart[] = SYSTEMS.flatMap((s) =>
+    s.zones.map((slug) => ({
+      slug,
+      ...(colors[s.id] !== 'none' ? { color: STATUS_FILL[colors[s.id]] } : {}),
+      ...(selected === s.id ? { styles: { stroke: FIGURE.outline, strokeWidth: 6 } } : {}),
+    })),
+  )
 
   return (
     <div className="body-home">
@@ -73,38 +81,39 @@ export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pa
       <div className="bodymap">
         <section className="bodymap-figure" aria-label={t('body.title', { day })}>
           <h2>{t('body.title', { day })}</h2>
-          <svg viewBox="0 0 200 400" className="figure" role="group" aria-label={t('body.figure')}>
-            <g className="silhouette" aria-hidden="true">
-              <circle cx="100" cy="46" r="32" />
-              <rect x="90" y="76" width="20" height="14" rx="4" />
-              <rect x="62" y="88" width="76" height="140" rx="26" />
-              <rect x="34" y="96" width="22" height="120" rx="11" />
-              <rect x="144" y="96" width="22" height="120" rx="11" />
-              <rect x="68" y="222" width="28" height="150" rx="13" />
-              <rect x="104" y="222" width="28" height="150" rx="13" />
-            </g>
-            {SYSTEMS.map((s) => {
-              const p = SPOTS[s.id]
-              const c = colors[s.id]
-              return (
-                <g
-                  key={s.id}
-                  className={`spot color-${c}${selected === s.id ? ' selected' : ''}`}
-                  role="button"
-                  tabIndex={0}
-                  aria-pressed={selected === s.id}
-                  aria-label={`${name(s.id)}: ${t(`color.${c}`)}`}
-                  onClick={() => setSelected(s.id)}
-                  onKeyDown={keyActivate(s.id)}
-                >
-                  <circle cx={p.x} cy={p.y} r={p.r} />
-                  <text x={p.x} y={p.y + 4} textAnchor="middle" aria-hidden="true">
-                    {COLOR_SYMBOL[c]}
-                  </text>
-                </g>
-              )
-            })}
-          </svg>
+          <div className="system-figure" role="group" aria-label={t('body.figure')}>
+            <Body
+              gender="female"
+              side="front"
+              scale={1.4}
+              data={zones}
+              defaultFill={FIGURE.fill}
+              border={FIGURE.border}
+              onBodyPartPress={(part) => {
+                const id = part.slug && systemOfZone(part.slug)
+                if (id) setSelected(id)
+              }}
+            />
+            <div className="spot-layer">
+              {SYSTEMS.map((s) => {
+                const p = SPOTS[s.id]
+                const c = colors[s.id]
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    className={`spot color-${c}${selected === s.id ? ' selected' : ''}`}
+                    style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
+                    aria-pressed={selected === s.id}
+                    aria-label={`${name(s.id)}: ${t(`color.${c}`)}`}
+                    onClick={() => setSelected(s.id)}
+                  >
+                    <span aria-hidden="true">{COLOR_SYMBOL[c]}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
           <ul className="system-list">
             {SYSTEMS.map((s) => (
               <li key={s.id}>

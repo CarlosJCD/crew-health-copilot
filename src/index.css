@@ -249,12 +249,16 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 /* ORBIT: body map */
 .bodymap { display: grid; grid-template-columns: minmax(240px, 340px) 1fr; gap: 1rem; align-items: start; }
 .bodymap-figure { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.9rem 1rem; }
-.figure { width: 100%; max-width: 280px; display: block; margin: 0 auto; }
-.silhouette > * { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }
-.spot { cursor: pointer; outline: none; }
-.spot circle { fill: color-mix(in srgb, var(--status) 30%, transparent); stroke: var(--status); stroke-width: 2; }
-.spot text { fill: var(--status); font-size: 11px; font-weight: 700; pointer-events: none; }
-.spot.selected circle, .spot:focus-visible circle { stroke-width: 4; stroke: var(--text); }
+.system-figure { position: relative; width: min(100%, 280px); margin: 0 auto; }
+.system-figure svg { width: 100%; height: auto; display: block; }
+.spot-layer { position: absolute; inset: 0; pointer-events: none; }
+.spot {
+  position: absolute; transform: translate(-50%, -50%); width: 8%; aspect-ratio: 1; padding: 0;
+  display: grid; place-items: center; border-radius: 50%; pointer-events: auto; cursor: pointer;
+  border: 2px solid var(--status); background: color-mix(in srgb, var(--bg) 70%, transparent);
+  color: var(--status); font: 700 0.62rem/1 system-ui, sans-serif;
+}
+.spot.selected, .spot:focus-visible { border-color: var(--text); border-width: 3px; outline: none; box-shadow: 0 0 0 2px var(--status); }
 .system-list { list-style: none; padding: 0; margin: 0.6rem 0 0; display: grid; gap: 0.3rem; }
 .system-btn { width: 100%; text-align: left; background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-left: 4px solid var(--status); border-radius: 8px; padding: 0.35rem 0.6rem; cursor: pointer; font: inherit; font-size: 0.88rem; }
 .system-btn[aria-pressed='true'] { border-color: var(--accent); border-left-color: var(--status); }
