@@ -5,11 +5,13 @@ import { applyCheckins, type Checkins } from './orbit/checkin'
 import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { applyPulse, type PulseSession } from './orbit/pulse'
+import { applySymptoms, type SymptomLog } from './orbit/body'
 import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { useStoredJson } from './hooks/useStoredJson'
 import { useI18n } from './i18n/context'
 import { Boost } from './modules/Boost'
+import { BodyMap } from './modules/BodyMap'
 import { Mind } from './modules/Mind'
 import { Placeholder } from './modules/Placeholder'
 import { Today } from './modules/Today'
@@ -43,6 +45,7 @@ export default function App() {
   const [demoClock, setDemoClock] = useStoredJson('orbit.demoClock', true)
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
   const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
+  const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
 
   useEffect(() => {
     const onHash = () => {
@@ -66,10 +69,10 @@ export default function App() {
     }
   }, [])
 
-  // Her check-in answers and pulse sessions replace that day's values, so every module sees the same data.
+  // Her check-in answers, pulse sessions and logged symptoms replace that day's values, so every module sees the same data.
   const demo = useMemo(
-    () => ({ ...loaded, data: applyPulse(applyCheckins(loaded.data, checkins), pulseSessions) }),
-    [loaded, checkins, pulseSessions],
+    () => ({ ...loaded, data: applySymptoms(applyPulse(applyCheckins(loaded.data, checkins), pulseSessions), symptomLog) }),
+    [loaded, checkins, pulseSessions, symptomLog],
   )
   const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS.find((s) => s.id === DEFAULT_SCENARIO_ID)!
   const active = MODULES.find((m) => m.id === route.id) ?? MODULES[0]
@@ -111,6 +114,8 @@ export default function App() {
             demoClock={demoClock}
             onDemoClockChange={setDemoClock}
           />
+        ) : active.id === 'body' ? (
+          <BodyMap demo={demo} day={day} log={symptomLog} onLogChange={setSymptomLog} />
         ) : active.id === 'boost' ? (
           <Boost demo={demo} day={day} log={boostLog} onLogChange={setBoostLog} />
         ) : active.id === 'mind' ? (

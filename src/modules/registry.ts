@@ -52,7 +52,7 @@ export const MODULES: ModuleInfo[] = [
     id: 'body',
     label: { en: 'Body map', es: 'Figura humana' },
     summary: {
-      en: 'Human figure with six systems: brain and mood, eyes, heart and vessels, bone and muscle, immune and skin, gut.',
+      en: 'Human figure with six systems: brain and mood, eyes, heart and vessels, bone and muscle, immune and skin, gut and nutrition.',
       es: 'Figura humana con seis sistemas: cerebro y ánimo, ojos, corazón y vasos, hueso y músculo, inmune y piel, intestino.',
     },
     owner: { en: 'Engineering', es: 'Ingeniería' },
