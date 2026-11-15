@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-11-14T21:37:08+00:00",
+ "generated_at": "2026-11-15T02:03:59+00:00",
  "disclaimer_es": "Parámetros de documentos oficiales de NASA para apoyo a decisiones; no diagnostica.",
  "counts": {
-  "parameters": 132,
+  "parameters": 134,
   "verified": 0,
   "risks": 15,
   "tests": 12,
   "indicators": 14,
   "clinical_categories": 31,
-  "sources": 50
+  "sources": 52
  },
  "parameters": [
   {
@@ -159,14 +159,14 @@
    "type": "Valor de referencia",
    "min": 0.5,
    "max": 0.5,
-   "app_use": "Generador de datos",
+   "app_use": "Contexto educativo",
    "source": "TB-020",
    "page": "7",
    "quote": "the radiation environment exposure is approximately 0.5 mSv per day",
    "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-020-radiation-protection.pdf",
    "status": "Extraído (revisar página)",
    "captured_by": "Claude",
-   "notes": null,
+   "notes": "Referencia: ORBIT usa RAD-17 (crucero) y RAD-18 (superficie), medidas por RAD.",
    "cross_check": "Una sola fuente",
    "second_source_url": null,
    "cross_check_note": null,
@@ -182,14 +182,14 @@
    "type": "Valor de referencia",
    "min": 1.5,
    "max": 1.5,
-   "app_use": "Generador de datos",
+   "app_use": "Contexto educativo",
    "source": "TB-020",
    "page": "7",
    "quote": "1.5 mSv/day × 90 days = 135 mSv",
    "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-020-radiation-protection.pdf",
    "status": "Extraído (revisar página)",
    "captured_by": "Claude",
-   "notes": "Es un ejemplo de cálculo, no una medición.",
+   "notes": "Es un ejemplo de cálculo, no una medición. Referencia: ORBIT usa RAD-17 (crucero) y RAD-18 (superficie), medidas por RAD.",
    "cross_check": "Una sola fuente",
    "second_source_url": null,
    "cross_check_note": null,
@@ -2473,6 +2473,52 @@
    "verified": false
   },
   {
+   "id": "RAD-17",
+   "risk": "Radiación espacial",
+   "parameter": "Dosis equivalente por GCR medida en crucero a Marte (RAD, MSL)",
+   "value_text": "1.84",
+   "unit": "mSv/día",
+   "condition": "Dentro de la nave MSL, crucero 2011-2012, cerca del máximo solar",
+   "type": "Valor medido",
+   "min": 1.84,
+   "max": 1.84,
+   "app_use": "Escenario/entorno",
+   "source": "ZEITLIN2013",
+   "page": "1080 (resumen)",
+   "quote": "an average GCR dose equivalent rate of 1.8 milliSieverts per day in cruise",
+   "url": "https://doi.org/10.1126/science.1235989",
+   "status": "Cifra confirmada en dos fuentes; falta cotejar la página del artículo",
+   "captured_by": "Claude",
+   "notes": "Es la cifra que usa ORBIT en mars_transit (scenarios.json). La cita textual es del comunicado de SwRI (1.8, redondeado); 1.84 aparece en la cobertura del artículo. SEP aportó ~5 % en ese periodo.",
+   "cross_check": "Coincide",
+   "second_source_url": "https://www.swri.org/press-release/swri-led-team-calculates-radiation-exposure-associated-trip-mars",
+   "cross_check_note": "Scientific American / Space.com (Hassler 2013): 1.84 mSv por día en el viaje",
+   "verified": false
+  },
+  {
+   "id": "RAD-18",
+   "risk": "Radiación espacial",
+   "parameter": "Dosis equivalente medida en la superficie de Marte (RAD, cráter Gale)",
+   "value_text": "0.64",
+   "unit": "mSv/día",
+   "condition": "Superficie de Marte, ~300 soles desde agosto de 2012, cerca del máximo solar",
+   "type": "Valor medido",
+   "min": 0.64,
+   "max": 0.64,
+   "app_use": "Escenario/entorno",
+   "source": "HASSLER2014",
+   "page": "1244797 (resumen)",
+   "quote": "astronauts exploring the Martian surface would accumulate about 0.64 millisieverts of radiation per day",
+   "url": "https://doi.org/10.1126/science.1244797",
+   "status": "Cifra confirmada en dos fuentes; falta cotejar la página del artículo",
+   "captured_by": "Claude",
+   "notes": "Es la cifra que usa ORBIT en mars_base (scenarios.json). El comunicado de SwRI da 0.67 mSv/día solo por GCR; 0.64 es el total del artículo según la cobertura.",
+   "cross_check": "Coincide",
+   "second_source_url": "https://www.nbcnews.com/sciencemain/radiation-mars-manageable-manned-mission-curiosity-finds-2D11716674",
+   "cross_check_note": "La cita textual es de Space.com/Scientific American; phys.org (SwRI) da 0.67 solo GCR",
+   "verified": false
+  },
+  {
    "id": "BON-14",
    "risk": "Cambios óseos inducidos por el vuelo",
    "parameter": "Pérdida de DMO por sitio en la ISS (columna / cadera)",
@@ -2673,7 +2719,7 @@
    "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5701078/",
    "status": "Extraído (revisar página)",
    "captured_by": "Claude",
-   "notes": "Es temperatura central, no oral.",
+   "notes": "Es temperatura central, no oral. Pendiente P1: la base en vuelo de 37.9 °C viene de temperatura central; confirmar si aplica a la medición de la demo (oral o de frente) antes de citarla en el \"Why?\".",
    "cross_check": "Una sola fuente",
    "second_source_url": null,
    "cross_check_note": null,
@@ -2689,14 +2735,14 @@
    "type": "Umbral clínico",
    "min": 7,
    "max": null,
-   "app_use": "Alerta (semáforo)",
+   "app_use": "Contexto educativo",
    "source": "AASM2015",
    "page": "591",
    "quote": "Adults should sleep 7 or more hours per night",
    "url": "https://www.aasm.org/resources/pdf/adultsleepdurationconsensus.pdf",
    "status": "Extraído (revisar página)",
    "captured_by": "Claude",
-   "notes": null,
+   "notes": "Referencia: ORBIT usa menos de 7 h y más de 1 h bajo la línea base (orbit-indicators.json).",
    "cross_check": "Una sola fuente",
    "second_source_url": null,
    "cross_check_note": null,
@@ -2804,14 +2850,14 @@
    "type": "Umbral clínico",
    "min": null,
    "max": 6,
-   "app_use": "Alerta (semáforo)",
+   "app_use": "Contexto educativo",
    "source": "JONES2022",
    "page": "Significance",
    "quote": "sleep durations of 6 h or less are associated with slower psychomotor speed",
    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197",
    "status": "Extraído (revisar página)",
    "captured_by": "Claude",
-   "notes": null,
+   "notes": "Referencia: ORBIT usa menos de 7 h y más de 1 h bajo la línea base (orbit-indicators.json).",
    "cross_check": "Una sola fuente",
    "second_source_url": null,
    "cross_check_note": null,
@@ -2827,14 +2873,14 @@
    "type": "Umbral clínico",
    "min": null,
    "max": 5,
-   "app_use": "Alerta (semáforo)",
+   "app_use": "Contexto educativo",
    "source": "JONES2022",
    "page": "Resumen",
    "quote": "Sleep durations <5 h were associated with elevated negative somatic",
    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197",
    "status": "Extraído (revisar página)",
    "captured_by": "Claude",
-   "notes": null,
+   "notes": "Referencia: ORBIT usa menos de 7 h y más de 1 h bajo la línea base (orbit-indicators.json).",
    "cross_check": "Una sola fuente",
    "second_source_url": null,
    "cross_check_note": null,
@@ -3075,7 +3121,9 @@
     "RAD-13",
     "RAD-14",
     "RAD-15",
-    "RAD-16"
+    "RAD-16",
+    "RAD-17",
+    "RAD-18"
    ]
   },
   {
@@ -3381,13 +3429,13 @@
    "id": "radiacion_acumulada",
    "name": "Dosis de radiación acumulada",
    "inputs": "Días de misión; dosis del dosímetro (opcional); dosis de misiones anteriores",
-   "calculation": "Dosis = dosímetro, o días × tasa del escenario (superficie 0.5, tránsito 1.5 mSv/día). % = total ÷ 600",
+   "calculation": "Dosis = dosímetro, o días × tasa del escenario (superficie 0.64, tránsito 1.84 mSv/día, RAD). % = total ÷ 600",
    "parameter_ids": [
     "RAD-01",
     "RAD-05",
     "RAD-06",
-    "RAD-07",
-    "RAD-08"
+    "RAD-17",
+    "RAD-18"
    ],
    "status_rules": "Verde < 80 % del límite · Amarillo ≥ 80 % o tasa sobre el límite de diseño · Rojo ≥ 100 %",
    "escalates_to": "Oficial médico"
@@ -3556,7 +3604,8 @@
    "evaluate_on": "valor",
    "has_clinical_categories": "Sí",
    "sources": "AASM2015; BARGER2014; JONES2022",
-   "provenance": "Valores en vuelo y cortes: fuente. DE mínima, promedio y confirmación: diseño"
+   "provenance": "Valores en vuelo y cortes: fuente. DE mínima, promedio y confirmación: diseño",
+   "orbit_note": "smooth_n y las categorías son referencia; ORBIT evalúa cada noche contra la línea base."
   },
   {
    "id": "hr",
@@ -3576,7 +3625,8 @@
    "evaluate_on": "valor",
    "has_clinical_categories": "Sí",
    "sources": "MAYO-FC; NORSK2015",
-   "provenance": "Cortes: fuente. DE y confirmación: diseño"
+   "provenance": "Cortes: fuente. DE y confirmación: diseño",
+   "orbit_note": "sd_floor, confirm_n y las categorías son referencia; ORBIT usa 10 lpm sobre la línea base."
   },
   {
    "id": "sbp",
@@ -3656,7 +3706,8 @@
    "evaluate_on": "valor",
    "has_clinical_categories": "Sí",
    "sources": "CDC-FIEBRE; CLEVELAND-FIEBRE; MEDLINEPLUS-FIEBRE; STAHN2017",
-   "provenance": "Cortes: fuente. El ajuste de +1 °C no se aplica porque es temperatura central, no oral"
+   "provenance": "Cortes: fuente. El ajuste de +1 °C no se aplica porque es temperatura central, no oral",
+   "orbit_note": "Colores de ORBIT: orbit-indicators.json (contra la base en vuelo). Las categorías de fiebre de este catálogo son referencia en Tierra."
   },
   {
    "id": "mood",
@@ -3741,11 +3792,11 @@
   {
    "id": "contact",
    "name": "Contacto con la red de apoyo",
-   "unit": "mensajes/semana",
+   "unit": "mensajes en las 24 h previas",
    "domain": "social",
    "direction": "low_bad",
    "how_measured": "Registro de la app",
-   "frequency": "Semanal",
+   "frequency": "Diaria",
    "typical_inflight": "Sin dato",
    "expected_inflight_shift": null,
    "sd_floor": 2,
@@ -3756,7 +3807,8 @@
    "evaluate_on": "valor",
    "has_clinical_categories": "No: solo línea base personal",
    "sources": "(pendiente psicólogas)",
-   "provenance": "Todo: diseño"
+   "provenance": "Todo: diseño",
+   "orbit_note": "Misma unidad que demo-data.json. Rango plausible sin cambio (0 a 200)."
   },
   {
    "id": "exercise",
@@ -3986,7 +4038,7 @@
    "confirm_n": 1,
    "source": "MAYO-FC",
    "quote": "very fit athletes may have a resting heart rate closer to 40",
-   "note": "Mayo indica consultar si no eres atleta entrenado; las caídas reales las detecta la línea base personal.",
+   "note": "Mayo indica consultar si no eres atleta entrenado; las caídas reales las detecta la línea base personal. Referencia: ORBIT usa 10 lpm o más sobre la línea base; rojo con > 100 dos días o < 60 con mareo.",
    "url": "https://mayoclinic.org/health/heart-rate/AN01906/"
   },
   {
@@ -3999,7 +4051,7 @@
    "confirm_n": 1,
    "source": "MAYO-FC",
    "quote": "ranges from 60 to 100 beats per minute for adults",
-   "note": null,
+   "note": "Referencia: ORBIT usa 10 lpm o más sobre la línea base; rojo con > 100 dos días o < 60 con mareo.",
    "url": "https://mayoclinic.org/health/heart-rate/AN01906/"
   },
   {
@@ -4012,7 +4064,7 @@
    "confirm_n": 2,
    "source": "MAYO-FC",
    "quote": "regularly above 100 beats per minute",
-   "note": "Mayo recomienda consultar si es habitual.",
+   "note": "Mayo recomienda consultar si es habitual. Referencia: ORBIT usa 10 lpm o más sobre la línea base; rojo con > 100 dos días o < 60 con mareo.",
    "url": "https://mayoclinic.org/health/heart-rate/AN01906/"
   },
   {
@@ -4129,7 +4181,7 @@
    "confirm_n": 1,
    "source": "JONES2022",
    "quote": "Sleep durations <5 h were associated with elevated negative somatic",
-   "note": "Promedio de 3 noches.",
+   "note": "Promedio de 3 noches. Referencia: ORBIT compara contra la línea base personal.",
    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197"
   },
   {
@@ -4142,7 +4194,7 @@
    "confirm_n": 1,
    "source": "JONES2022",
    "quote": "sleep durations of 6 h or less are associated with slower psychomotor speed",
-   "note": null,
+   "note": "Referencia: ORBIT compara contra la línea base personal.",
    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197"
   },
   {
@@ -4155,7 +4207,7 @@
    "confirm_n": 1,
    "source": "AASM2015",
    "quote": "Adults should sleep 7 or more hours per night",
-   "note": null,
+   "note": "Referencia: ORBIT compara contra la línea base personal.",
    "url": "https://www.aasm.org/resources/pdf/adultsleepdurationconsensus.pdf"
   },
   {
@@ -4168,7 +4220,7 @@
    "confirm_n": 1,
    "source": "AASM2015",
    "quote": "Adults should sleep 7 or more hours per night",
-   "note": null,
+   "note": "Referencia: ORBIT compara contra la línea base personal.",
    "url": "https://www.aasm.org/resources/pdf/adultsleepdurationconsensus.pdf"
   },
   {
@@ -4181,7 +4233,7 @@
    "confirm_n": 1,
    "source": "CLEVELAND-FIEBRE",
    "quote": "between 99.5 degrees F (37.5 degrees C)",
-   "note": "La temperatura central sube ~1 °C en vuelo (Stahn 2017): comparar también con la línea base.",
+   "note": "La temperatura central sube ~1 °C en vuelo (Stahn 2017): comparar también con la línea base. Referencia en Tierra: ORBIT marca amarillo con más de 0.5 °C sobre la base en vuelo (37.9 °C) y rojo con ≥ 38 °C, > 0.5 °C sobre la base y síntomas (orbit-indicators.json).",
    "url": "https://my.clevelandclinic.org/health/articles/fever"
   },
   {
@@ -4194,7 +4246,7 @@
    "confirm_n": 1,
    "source": "CLEVELAND-FIEBRE",
    "quote": "between 99.5 degrees F (37.5 degrees C) and 100.3 degrees F",
-   "note": null,
+   "note": "Referencia en Tierra: ORBIT marca amarillo con más de 0.5 °C sobre la base en vuelo (37.9 °C) y rojo con ≥ 38 °C, > 0.5 °C sobre la base y síntomas (orbit-indicators.json).",
    "url": "https://my.clevelandclinic.org/health/articles/fever"
   },
   {
@@ -4207,7 +4259,7 @@
    "confirm_n": 1,
    "source": "CDC-FIEBRE",
    "quote": "measured temperature of 100.4°F [38°C] or greater",
-   "note": "En una nave también implica riesgo de contagio.",
+   "note": "En una nave también implica riesgo de contagio. Referencia en Tierra: ORBIT marca amarillo con más de 0.5 °C sobre la base en vuelo (37.9 °C) y rojo con ≥ 38 °C, > 0.5 °C sobre la base y síntomas (orbit-indicators.json).",
    "url": "https://www.cdc.gov/port-health/php/definitions-symptoms-reportable-illness/index.html"
   },
   {
@@ -4220,7 +4272,7 @@
    "confirm_n": 1,
    "source": "MEDLINEPLUS-FIEBRE",
    "quote": "Have a fever that stays at or keeps rising above 103°F",
-   "note": "103 °F = 39.4 °C.",
+   "note": "103 °F = 39.4 °C. Referencia en Tierra: ORBIT marca amarillo con más de 0.5 °C sobre la base en vuelo (37.9 °C) y rojo con ≥ 38 °C, > 0.5 °C sobre la base y síntomas (orbit-indicators.json).",
    "url": "https://medlineplus.gov/ency/article/003090.htm"
   }
  ],
@@ -4429,8 +4481,8 @@
    "identifier": "—",
    "revision": "—",
    "date": "—",
-   "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
-   "contents": "Masas, radios y distancias de la pestaña Física (por verificar)"
+   "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+   "contents": "Distancia mínima y máxima Tierra-Marte (verificadas); masas y radios por verificar"
   },
   {
    "code": "NASEM2021",
@@ -4674,6 +4726,24 @@
    "date": "—",
    "url": "https://mayoclinic.org/health/heart-rate/AN01906/",
    "contents": "FC en reposo 60 a 100 lpm"
+  },
+  {
+   "code": "ZEITLIN2013",
+   "title": "Measurements of energetic particle radiation in transit to Mars on the Mars Science Laboratory",
+   "identifier": "Science 340(6136):1080-1084",
+   "revision": "—",
+   "date": "2013",
+   "url": "https://doi.org/10.1126/science.1235989",
+   "contents": "Dosis por GCR en crucero a Marte (RAD)"
+  },
+  {
+   "code": "HASSLER2014",
+   "title": "Mars' surface radiation environment measured with the Mars Science Laboratory's Curiosity rover",
+   "identifier": "Science 343(6169):1244797",
+   "revision": "—",
+   "date": "2014",
+   "url": "https://doi.org/10.1126/science.1244797",
+   "contents": "Dosis en la superficie de Marte (RAD)"
   }
  ],
  "physics": {
@@ -4724,10 +4794,10 @@
     "round_trip_min": 6.07
    },
    "mars_farthest": {
-    "km": 401000000.0,
-    "one_way_delay_s": 1337.592,
-    "one_way_delay_min": 22.29,
-    "round_trip_min": 44.59
+    "km": 401400000.0,
+    "one_way_delay_s": 1338.926,
+    "one_way_delay_min": 22.32,
+    "round_trip_min": 44.63
    }
   },
   "scenarios": {
@@ -4760,26 +4830,30 @@
     "gravity": "microgravity",
     "distance_km": [
      54600000.0,
-     401000000.0
+     401400000.0
     ],
     "gravity_m_s2": 0.0,
     "one_way_delay_s_range": [
      182.1,
-     1337.6
-    ]
+     1338.9
+    ],
+    "demo_one_way_delay_s": 720,
+    "demo_note": "Valor del escenario de la demo (scenarios.json), no dato físico. En el deck: de 3 a 22 min; en la demo, 12 min."
    },
    "mars_base": {
     "label_es": "Base en Marte",
     "gravity": "mars",
     "distance_km": [
      54600000.0,
-     401000000.0
+     401400000.0
     ],
     "gravity_m_s2": 3.728,
     "one_way_delay_s_range": [
      182.1,
-     1337.6
-    ]
+     1338.9
+    ],
+    "demo_one_way_delay_s": 1200,
+    "demo_note": "Valor del escenario de la demo (scenarios.json), no dato físico."
    }
   },
   "formulas": {
@@ -4788,6 +4862,20 @@
    "inspired_po2": "PIO2 = 0.209 * (Pb - 47)",
    "alveolar_po2": "PAO2 = (Pb - 47) * FiO2 - 1.25 * PaCO2"
   },
-  "source_note": "Constantes físicas estándar; masas y radios de NASA Planetary Fact Sheet (por verificar)."
- }
+  "source_note": "Constantes físicas estándar. Distancias Tierra-Marte del NASA Mars Fact Sheet: mínimo 54.6 y máximo 401.4 millones de km (verificado el 14 nov 2026). Masas y radios por verificar."
+ },
+ "changelog": [
+  {
+   "date": "2026-11-14",
+   "by": "Datos (Persona 1)",
+   "changes": [
+    "RAD-17 y RAD-18 nuevos: 1.84 y 0.64 mSv/día (RAD)",
+    "RAD-07 y RAD-08 (TB-020, 0.5 y 1.5) marcados como referencia",
+    "Fiebre fija (37.5 y 38 °C) marcada como referencia en Tierra; pregunta de temperatura central u oral anotada para P1",
+    "Distancia máxima a Marte 401.0 → 401.4 millones de km (Fact Sheet); retraso de 3.0 a 22.3 min; 720 s registrado como valor de la demo",
+    "Sueño (SUE-01, SUE-06, SUE-07, categorías, smooth_n) y FC (categorías, sd_floor, confirm_n) marcados como referencia",
+    "Contacto: unidad alineada con ORBIT (mensajes en 24 h); rango plausible sin cambio"
+   ]
+  }
+ ]
 }
