@@ -4,7 +4,10 @@ import { applyCheckins, type Checkins } from './orbit/checkin'
 import { BUILT_IN_DEMO, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { LanguageToggle } from './components/LanguageToggle'
+import { Logo } from './components/Logo'
 import { ScenarioSelector } from './components/ScenarioSelector'
+import { ThemeToggle } from './components/ThemeToggle'
+import { useTheme } from './lib/theme'
 import { useStoredJson } from './hooks/useStoredJson'
 import { useI18n } from './i18n/context'
 import { Mind } from './modules/Mind'
@@ -14,6 +17,7 @@ import { Transmit } from './modules/Transmit'
 import { DEFAULT_MODULE, MODULES } from './modules/registry'
 
 export const APP_NAME = 'ORBIT'
+const APP_EXPANSION = 'Observe · Read · Boost · Iterate · Transmit'
 
 /** Route from the hash: `#/today?day=125&why=temp` (deep links for the deck and the demo). */
 function readRoute(): { id: string; day?: number; why?: string } {
@@ -38,6 +42,7 @@ export default function App() {
   const [share, setShare] = useStoredJson<ShareSettings>('orbit.share', DEFAULT_SHARE)
   const [outbox, setOutbox] = useStoredJson<Packet[]>('orbit.outbox', [])
   const [demoClock, setDemoClock] = useStoredJson('orbit.demoClock', true)
+  const [theme, setTheme] = useTheme()
 
   useEffect(() => {
     const onHash = () => {
@@ -69,13 +74,15 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand">
-          <span className="logo" aria-hidden="true">◎</span>
-          <span>{APP_NAME}</span>
-          <span className={`net ${online ? 'on' : 'off'}`}>{online ? t('net.online') : t('net.offline')}</span>
+        {/* Wordmark: the logo ring is the O of ORBIT. */}
+        <div className="wordmark" role="img" aria-label={APP_NAME} title={APP_EXPANSION}>
+          <Logo />
+          <span aria-hidden="true">{APP_NAME.slice(1)}</span>
         </div>
+        <ScenarioSelector scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} day={day} />
         <div className="topbar-controls">
-          <ScenarioSelector scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} />
+          <span className={`net ${online ? 'on' : 'off'}`}>● {online ? t('net.online') : t('net.offline')}</span>
+          <ThemeToggle theme={theme} onChange={setTheme} />
           <LanguageToggle />
         </div>
       </header>

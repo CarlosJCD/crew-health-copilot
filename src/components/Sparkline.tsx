@@ -1,3 +1,5 @@
+import { missionDayCode } from '../lib/missionDay'
+
 interface Props {
   values: { day: number; value: number }[]
   /** Personal baseline band: mean ± spread. */
@@ -26,6 +28,7 @@ export function Sparkline({ values, band, currentDay, ariaLabel }: Props) {
   const current = values.find((p) => p.day === currentDay)
 
   return (
+    <div className="spark">
     <svg className="sparkline" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel}>
       {band && (
         <rect
@@ -37,7 +40,12 @@ export function Sparkline({ values, band, currentDay, ariaLabel }: Props) {
         />
       )}
       <path className="sparkline-line" d={path} />
-      {current && <circle className="sparkline-dot" cx={x(current.day)} cy={y(current.value)} r={3} />}
+      {current && <circle className="sparkline-dot" cx={x(current.day)} cy={y(current.value)} r={3.4} />}
     </svg>
+      <div className="spark-axis" aria-hidden="true">
+        <span className="first">{missionDayCode(minX)}</span>
+        <span className="last">{missionDayCode(maxX)}</span>
+      </div>
+    </div>
   )
 }

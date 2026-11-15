@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 export const THEMES = ['dark', 'light'] as const
 export type Theme = (typeof THEMES)[number]
 
-const STORAGE_KEY = 'theme'
+const STORAGE_KEY = 'orbit.theme'
 /** Matches --head in index.css, so the browser chrome blends with the header. */
 const THEME_COLOR: Record<Theme, string> = { dark: '#000000', light: '#ffffff' }
 

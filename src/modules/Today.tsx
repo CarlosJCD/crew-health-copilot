@@ -7,6 +7,7 @@ import { DomainRing } from '../components/DomainRing'
 import { OrbitCard } from '../components/OrbitCard'
 import { StatePanel } from '../components/StatePanel'
 import { SpaceWeatherPanel } from '../components/SpaceWeatherPanel'
+import { DemoReplay } from '../components/DemoReplay'
 
 interface Props {
   demo: LoadedDemo
@@ -38,16 +39,13 @@ export function Today({ demo, day, onDayChange, scenario, openWhy }: Props) {
         })}
       </p>
 
-      <div className="day-control">
-        <label htmlFor="day">{t('day.label', { n: day })}</label>
-        <input id="day" type="range" min={first} max={last} value={day} onChange={(e) => onDayChange(Number(e.target.value))} />
-        <span className="hint">{demo.origin === 'file' ? t('day.hintFile') : t('day.hint')}</span>
+      <DemoReplay day={day} range={{ first, last }} onChange={onDayChange} hint={demo.origin === 'file' ? t('day.hintFile') : t('day.hint')}>
         {record && record.events.length > 0 && (
           <p className="log" lang="en">
             <strong>{t('day.log')}</strong> {record.events.join(' · ')}
           </p>
         )}
-      </div>
+      </DemoReplay>
 
       {demo.errors.length > 0 && (
         <details className="data-issues">
@@ -60,18 +58,19 @@ export function Today({ demo, day, onDayChange, scenario, openWhy }: Props) {
         </details>
       )}
 
-      <div className="rings">
-        {DOMAIN_IDS.map((d) => (
-          <DomainRing
-            key={d}
-            domain={d}
-            color={result.domains[d]}
-            flagged={result.flagged.filter((id) => RULES.domains[d].includes(id))}
-          />
-        ))}
+      <div className="summary-row">
+        <div className="rings">
+          {DOMAIN_IDS.map((d) => (
+            <DomainRing
+              key={d}
+              domain={d}
+              color={result.domains[d]}
+              flagged={result.flagged.filter((id) => RULES.domains[d].includes(id))}
+            />
+          ))}
+        </div>
+        <StatePanel result={result} scenario={scenario} />
       </div>
-
-      <StatePanel result={result} scenario={scenario} />
 
       {DOMAIN_IDS.map((d) => (
         <section key={d} className="domain" aria-labelledby={`domain-${d}`}>

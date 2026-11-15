@@ -15,7 +15,8 @@ const en = {
   'net.online': 'Online',
   'net.offline': 'Offline mode',
   'nav.label': 'Modules',
-  'footer': 'Prototype for NASA Space Apps Challenge 2026. Synthetic data, not a diagnostic tool. ORBIT supports decisions; it does not diagnose.',
+  'footer':
+    'Prototype for NASA Space Apps Challenge 2026. Not affiliated with or endorsed by NASA. Synthetic data, not a diagnostic tool. ORBIT supports decisions; it does not diagnose.',
 
   'scenario.label': 'Mission',
   'scenario.delay': 'Signal delay to Earth: {delay}',
@@ -149,6 +150,26 @@ const en = {
 
   'placeholder.next': 'Coming next',
   'placeholder.owner': 'Owner: {owner}',
+
+  // Redesign: header, themes, demo replay, ORBIT loop
+  'theme.label': 'Color theme',
+  'theme.dark': 'Dark',
+  'theme.light': 'Light',
+  'mission.day': 'Day',
+  'mission.signal': 'Signal to Earth, one way',
+  'demo.tag': 'Demo replay',
+  'demo.play': 'Play the demo story',
+  'demo.pause': 'Pause the replay',
+  'orbit.label': 'ORBIT loop',
+  'orbit.today': 'ORBIT today',
+  'orbit.observe': 'Observe',
+  'orbit.read': 'Read',
+  'orbit.boost': 'Boost',
+  'orbit.iterate': 'Iterate',
+  'orbit.transmit': 'Transmit',
+  'orbit.heading.observe': 'Observe: keep logging, everything is in your range.',
+  'orbit.heading.boost': 'Boost, then Iterate: act on board and check again in 24 h.',
+  'orbit.heading.transmit': 'Transmit: a person needs to know today.',
 }
 
 export type StringKey = keyof typeof en
@@ -159,7 +180,8 @@ const es: Record<StringKey, string> = {
   'net.online': 'En línea',
   'net.offline': 'Sin conexión',
   'nav.label': 'Módulos',
-  'footer': 'Prototipo para el NASA Space Apps Challenge 2026. Datos sintéticos, no es una herramienta de diagnóstico. ORBIT apoya decisiones; no diagnostica.',
+  'footer':
+    'Prototipo para el NASA Space Apps Challenge 2026. Sin afiliación ni respaldo de NASA. Datos sintéticos, no es una herramienta de diagnóstico. ORBIT apoya decisiones; no diagnostica.',
 
   'scenario.label': 'Misión',
   'scenario.delay': 'Retraso de señal a la Tierra: {delay}',
@@ -293,6 +315,26 @@ const es: Record<StringKey, string> = {
 
   'placeholder.next': 'Lo que sigue',
   'placeholder.owner': 'Responsable: {owner}',
+
+  // Rediseño: encabezado, temas, demo, ciclo ORBIT (los verbos quedan en inglés, como el nombre)
+  'theme.label': 'Tema de color',
+  'theme.dark': 'Oscuro',
+  'theme.light': 'Claro',
+  'mission.day': 'Día',
+  'mission.signal': 'Señal a la Tierra, solo ida',
+  'demo.tag': 'Demo',
+  'demo.play': 'Reproducir la historia de demostración',
+  'demo.pause': 'Pausar la reproducción',
+  'orbit.label': 'Ciclo ORBIT',
+  'orbit.today': 'ORBIT hoy',
+  'orbit.observe': 'Observe (observar)',
+  'orbit.read': 'Read (leer)',
+  'orbit.boost': 'Boost (impulsar)',
+  'orbit.iterate': 'Iterate (volver a medir)',
+  'orbit.transmit': 'Transmit (transmitir)',
+  'orbit.heading.observe': 'Observe (observar): sigue registrando, todo está en tu rango.',
+  'orbit.heading.boost': 'Boost e Iterate (impulsar y volver a medir): actúa a bordo y revisa de nuevo en 24 h.',
+  'orbit.heading.transmit': 'Transmit (transmitir): hoy una persona necesita saberlo.',
 }
 
 export const DICTIONARIES: Record<Lang, Record<StringKey, string>> = { en, es }
