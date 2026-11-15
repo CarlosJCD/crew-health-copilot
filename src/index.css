@@ -792,6 +792,8 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .link-btn { display: inline-block; margin: -0.7rem 0; padding: 0.7rem 0.1rem; border: 0; background: none; color: var(--accent);
   font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .paint-hint .infotip { vertical-align: middle; }
+/* The hint line sits above the figure and the side buttons, so its "?" bubble is never drawn under them. */
+.paint-hint { z-index: 4; }
 .paint-hint .infotip-text { left: auto; right: -0.4rem; text-align: left; }
 
 /* N6: what has no place on the figure (eyes, skin, symptoms with no zone), listed under it. */
@@ -945,3 +947,8 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .pulse-alt .link, .talk-actions .link, .mind-more .link { display: inline-flex; align-items: center; }
 #pulse-card, #talk-card { scroll-margin-top: 4.5rem; }
 .pulse-alt .link, .talk-actions .link, .mind-more .link { align-self: center; }
+
+/* Earth Window: the newest EPIC photo of Earth inside its Boost card. */
+.earth-photo { margin: 0.6rem auto 0.5rem; max-width: 240px; text-align: center; }
+.earth-photo img, .earth-photo .earth-wait { display: block; width: 100%; height: auto; aspect-ratio: 1; border-radius: 16px; background: #000; }
+.earth-photo figcaption { margin-top: 0.3rem; font-size: 0.75rem; color: var(--muted); }

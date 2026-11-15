@@ -63,6 +63,8 @@ const en = {
   'card.action': 'What to do:',
   'card.risk': 'NASA HRP risk:',
   'card.sources': 'Sources:',
+  'earth.alt': "The whole Earth seen by NASA's EPIC camera on the DSCOVR spacecraft, {when} UTC",
+  'earth.credit': 'Earth on {when} UTC · NASA EPIC (DSCOVR)',
   'card.noSources': 'Source pending (Psychology 1).',
   'card.team': 'Team criterion, pending validation:',
   'card.usual': 'your usual {value}',
@@ -195,7 +197,6 @@ const en = {
   'boost.chosen': 'Chosen',
   'boost.minutes': '{n} min',
   'boost.instant': 'No extra time',
-  'boost.confidence': 'Confidence:',
   'boost.openTransmit': 'Open Transmit',
   'state.boostYellow': 'See self-care options',
 
@@ -585,6 +586,8 @@ const es: Record<StringKey, string> = {
   'card.action': 'Qué hacer:',
   'card.risk': 'Riesgo HRP de NASA:',
   'card.sources': 'Fuentes:',
+  'earth.alt': 'La Tierra completa vista por la cámara EPIC de NASA en la nave DSCOVR, {when} UTC',
+  'earth.credit': 'La Tierra el {when} UTC · NASA EPIC (DSCOVR)',
   'card.noSources': 'Fuente pendiente (Psicología 1).',
   'card.team': 'Criterio del equipo, pendiente de validar:',
   'card.usual': 'tu normal {value}',
@@ -717,7 +720,6 @@ const es: Record<StringKey, string> = {
   'boost.chosen': 'Elegida',
   'boost.minutes': '{n} min',
   'boost.instant': 'Sin tiempo extra',
-  'boost.confidence': 'Confianza:',
   'boost.openTransmit': 'Abrir Transmit',
   'state.boostYellow': 'Ver opciones de autocuidado',
 

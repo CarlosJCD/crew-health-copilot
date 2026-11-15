@@ -39,8 +39,8 @@ export const MODULES: ModuleInfo[] = [
     id: 'boost',
     label: { en: 'Boost', es: 'Boost' },
     summary: {
-      en: 'Protective actions from the Psychology library: up to 4 cards for the day, with evidence and confidence. You choose up to two.',
-      es: 'Acciones protectoras de la biblioteca de Psicología: hasta 4 tarjetas por día, con evidencia y confianza. Tú eliges hasta dos.',
+      en: 'Protective actions from the Psychology library: up to 4 cards for the day, each with its evidence. You choose up to two.',
+      es: 'Acciones protectoras de la biblioteca de Psicología: hasta 4 tarjetas por día, cada una con su evidencia. Tú eliges hasta dos.',
     },
     owner: { en: 'Engineering (texts: Psychology 2)', es: 'Ingeniería (textos: Psicología 2)' },
     planned: [

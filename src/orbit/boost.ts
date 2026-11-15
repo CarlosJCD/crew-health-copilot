@@ -1,6 +1,7 @@
 // Boost (ORBIT stage B): protective actions she chooses. Content and rules come from Psychology,
 // copied unchanged: boost/orbit-boost-library.json (cards, triggers, display rules, safety question)
-// and boost/boost-cards.json (the offerable cards with priority and confidence in English).
+// and boost/boost-cards.json (the offerable cards with their priority). The cards' confidence ratings stay
+// in those files but are not shown (team decision, Nov 15).
 // Display rules: safety question first, then "check first" cards, then up to 4 offered cards;
 // she chooses up to 2; "Did it help?" afterwards. A red state replaces self-care with escalation.
 import library from './boost/orbit-boost-library.json'
@@ -24,7 +25,6 @@ export interface BoostCard {
   why_en: string
   sources: BoostSource[]
   priority?: 'P0' | 'P1'
-  confidence_en?: string
 }
 
 export interface Trigger {
@@ -41,13 +41,13 @@ export interface SafetyQuestion {
   sources: BoostSource[]
 }
 
-type RawCard = Omit<BoostCard, 'priority' | 'confidence_en'>
-const extra = new Map((offerable as { id: string; priority: 'P0' | 'P1'; confidence_en: string }[]).map((c) => [c.id, c]))
+type RawCard = Omit<BoostCard, 'priority'>
+const extra = new Map((offerable as { id: string; priority: 'P0' | 'P1' }[]).map((c) => [c.id, c]))
 
 export const CARDS: Record<string, BoostCard> = Object.fromEntries(
   (library.cards as unknown as RawCard[]).map((c) => {
     const e = extra.get(c.id)
-    return [c.id, { ...c, priority: e?.priority, confidence_en: e?.confidence_en }]
+    return [c.id, { ...c, priority: e?.priority }]
   }),
 )
 
