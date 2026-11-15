@@ -71,6 +71,17 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
   const [alarms, setAlarms] = useState<string[]>([])
   /** What she feels in that zone: pain and/or the symptoms of the zone. */
   const [feels, setFeels] = useState<{ pain: boolean; symptoms: string[] }>({ pain: false, symptoms: [] })
+  /** A symptom she writes in her own words, besides the fixed options. */
+  const [other, setOther] = useState('')
+  const typed = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase().slice(0, MAX_TYPED)
+  const addOther = (): string[] => {
+    const s = typed(other)
+    setOther('')
+    if (!s || feels.symptoms.includes(s)) return feels.symptoms
+    const symptoms = [...feels.symptoms, s]
+    setFeels((f) => ({ ...f, symptoms }))
+    return symptoms
+  }
   const today = painDay(pain)
   const where = whereOf(muscles, strokes, extra)
   const checks = alarmCheckFor(where.regions)
@@ -87,6 +98,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
     setDetails(EMPTY_DETAILS)
     setAlarms([])
     setFeels({ pain: false, symptoms: [] })
+    setOther('')
   }
   const save = (confirmed: string[]) => {
     const described = feels.pain ? details : { ...details, qualities: [], worse: undefined }
@@ -193,13 +205,60 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
                 {cap(s)}
               </button>
             ))}
+            {/* What she wrote herself: shown as chips she can tap again to remove. */}
+            {feels.symptoms
+              .filter((s) => !symptomsFor(where.regions).includes(s))
+              .map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className="button secondary"
+                  aria-pressed="true"
+                  aria-label={t('pain.otherRemove', { s })}
+                  onClick={() => setFeels((f) => ({ ...f, symptoms: f.symptoms.filter((x) => x !== s) }))}
+                >
+                  {cap(s)} ✕
+                </button>
+              ))}
           </div>
+          <form
+            className="pain-other"
+            onSubmit={(e) => {
+              e.preventDefault()
+              addOther()
+            }}
+          >
+            <label htmlFor="pain-other">{t('pain.otherLabel')}</label>
+            <div className="pain-other-row">
+              <input
+                id="pain-other"
+                type="text"
+                value={other}
+                maxLength={MAX_TYPED}
+                placeholder={t('pain.otherPlaceholder')}
+                autoComplete="off"
+                onChange={(e) => setOther(e.target.value)}
+              />
+              <button type="submit" className="button secondary" disabled={!typed(other)}>
+                {t('pain.otherAdd')}
+              </button>
+            </div>
+          </form>
           <p className="hint">{t('pain.whatHint')}</p>
           <div className="actions">
             <button type="button" className="button secondary" onClick={() => setStep('where')}>
               {t('pain.prev')}
             </button>
-            <button type="button" className="button" disabled={!feels.pain && !feels.symptoms.length} onClick={() => setStep('details')}>
+            <button
+              type="button"
+              className="button"
+              disabled={!feels.pain && !feels.symptoms.length && !typed(other)}
+              onClick={() => {
+                // Text left in the box counts too, without pressing "Add".
+                if (typed(other)) addOther()
+                setStep('details')
+              }}
+            >
               {t('pain.next')}
             </button>
           </div>
@@ -210,7 +269,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
         <>
           <p>
             <strong>{t('pain.whereIs', { where: whereText(where) })}</strong>
-            {feels.symptoms.length > 0 && <span lang="en"> · {feels.symptoms.map(cap).join(', ')}</span>}
+            {feels.symptoms.length > 0 && <span> · {feels.symptoms.map(cap).join(', ')}</span>}
           </p>
           <PainDetails value={details} onChange={setDetails} pain={feels.pain} />
           <div className="actions">
@@ -329,6 +388,9 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
     </section>
   )
 }
+
+/** Longest symptom she can write herself. */
+const MAX_TYPED = 60
 
 /** Symptom words of the vocabulary are lower case; shown with a capital first letter. */
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)

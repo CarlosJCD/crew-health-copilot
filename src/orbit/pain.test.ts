@@ -171,4 +171,13 @@ describe('symptoms logged where she feels them', () => {
     expect(painSymptoms(day(event({ regions: ['head'], symptoms: ['dizziness'] })))).toEqual(['pain in head', 'dizziness'])
     expect(painPacketLines(day(nausea), false)[0]).toMatch(/^Symptom: Belly, 6\/10 moderate; symptoms: nausea/)
   })
+
+  it('a symptom she writes herself travels like the others: the engine logs it and the packet carries it', () => {
+    const tingling = event({ regions: ['leg'], pain: false, symptoms: ['tingling in the toes'] })
+    expect(painSymptoms(day(tingling))).toEqual(['tingling in the toes'])
+    const r = evaluateDay(applyPain(BUILT_IN_DEMO, { 23: day(tingling) }), 23).indicators.symptoms
+    expect(r.color).toBe('green')
+    expect(r.reason).toMatch(/tingling in the toes/)
+    expect(painPacketLines(day(tingling), false)[0]).toMatch(/symptoms: tingling in the toes/)
+  })
 })

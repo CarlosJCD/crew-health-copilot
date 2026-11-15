@@ -734,3 +734,13 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
   .app.route-body .figure { max-height: calc((100vw - 2 * 76px) / var(--ar, 0.5)); }
 }
 .app.route-body .figure { margin-block: auto; }
+
+/* "Something else? Write it": a free-text symptom next to the fixed options. */
+.pain-other { display: grid; gap: 0.35rem; margin: 0.6rem 0 0.2rem; }
+.pain-other label { font-size: 0.9rem; color: var(--muted); }
+.pain-other-row { display: flex; gap: 0.5rem; }
+.pain-other input { flex: 1; min-width: 0; min-height: 44px; padding: 0 0.9rem; border-radius: 12px; border: 1px solid var(--glass-border, var(--line));
+  background: var(--glass-btn-bg, var(--panel-2)); color: var(--text); font: inherit; }
+.pain-other input::placeholder { color: var(--muted); }
+.pain-other input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pain-other .button { margin: 0; }
