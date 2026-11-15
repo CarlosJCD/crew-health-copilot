@@ -25,26 +25,32 @@ export function BoostCardBody({ card, time = true, chosen = false }: { card: Boo
       <button type="button" className="link" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {open ? t('card.hide') : t('card.why')}
       </button>
-      {open && (
-        <div className="details">
-          <p className="why" lang="en">{card.why_en}</p>
-          <p>
-            <strong>{t('card.sources')}</strong>{' '}
-            {card.sources.map((s, i) => (
-              <span key={s.cite}>
-                {i > 0 && ' · '}
-                {s.url ? (
-                  <a href={s.url} target="_blank" rel="noreferrer">
-                    {s.cite}
-                  </a>
-                ) : (
-                  s.cite
-                )}
-              </span>
-            ))}
-          </p>
-        </div>
-      )}
+      {open && <CardWhy card={card} />}
     </>
+  )
+}
+
+/** Why the card is offered, and its sources. */
+export function CardWhy({ card }: { card: BoostCard }) {
+  const { t } = useI18n()
+  return (
+    <div className="details">
+      <p className="why" lang="en">{card.why_en}</p>
+      <p>
+        <strong>{t('card.sources')}</strong>{' '}
+        {card.sources.map((s, i) => (
+          <span key={s.cite}>
+            {i > 0 && ' · '}
+            {s.url ? (
+              <a href={s.url} target="_blank" rel="noreferrer">
+                {s.cite}
+              </a>
+            ) : (
+              s.cite
+            )}
+          </span>
+        ))}
+      </p>
+    </div>
   )
 }
