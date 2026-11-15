@@ -68,10 +68,12 @@ export default function App() {
   const [demoClock, setDemoClock] = useStoredJson('orbit.demoClock', true)
   const [boostLog, setBoostLog] = useStoredJson<BoostLog>('orbit.boost', {})
   const [pulseSessions, setPulseSessions] = useStoredJson<PulseSession[]>('orbit.pulse', [])
-  const [symptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
+  const [symptomLog, setSymptomLog] = useStoredJson<SymptomLog>('orbit.symptoms', {})
   const [painLog, setPainLog] = useStoredJson<PainLog>('orbit.pain', {})
   const [boardsDone, setBoardsDone] = useStoredJson('orbit.play', 0)
   const [moreOpen, setMoreOpen] = useState(false)
+  /** Testing: "Reset my symptoms" asks once more before clearing. */
+  const [confirmReset, setConfirmReset] = useState(false)
   const [theme, setTheme] = useTheme()
   const [figure, setFigure] = useFigure()
   const [playing, setPlaying] = useState(false)
@@ -121,7 +123,11 @@ export default function App() {
   const { first, last } = dayRange(demo.data)
   const inStory = day >= STORY_DAYS.first && day <= STORY_DAYS.last
   const record = demo.data.days.find((d) => d.day === day)
-  const closeMore = useCallback(() => setMoreOpen(false), [])
+  const closeMore = useCallback(() => {
+    setMoreOpen(false)
+    setConfirmReset(false)
+  }, [])
+  const symptomCount = Object.values(painLog).reduce((n, d) => n + (d?.events?.length ?? 0), 0) + Object.values(symptomLog).reduce((n, s) => n + (s?.length ?? 0), 0)
 
   // Demo replay: from where she is to the last day; quiet days before the story pass quickly (0.7 s),
   // story days take 2.5 s each.
@@ -289,6 +295,33 @@ export default function App() {
               <strong>{t('more.log', { n: day })}</strong> <span lang="en">{record.events.join(' · ')}</span>
             </p>
           )}
+          {/* Testing: clears every symptom and pain she logged (all days), nothing else. */}
+          <div className="more-row reset-row">
+            {!confirmReset ? (
+              <button type="button" className="button ghost" disabled={symptomCount === 0} onClick={() => setConfirmReset(true)}>
+                {t('more.resetSymptoms')}
+              </button>
+            ) : (
+              <>
+                <span className="small">{t('more.resetConfirm', { n: symptomCount })}</span>
+                <button
+                  type="button"
+                  className="button danger"
+                  onClick={() => {
+                    setPainLog({})
+                    setSymptomLog({})
+                    setConfirmReset(false)
+                  }}
+                >
+                  {t('more.resetYes')}
+                </button>
+                <button type="button" className="button ghost" onClick={() => setConfirmReset(false)}>
+                  {t('more.resetNo')}
+                </button>
+              </>
+            )}
+            {symptomCount === 0 && <span className="muted small">{t('more.resetNone')}</span>}
+          </div>
           {demo.errors.length > 0 && <p className="small warn">{t('data.issues', { n: demo.errors.length })}</p>}
           <p className="muted small">{t('footer')}</p>
         </Sheet>
