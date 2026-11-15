@@ -22,10 +22,12 @@ import {
   type PainEvent,
   type PaintStroke,
 } from '../orbit/pain'
-import { DISPLAY } from '../orbit/boost'
+import { CARDS, DISPLAY } from '../orbit/boost'
 import { painSuggestions } from '../orbit/plan'
 import { useI18n } from '../i18n/context'
 import { SuggestionCard } from './SuggestionCard'
+import { BoostCardBody } from './BoostCardBody'
+import { Icon } from './Icon'
 import { MuscleSelector } from './MuscleSelector'
 import { PainDetails } from './PainDetails'
 import { PainPainter } from './PainPainter'
@@ -88,6 +90,11 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
 
   const sideText = (side?: BodySide | 'both') => (side ? ` (${t(side === 'left' ? 'pain.left' : side === 'right' ? 'pain.right' : 'pain.both')})` : '')
   const whereText = (e: Pick<PainEvent, 'regions' | 'side'>) => e.regions.map((r) => regionLabel(r, lang)).join(', ') + sideText(e.side)
+  /** "5/10 Moderate": only for a pain; a symptom alone has no strength. */
+  const strengthText = (e: PainEvent) => (isPain(e) ? `${e.intensity}/10 ${t(`pain.level.${verbalLabel(e.intensity)}`)}` : t('pain.symptomOnly'))
+  const wordsText = (e: PainEvent) => [...e.qualities.map((q) => qualityLabel(q, lang)), ...(e.symptoms ?? []).map(cap)].join(', ')
+  const last = today.events.at(-1)
+  const alarmNow = step === 'done' && !!last?.alarms.length
 
   const reset = () => {
     setStep('where')
@@ -112,7 +119,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
   return (
     <section className="pain card" aria-labelledby="pain-title">
       <h2 id="pain-title">{t('pain.title')}</h2>
-      <p className="muted">{t('pain.noCause')}</p>
+      {step !== 'done' && <p className="muted pain-intro">{t('pain.noCause')}</p>}
 
       {step === 'where' && (
         <>
@@ -314,77 +321,99 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
         </div>
       )}
 
-      {step === 'done' && (
+      {/* After saving: what was saved, then what to do now (the medical officer if an alarm sign was logged,
+          otherwise the self-care for this pain), then today's log, with the next step pinned at the bottom. */}
+      {step === 'done' && last && (
         <div className="pain-done">
-          <p role="status">
-            <strong>✓ {t('pain.savedOk')}</strong>
-          </p>
-          <div className="actions">
-            {onDone && (
-              <button type="button" className="button" onClick={onDone}>
-                {t('pain.done')}
-              </button>
-            )}
-            <button type="button" className="button secondary" onClick={() => setStep('where')}>
-              {t('pain.another')}
-            </button>
+          <div className="pain-saved" role="status">
+            <span className="pain-saved-icon" aria-hidden="true">
+              <Icon name="check" size={18} />
+            </span>
+            <p>
+              <strong>{t('pain.savedOk')}</strong>
+              <span className="muted">
+                {whereText(last)} · {strengthText(last)}
+                {wordsText(last) && ` · ${wordsText(last)}`}
+              </span>
+            </p>
           </div>
+          {last.alarms.length > 0 ? <PainAlarm /> : <PainSuggestions event={last} chosen={chosen} onToggle={onToggleCard} />}
+          {last.regions.includes('head') && (
+            <p className="pain-note">
+              <Icon name="info" size={18} />
+              <span>
+                {t('pain.co2')}{' '}
+                {CO2_SOURCE.url && (
+                  <a href={CO2_SOURCE.url} target="_blank" rel="noreferrer">
+                    {t('pain.source')}: {CO2_SOURCE.cite.split(',').slice(0, 2).join(',')}
+                  </a>
+                )}
+              </span>
+            </p>
+          )}
         </div>
       )}
 
       {today.events.length > 0 && (
-        <div role="status" className="pain-summary">
-          <p>
-            <strong>{t('pain.events', { day })}</strong>
-          </p>
+        <section className="pain-log" aria-labelledby="pain-log-title">
+          <div className="pain-log-head">
+            <h3 id="pain-log-title" className="overline">
+              {t('pain.events', { day })}
+            </h3>
+            <button type="button" className="link" onClick={() => onChange({ events: [] })}>
+              {t('pain.clear')}
+            </button>
+          </div>
           <ul className="pain-events">
             {today.events.map((e, i) => {
-              const label = `${whereText(e)} · ${e.intensity}/10 ${t(`pain.level.${verbalLabel(e.intensity)}`)}`
-              const words = [...e.qualities.map((q) => qualityLabel(q, lang)), ...(e.symptoms ?? []).map(cap)].join(', ')
-              const kind = isPain(e) ? '' : `${t('pain.symptomOnly')} · `
+              const label = `${whereText(e)} · ${strengthText(e)}`
+              const words = wordsText(e)
               return (
-                <li key={e.id}>
-                  <span>
-                    {kind}
-                    {label}
-                    {words && ` · ${words}`}
-                  </span>{' '}
+                <li key={e.id} className="pain-event">
+                  <div className="pain-event-text">
+                    <p>
+                      <strong>{whereText(e)}</strong> <span className="muted">· {strengthText(e)}</span>
+                    </p>
+                    {words && <p className="muted">{words}</p>}
+                    {e.alarms.length > 0 && (
+                      <p className="pain-tag">
+                        <span aria-hidden="true">■ </span>
+                        {t('pain.alarmTag')}
+                      </p>
+                    )}
+                    {e.alarms.length === 0 && nerveLike(e.qualities) && <p className="hint">{t('pain.nerve')}</p>}
+                  </div>
                   <button
                     type="button"
-                    className="chip"
+                    className="icon-btn"
                     aria-label={t('pain.remove', { s: label })}
                     onClick={() => onChange({ events: today.events.filter((_, k) => k !== i) })}
                   >
-                    ✕
+                    <Icon name="close" size={18} />
                   </button>
-                  {e.alarms.length > 0 && <p className="alarm-text">{t('body.redNow')} <a href="#/transmit">{t('boost.openTransmit')}</a></p>}
-                  {e.alarms.length === 0 && nerveLike(e.qualities) && <p className="hint">{t('pain.nerve')}</p>}
-                  {i === today.events.length - 1 && <PainSuggestions event={e} chosen={chosen} onToggle={onToggleCard} />}
-                  {e.regions.includes('head') && (
-                    <p className="hint">
-                      {t('pain.co2')}{' '}
-                      {CO2_SOURCE.url && (
-                        <a href={CO2_SOURCE.url} target="_blank" rel="noreferrer">
-                          {t('pain.source')}: {CO2_SOURCE.cite.split(',').slice(0, 2).join(',')}
-                        </a>
-                      )}
-                    </p>
-                  )}
                 </li>
               )
             })}
           </ul>
-          <p>
-            <strong>{t('pain.loggedAs')}</strong> <span lang="en">{painSymptoms(today).join(', ')}</span>
+          <p className="hint">
+            {t('pain.loggedAs')} <span lang="en">{painSymptoms(today).join(', ')}</span>
           </p>
-          <div className="actions">
-            <button type="button" className="button secondary" onClick={() => onChange({ events: [] })}>
-              {t('pain.clear')}
+        </section>
+      )}
+      <p className="muted pain-private">{t('pain.private')}</p>
+
+      {step === 'done' && (
+        <div className="pain-foot">
+          <button type="button" className="button secondary" onClick={() => setStep('where')}>
+            {t('pain.another')}
+          </button>
+          {onDone && (
+            <button type="button" className={alarmNow ? 'button secondary' : 'button'} onClick={onDone}>
+              {t('pain.done')}
             </button>
-          </div>
+          )}
         </div>
       )}
-      <p className="muted">{t('pain.private')}</p>
     </section>
   )
 }
@@ -395,16 +424,40 @@ const MAX_TYPED = 60
 /** Symptom words of the vocabulary are lower case; shown with a capital first letter. */
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
+/** An alarm sign was logged: the medical officer comes first, and Transmit is the one action. */
+function PainAlarm() {
+  const { t } = useI18n()
+  const card = CARDS.cmo_now
+  return (
+    <section className="cmo-card pain-alert" role="alert">
+      <p className="pain-alert-lead">
+        <span aria-hidden="true">■ </span>
+        {t('body.redNow')}
+      </p>
+      {card && <BoostCardBody card={card} time={false} />}
+      <a className="button wide" href="#/transmit">
+        {t('boost.openTransmit')}
+      </a>
+    </section>
+  )
+}
+
 /** Right after she logs a pain: the self-care that matches it, or what to do if there is none. */
 function PainSuggestions({ event, chosen, onToggle }: { event: PainEvent; chosen: string[]; onToggle: (id: string) => void }) {
   const { t } = useI18n()
   const cards = painSuggestions(event)
-  if (!cards.length) return <p className="hint">{t('pain.noCard')}</p>
-  return (
-    <div className="pain-suggest">
-      <p>
-        <strong>{t('pain.suggest')}</strong>
+  if (!cards.length)
+    return (
+      <p className="pain-note">
+        <Icon name="info" size={18} />
+        <span>{t('pain.noCard')}</span>
       </p>
+    )
+  return (
+    <section className="pain-suggest" aria-labelledby="pain-suggest-title">
+      <h3 id="pain-suggest-title" className="overline">
+        {t('pain.suggest')}
+      </h3>
       <div className="suggestions">
         {cards.map((c) => (
           <SuggestionCard
@@ -416,6 +469,6 @@ function PainSuggestions({ event, chosen, onToggle }: { event: PainEvent; chosen
           />
         ))}
       </div>
-    </div>
+    </section>
   )
 }

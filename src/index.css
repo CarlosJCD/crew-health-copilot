@@ -774,3 +774,44 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .spark-axis span { position: absolute; top: 0; white-space: nowrap; }
 .spark-axis .first { left: 0; }
 .spark-axis .last { right: 0; }
+
+/* ---- Pain sheet after saving: saved line, one next action, today's log, pinned footer ---- */
+.sheet .pain { margin-top: 0; }
+.sheet .pain > p.pain-intro { margin: 0 0 0.75rem; }
+.pain-done { display: grid; gap: 1rem; margin: 0.25rem 0 0; }
+.pain-saved { display: flex; align-items: flex-start; gap: 0.75rem; }
+.pain-saved p { margin: 0; display: grid; gap: 0.15rem; }
+.pain-saved strong { font-size: 1.05rem; }
+.pain-saved .muted { font-size: 0.9rem; }
+.pain-saved-icon { flex: none; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--text); }
+.pain-alert { width: auto; margin: 0; padding: 1rem 1.1rem 1.1rem; display: grid; gap: 0.45rem; }
+.pain-alert p { margin: 0; }
+.pain-alert-lead { color: var(--act); font-weight: 600; font-size: 0.88rem; line-height: 1.4; }
+.pain-alert h3 { margin: 0.2rem 0 0; font-size: 1.15rem; line-height: 1.3; }
+.pain-alert .button { margin-top: 0.4rem; }
+.pain-suggest { display: grid; gap: 0.6rem; margin: 0; }
+.pain-suggest .suggestions { grid-template-columns: 1fr; }
+.pain-note { display: flex; align-items: flex-start; gap: 0.6rem; margin: 0; padding: 0.75rem 0.9rem; border-radius: 12px;
+  background: var(--panel-2); color: var(--muted); font-size: 0.85rem; line-height: 1.45; }
+.pain-note svg { flex: none; margin-top: 0.05rem; color: var(--text); }
+.pain-note a { color: var(--accent); }
+.pain-log { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.pain-log-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.pain-log-head .link { min-height: 44px; padding: 0 0.25rem; font-size: 0.85rem; }
+.pain .pain-events { gap: 0.5rem; margin: 0.25rem 0 0.6rem; font-size: 0.92rem; }
+.pain-event { display: flex; align-items: center; gap: 0.25rem; padding: 0.55rem 0.25rem 0.55rem 0.9rem;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+.pain-event-text { flex: 1; min-width: 0; display: grid; gap: 0.15rem; }
+.pain .pain-event-text p { margin: 0; }
+.pain-event-text .muted { font-size: 0.85rem; }
+.pain-event .icon-btn { flex: none; color: var(--muted); }
+.pain-event .icon-btn:hover { color: var(--text); }
+.pain-tag { color: var(--act); font-weight: 600; font-size: 0.8rem; }
+.pain-log .hint { margin: 0; font-size: 0.8rem; }
+.sheet .pain > p.pain-private { margin: 1rem 0 0; font-size: 0.78rem; }
+.pain-foot { position: sticky; bottom: -1.4rem; z-index: 1; display: flex; gap: 0.6rem; margin: 1rem -1.1rem -1.4rem;
+  padding: 0.75rem 1.1rem calc(1rem + env(safe-area-inset-bottom)); background: var(--panel); border-top: 1px solid var(--line); }
+.pain-foot .button { flex: 1; }
+.pain-alert .link { justify-self: start; min-height: 32px; }
+.pain-foot .button { flex: 1 1 auto; white-space: nowrap; padding-inline: 1rem; }
