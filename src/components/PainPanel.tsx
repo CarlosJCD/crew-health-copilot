@@ -3,11 +3,9 @@ import { qualityLabel, regionLabel } from '../orbit/display'
 import {
   alarmCheckFor,
   alarmsInText,
-  BRUSH,
   CO2_SOURCE,
   EMPTY_DETAILS,
   nerveLike,
-  OFF_FIGURE,
   painDay,
   painSymptoms,
   symptomsFor,
@@ -15,8 +13,6 @@ import {
   verbalLabel,
   whereOf,
   type BodySide,
-  type BodyView,
-  type BrushSize,
   type MuscleMark,
   type PainDay,
   type PainDetailsValue,
@@ -30,9 +26,8 @@ import { useI18n } from '../i18n/context'
 import { SuggestionCard } from './SuggestionCard'
 import { BoostCardBody } from './BoostCardBody'
 import { Icon } from './Icon'
-import { MuscleSelector } from './MuscleSelector'
 import { PainDetails } from './PainDetails'
-import { PainPainter } from './PainPainter'
+import { WherePicker } from './WherePicker'
 
 interface Props {
   day: number
@@ -47,27 +42,23 @@ interface Props {
   onSaved?: () => void
   /** "Done" after saving: closes the panel. */
   onDone?: () => void
-  /** The brush lives on the home figure: here the area is picked from a list instead (no second brush). */
-  brush?: boolean
+  /** The home figure's colors for the current theme: the body here looks the same. */
+  figureColors?: { fill: string; border: string }
 }
 
 type Step = 'where' | 'what' | 'details' | 'safety' | 'done'
 
 /** Id of a new report (wall clock, read only in event handlers). */
 const newEventId = () => `ev-${Date.now()}`
-type Mode = 'exact' | 'area'
 
 /**
  * "Does something hurt?" Psychology's report flow (pain-spec.json): where (exact muscle or painted area,
  * side, front or back), then what it feels like, how strong, when, what was happening and whether moving or
  * pressing makes it worse. Pain in the head, eyes or chest asks the alarm question before saving.
  */
-export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted = [], onSaved, onDone, brush = true }: Props) {
+export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted = [], onSaved, onDone, figureColors }: Props) {
   const { t, lang } = useI18n()
   const [step, setStep] = useState<Step>(painted.length ? 'what' : 'where')
-  const [mode, setMode] = useState<Mode | null>(painted.length ? 'area' : null)
-  const [view, setView] = useState<BodyView>(painted[0]?.view ?? 'front')
-  const [size, setSize] = useState<BrushSize>('m')
   const [muscles, setMuscles] = useState<MuscleMark[]>([])
   const [strokes, setStrokes] = useState<PaintStroke[]>(painted)
   const [extra, setExtra] = useState<string[]>([])
@@ -102,7 +93,6 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
 
   const reset = () => {
     setStep('where')
-    setMode(null)
     setMuscles([])
     setStrokes([])
     setExtra([])
@@ -128,69 +118,17 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
       {step === 'where' && (
         <>
           <h3>{t('pain.where')}</h3>
-          <p>{t('pain.ask')}</p>
-          <div className="actions" role="group" aria-label={t('pain.ask')}>
-            <button type="button" className="button secondary" aria-pressed={mode === 'exact'} onClick={() => setMode('exact')}>
-              {t('pain.muscle')}
-            </button>
-            <button type="button" className="button secondary" aria-pressed={mode === 'area'} onClick={() => setMode('area')}>
-              {t(brush ? 'pain.paint' : 'pain.zonePick')}
-            </button>
-          </div>
-          <div className="actions" role="group" aria-label={t('pain.offFigure')}>
-            <span className="muted">{t('pain.offFigure')}</span>
-            {OFF_FIGURE.map((r) => (
-              <button
-                key={r}
-                type="button"
-                className="button secondary"
-                aria-pressed={extra.includes(r)}
-                onClick={() => setExtra((x) => (x.includes(r) ? x.filter((y) => y !== r) : [...x, r]))}
-              >
-                {regionLabel(r, lang)}
-              </button>
-            ))}
-          </div>
-
-          {mode && (
-            <div className="pain-work">
-              <div className="pain-controls">
-                <div className="actions" role="group" aria-label={t('pain.view')}>
-                  {(['front', 'back'] as const).map((v) => (
-                    <button key={v} type="button" className="button secondary" aria-pressed={view === v} onClick={() => setView(v)}>
-                      {t(v === 'front' ? 'pain.front' : 'pain.back')}
-                    </button>
-                  ))}
-                </div>
-                {mode === 'area' && brush && (
-                  <div className="actions" role="group" aria-label={t('pain.brush')}>
-                    {(Object.keys(BRUSH) as BrushSize[]).map((s) => (
-                      <button key={s} type="button" className="button secondary" aria-pressed={size === s} onClick={() => setSize(s)}>
-                        {t(`pain.brush.${s}`)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {mode === 'exact' ? (
-                <MuscleSelector view={view} marks={muscles} onChange={setMuscles} />
-              ) : (
-                <PainPainter view={view} size={size} strokes={strokes} onChange={setStrokes} brush={brush} />
-              )}
-            </div>
-          )}
-
-          {where.regions.length > 0 && <p role="status">{t('pain.whereIs', { where: whereText(where) })}</p>}
-          <div className="actions">
-            <button type="button" className="button" disabled={!where.regions.length} onClick={() => setStep('what')}>
-              {t('pain.nextWhat')}
-            </button>
-            {(muscles.length > 0 || strokes.length > 0 || extra.length > 0) && (
-              <button type="button" className="button secondary" onClick={reset}>
-                {t('pain.clearMarks')}
-              </button>
-            )}
-          </div>
+          <p className="muted where-hint">{t('pain.tapOrPick')}</p>
+          <WherePicker
+            marks={muscles}
+            onMarks={setMuscles}
+            strokes={strokes}
+            onStrokes={setStrokes}
+            extra={extra}
+            onExtra={setExtra}
+            fill={figureColors?.fill}
+            border={figureColors?.border}
+          />
         </>
       )}
 
@@ -423,6 +361,26 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
         {t('pain.serious')} <a href="#/transmit">{t('pain.seriousLink')}</a>
       </p>
       <p className="muted pain-private">{t('pain.private')}</p>
+
+      {step === 'where' && (
+        <div className="pain-foot where-foot">
+          <p className="where-summary" role="status">
+            {where.regions.length > 0 ? (
+              <>
+                <span>{whereText(where)}</span>
+                <button type="button" className="link" onClick={reset}>
+                  {t('pain.clearMarks')}
+                </button>
+              </>
+            ) : (
+              <span className="muted">{t('pain.nothingYet')}</span>
+            )}
+          </p>
+          <button type="button" className="button" disabled={!where.regions.length} onClick={() => setStep('what')}>
+            {t('pain.nextWhat')}
+          </button>
+        </div>
+      )}
 
       {step === 'done' && (
         <div className="pain-foot">
