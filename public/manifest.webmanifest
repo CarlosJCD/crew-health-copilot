@@ -1,7 +1,7 @@
 {
-  "name": "Crew Health Copilot",
-  "short_name": "Crew Health",
-  "description": "Preventive, biopsychosocial health self-assessment for astronauts. Works offline.",
+  "name": "ORBIT",
+  "short_name": "ORBIT",
+  "description": "ORBIT (Observe, Read, Boost, Iterate, Transmit): preventive health self-assessment for astronauts, built on the biopsychosocial model and the five NASA HRP hazards. Works offline.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

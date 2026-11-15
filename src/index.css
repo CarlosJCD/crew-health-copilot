@@ -85,7 +85,7 @@ button { font: inherit; }
 }
 .brand { display: flex; align-items: center; gap: 0.6rem; color: var(--text); }
 .brand .logo { width: 30px; height: 30px; flex: none; }
-.brand-name { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; }
+.brand-name { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; letter-spacing: 0.12em; }
 .brand-sub { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); }
 .logo-arc { stroke: currentColor; }
 .logo-pulse { stroke: var(--brand-red); }

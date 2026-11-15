@@ -12,14 +12,9 @@ import { Dashboard } from './modules/Dashboard'
 import { Placeholder } from './modules/Placeholder'
 import { DEFAULT_MODULE, MODULES } from './modules/registry'
 
-// Working title. Final name is decided in Phase 4; change it here only.
-export const APP_NAME = 'Crew Health Copilot'
-
-/** "Crew Health Copilot" → ["Crew Health", "Copilot"]: the last word is set small in the wordmark. */
-function wordmark(name: string): [string, string] {
-  const i = name.lastIndexOf(' ')
-  return i > 0 ? [name.slice(0, i), name.slice(i + 1)] : [name, '']
-}
+// Product name: ORBIT = Observe, Read, Boost, Iterate, Transmit. Change it here only.
+export const APP_NAME = 'ORBIT'
+const APP_EXPANSION = 'Observe · Read · Boost · Iterate · Transmit'
 
 function readHash(): string {
   const id = window.location.hash.replace(/^#\/?/, '')
@@ -66,10 +61,9 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand">
+        <div className="brand" title={APP_EXPANSION}>
           <Logo />
-          <span className="brand-name">{wordmark(APP_NAME)[0]}</span>
-          <span className="brand-sub">{wordmark(APP_NAME)[1]}</span>
+          <span className="brand-name">{APP_NAME}</span>
         </div>
         <MissionBar scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} day={day} />
         <div className="topbar-end">

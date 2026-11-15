@@ -1,7 +1,9 @@
-# Crew Health Copilot (working title)
+# ORBIT
 
-Offline-first, preventive health self-assessment for astronauts. NASA Space Apps Challenge 2026,
-challenge "Create Health Monitoring Software for Astronauts on Space Missions".
+**Observe, Read, Boost, Iterate, Transmit.** Offline-first, preventive health self-assessment for astronauts,
+built on the biopsychosocial model and the five hazards of the NASA Human Research Program (radiation,
+isolation and confinement, distance from Earth, gravity fields, hostile and closed environments).
+NASA Space Apps Challenge 2026, challenge "Create Health Monitoring Software for Astronauts on Space Missions".
 
 > Decision support only. This prototype does not diagnose. All data shown is synthetic.
 
