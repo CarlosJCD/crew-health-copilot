@@ -124,7 +124,8 @@ export function heatOn(day: number, view: BodyView, pain: PainLog, symptoms: Sym
       }
       // Eyes and skin have no zone on the figure.
       for (const r of e.regions.filter((r) => OFF_FIGURE.includes(r))) {
-        if (warmth(e.intensity, day - d) >= HEAT.minWarmth) noPlace.push({ symptom: regionSymptom(r), day: d })
+        if (warmth(e.intensity, day - d) < HEAT.minWarmth) continue
+        for (const what of labels) noPlace.push({ symptom: what === 'pain' ? regionSymptom(r) : what, day: d })
       }
     }
     for (const symptom of symptoms[d] ?? []) {

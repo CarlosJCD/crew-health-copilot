@@ -112,7 +112,8 @@ interface ReminderInput {
 }
 
 /**
- * What she has not done yet today: the daily check-in, pulse mode (daily or every other day), the
+ * What she has not done yet today: the daily check-in, pulse mode (daily or every other day; a practice
+ * session counts, since she did the task), the
  * safety question of Boost, "Did it help?" for yesterday's choices, and pain from the last days that
  * she has not logged again (it cools down on the heat map unless she does).
  */
@@ -120,7 +121,7 @@ export function remindersFor({ day, checkins, pulseSessions, boostLog, painLog, 
   const out: Reminder[] = []
   if (plan.safetyQuestion && !boostLog[day]?.safety) out.push({ id: 'safety' })
   if (!checkins[day]) out.push({ id: 'checkin' })
-  if (!pulseSessions.some((s) => !s.practice && (s.day === day || s.day === day - 1))) out.push({ id: 'pulse' })
+  if (!pulseSessions.some((s) => s.day === day || s.day === day - 1)) out.push({ id: 'pulse' })
   const y = boostLog[day - 1]
   const unrated = y ? y.chosen.filter((id) => !y.helped[id]) : []
   if (unrated.length) out.push({ id: 'did_it_help', cards: unrated })

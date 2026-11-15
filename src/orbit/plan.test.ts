@@ -114,3 +114,10 @@ describe('when everything is fine', () => {
     expect(todaySuggestions(planOf(121), 121, log).items.map((i) => i.card.id)).toContain('breathe')
   })
 })
+
+describe('pulse reminder', () => {
+  it('clears with a practice session too, since she did the task', () => {
+    const r = remindersFor({ day: 125, checkins: {}, boostLog: {}, painLog: {}, plan: empty, pulseSessions: [{ id: 'p', day: 125, at: 0, practice: true, result: {} as never }] })
+    expect(r.some((x) => x.id === 'pulse')).toBe(false)
+  })
+})

@@ -88,4 +88,9 @@ describe('symptom heat map', () => {
     const log: PainLog = { 125: { events: [{ id: 'x', muscles: [], strokes: [], regions: ['skin'], qualities: [], intensity: 4, contexts: [], alarms: [] }] } }
     expect(heatOn(125, 'front', log, {}).noPlace).toEqual([{ symptom: 'pain in skin (any area)', day: 125 }])
   })
+
+  it('lists a symptom without pain in the eyes by its own name', () => {
+    const log: PainLog = { 125: { events: [{ id: 'y', muscles: [], strokes: [], regions: ['eyes'], qualities: [], intensity: 4, contexts: [], alarms: [], pain: false, symptoms: ['eye irritation'] }] } }
+    expect(heatOn(125, 'front', log, {}).noPlace).toEqual([{ symptom: 'eye irritation', day: 125 }])
+  })
 })

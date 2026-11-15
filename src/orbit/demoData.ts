@@ -72,8 +72,17 @@ export const NUMERIC_FIELDS: NumericField[] = [
   'crew_climate', 'pulse_ms', 'contact', 'exercise_min', 'glucose',
 ]
 
-/** Story days the day control replays (handoff: 121 to 128). */
+/** Story days of the demo (handoff: 121 to 128). The app opens on the first one. */
 export const STORY_DAYS = { first: 121, last: 128 }
+
+/**
+ * Days the day control can reach: every day in the loaded file (107 to 128 in the data team's file), so
+ * testers can also visit her history before the story. The demo still opens on day 121.
+ */
+export function dayRange(data: DemoData): { first: number; last: number } {
+  const days = data.days.map((d) => d.day)
+  return days.length ? { first: Math.min(...days), last: Math.max(...days) } : STORY_DAYS
+}
 
 // ---------------------------------------------------------------------------------------------
 // Built-in demo (handoff sections 2.3 and 4)

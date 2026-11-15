@@ -24,6 +24,8 @@ const en = {
   'day.label': 'Mission day {n}',
   'day.hint': 'Demo replay: built-in story',
   'day.hintFile': 'Demo replay: data team file',
+  'day.story': 'demo story (days {first} to {last})',
+  'day.history': 'her history before the demo story (days {first} to {last})',
   'day.log': 'Mission log:',
   'data.issues': 'Dataset check for the data team: {n}',
 
@@ -438,6 +440,8 @@ const es: Record<StringKey, string> = {
   'day.label': 'Día de misión {n}',
   'day.hint': 'Recorrido de demostración: historia integrada',
   'day.hintFile': 'Recorrido de demostración: archivo del equipo de datos',
+  'day.story': 'historia de la demo (días {first} a {last})',
+  'day.history': 'días previos a la demo (la historia va del día {first} al {last})',
   'day.log': 'Bitácora:',
   'data.issues': 'Revisión del dataset para el equipo de datos: {n}',
 
