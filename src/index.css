@@ -318,3 +318,10 @@ button.link { align-self: flex-start; background: none; border: 0; padding: 0; c
 .alarm-text { color: var(--act); font-weight: 600; }
 .pain select { padding: 0.3rem 0.5rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; }
 @media (max-width: 720px) { .pain-work { grid-template-columns: 1fr; } }
+
+/* ORBIT: symptom history heat map */
+.heat-legend { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+.heat-bar { flex: 1; height: 8px; border-radius: 999px; border: 1px solid var(--line); }
+.heat-list-title { margin: 0.5rem 0 0.2rem; font-size: 0.85rem; font-weight: 600; }
+.heat-list { list-style: none; padding: 0; margin: 0 0 0.5rem; display: grid; gap: 0.25rem; font-size: 0.82rem; }
+.heat-list li { display: flex; align-items: center; gap: 0.4rem; }

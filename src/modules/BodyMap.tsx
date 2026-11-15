@@ -5,11 +5,12 @@ import { getIndicator, type Color, type Scenario } from '../orbit/config'
 import { COLOR_SYMBOL, FIGURE, STATUS_FILL } from '../orbit/display'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay } from '../orbit/engine'
-import type { PainDay } from '../orbit/pain'
+import type { PainDay, PainLog } from '../orbit/pain'
 import { useI18n } from '../i18n/context'
 import { DayControl } from '../components/DayControl'
 import { PainPanel } from '../components/PainPanel'
 import { StatePanel } from '../components/StatePanel'
+import { SymptomHeatmap } from '../components/SymptomHeatmap'
 
 interface Props {
   demo: LoadedDemo
@@ -18,7 +19,8 @@ interface Props {
   scenario: Scenario
   log: SymptomLog
   onLogChange: (log: SymptomLog) => void
-  pain: PainDay | undefined
+  /** Pain logged on every day (the heat map needs the history). */
+  painLog: PainLog
   onPainChange: (pain: PainDay) => void
 }
 
@@ -42,9 +44,10 @@ const SPOTS: Record<SystemId, { x: number; y: number }> = {
  * is the body: today's state in one panel, the six-system figure, and "Does something hurt?". The
  * numbers live one tap away in Metrics; the technical details of each system stay folded.
  */
-export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pain, onPainChange }: Props) {
+export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, painLog, onPainChange }: Props) {
   const { t } = useI18n()
   const [selected, setSelected] = useState<SystemId>('heart')
+  const [mode, setMode] = useState<'today' | 'history'>('today')
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
   const record = data.days.find((d) => d.day === day)
@@ -81,48 +84,62 @@ export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pa
       <div className="bodymap">
         <section className="bodymap-figure" aria-label={t('body.title', { day })}>
           <h2>{t('body.title', { day })}</h2>
-          <div className="system-figure" role="group" aria-label={t('body.figure')}>
-            <Body
-              gender="female"
-              side="front"
-              scale={1.4}
-              data={zones}
-              defaultFill={FIGURE.fill}
-              border={FIGURE.border}
-              onBodyPartPress={(part) => {
-                const id = part.slug && systemOfZone(part.slug)
-                if (id) setSelected(id)
-              }}
-            />
-            <div className="spot-layer">
-              {SYSTEMS.map((s) => {
-                const p = SPOTS[s.id]
-                const c = colors[s.id]
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    className={`spot color-${c}${selected === s.id ? ' selected' : ''}`}
-                    style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
-                    aria-pressed={selected === s.id}
-                    aria-label={`${name(s.id)}: ${t(`color.${c}`)}`}
-                    onClick={() => setSelected(s.id)}
-                  >
-                    <span aria-hidden="true">{COLOR_SYMBOL[c]}</span>
-                  </button>
-                )
-              })}
-            </div>
+          <div className="actions" role="group" aria-label={t('body.title', { day })}>
+            <button type="button" className="button secondary" aria-pressed={mode === 'today'} onClick={() => setMode('today')}>
+              {t('body.viewToday')}
+            </button>
+            <button type="button" className="button secondary" aria-pressed={mode === 'history'} onClick={() => setMode('history')}>
+              {t('body.viewHistory')}
+            </button>
           </div>
-          <ul className="system-list">
-            {SYSTEMS.map((s) => (
-              <li key={s.id}>
-                <button type="button" className={`system-btn color-${colors[s.id]}`} aria-pressed={selected === s.id} onClick={() => setSelected(s.id)}>
-                  <span aria-hidden="true">{COLOR_SYMBOL[colors[s.id]]}</span> {name(s.id)} · {t(`color.${colors[s.id]}`)}
-                </button>
-              </li>
-            ))}
-          </ul>
+          {mode === 'history' ? (
+            <SymptomHeatmap day={day} painLog={painLog} symptomLog={log} />
+          ) : (
+            <>
+            <div className="system-figure" role="group" aria-label={t('body.figure')}>
+              <Body
+                gender="female"
+                side="front"
+                scale={1.4}
+                data={zones}
+                defaultFill={FIGURE.fill}
+                border={FIGURE.border}
+                onBodyPartPress={(part) => {
+                  const id = part.slug && systemOfZone(part.slug)
+                  if (id) setSelected(id)
+                }}
+              />
+              <div className="spot-layer">
+                {SYSTEMS.map((s) => {
+                  const p = SPOTS[s.id]
+                  const c = colors[s.id]
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={`spot color-${c}${selected === s.id ? ' selected' : ''}`}
+                      style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
+                      aria-pressed={selected === s.id}
+                      aria-label={`${name(s.id)}: ${t(`color.${c}`)}`}
+                      onClick={() => setSelected(s.id)}
+                    >
+                      <span aria-hidden="true">{COLOR_SYMBOL[c]}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <ul className="system-list">
+              {SYSTEMS.map((s) => (
+                <li key={s.id}>
+                  <button type="button" className={`system-btn color-${colors[s.id]}`} aria-pressed={selected === s.id} onClick={() => setSelected(s.id)}>
+                    <span aria-hidden="true">{COLOR_SYMBOL[colors[s.id]]}</span> {name(s.id)} · {t(`color.${colors[s.id]}`)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            </>
+          )}
         </section>
 
         <section className={`bodymap-detail card color-${colors[selected]}`} aria-live="polite">
@@ -213,7 +230,7 @@ export function BodyMap({ demo, day, onDayChange, scenario, log, onLogChange, pa
         </section>
       </div>
 
-      <PainPanel day={day} pain={pain} onChange={onPainChange} />
+      <PainPanel day={day} pain={painLog[day]} onChange={onPainChange} />
     </div>
   )
 }

@@ -137,7 +137,7 @@ export default function App() {
             scenario={scenario}
             log={symptomLog}
             onLogChange={setSymptomLog}
-            pain={painLog[day]}
+            painLog={painLog}
             onPainChange={(p: PainDay) => setPainLog((all) => ({ ...all, [day]: p }))}
           />
         ) : active.id === 'play' ? (
