@@ -20,6 +20,9 @@ import { CareIcon } from '../components/CareIcon'
 import { EarthPhoto } from '../components/EarthPhoto'
 import { Icon } from '../components/Icon'
 import { InfoTip } from '../components/InfoTip'
+import { PrivateNoteSheet, type Notes } from '../components/PrivateNote'
+import { Sheet } from '../components/Sheet'
+import { Play } from './Play'
 
 interface Props {
   demo: LoadedDemo
@@ -28,6 +31,12 @@ interface Props {
   onLogChange: (log: BoostLog) => void
   /** The protective-factors tank (all care actions so far). */
   care: CareSummary
+  /** Her private notes by day (the "Private note" card opens them). */
+  notes: Notes
+  onNotesChange: (notes: Notes) => void
+  /** Constellations boards finished on this device (the "Play Constellations together" card opens the game). */
+  boardsDone: number
+  onBoardDone: () => void
 }
 
 const EMPTY: BoostDay = { chosen: [], helped: {} }
@@ -37,7 +46,7 @@ const EMPTY: BoostDay = { chosen: [], helped: {} }
  * Built to be read at a glance: every option is an icon, a title and its time; the whole tile chooses it,
  * and how to do it appears once chosen (or under ⓘ). A person comes first on a red day.
  */
-export function Boost({ demo, day, log, onLogChange, care }: Props) {
+export function Boost({ demo, day, log, onLogChange, care, notes, onNotesChange, boardsDone, onBoardDone }: Props) {
   const { t } = useI18n()
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
@@ -62,6 +71,19 @@ export function Boost({ demo, day, log, onLogChange, care }: Props) {
     onLogChange({ ...log, [target]: { ...which, helped: { ...which.helped, [id]: answer } } })
   const askedYes = today.safety === 'yes'
   const full = today.chosen.length >= max
+  const [noteOpen, setNoteOpen] = useState(false)
+  const [gameOpen, setGameOpen] = useState(false)
+  /** Cards she can do right here once chosen: write the note, play the game. */
+  const doIt = (c: BoostCard): ReactNode =>
+    c.id === 'private_note' ? (
+      <button type="button" className="button wide" onClick={() => setNoteOpen(true)}>
+        <Icon name="note" size={18} /> {notes[day] ? t('note.edit') : t('note.open')}
+      </button>
+    ) : c.id === 'crew_game' ? (
+      <button type="button" className="button wide" onClick={() => setGameOpen(true)}>
+        <Icon name="stars" size={18} /> {t('game.open')}
+      </button>
+    ) : undefined
 
   return (
     <div className="boost">
@@ -185,6 +207,8 @@ export function Boost({ demo, day, log, onLogChange, care }: Props) {
                   onToggle={() => toggle(c.id)}
                   helped={today.helped[c.id]}
                   onRate={(o) => rate(c.id, o)}
+                  action={doIt(c)}
+                  done={c.id === 'private_note' && !!notes[day]}
                 />
               )
             })}
@@ -196,6 +220,13 @@ export function Boost({ demo, day, log, onLogChange, care }: Props) {
       <p className="fineprint care-disclaimer" lang="en">
         {BOOST_DISCLAIMER}
       </p>
+
+      {noteOpen && <PrivateNoteSheet day={day} notes={notes} onChange={onNotesChange} onClose={() => setNoteOpen(false)} />}
+      {gameOpen && (
+        <Sheet title={t('play.title')} onClose={() => setGameOpen(false)}>
+          <Play completed={boardsDone} onComplete={onBoardDone} heading={false} />
+        </Sheet>
+      )}
     </div>
   )
 }
@@ -290,13 +321,15 @@ interface TileProps {
   helped?: string
   onRate?: (answer: string) => void
   action?: ReactNode
+  /** Already done today (the note is written): a small tick under the title. */
+  done?: boolean
 }
 
 /**
  * One option: icon, title and time. In "pick" mode the whole head is the choose button, with a circle that
  * fills when chosen; what to do shows once chosen, or under ⓘ together with why and the sources.
  */
-function CareTile({ card, mode, chosen = false, disabled = false, onToggle, helped, onRate, action }: TileProps) {
+function CareTile({ card, mode, chosen = false, disabled = false, onToggle, helped, onRate, action, done = false }: TileProps) {
   const { t } = useI18n()
   const [info, setInfo] = useState(false)
   const time = card.minutes > 0 ? t('boost.minutes', { n: card.minutes }) : t('boost.instant')
@@ -310,12 +343,20 @@ function CareTile({ card, mode, chosen = false, disabled = false, onToggle, help
         {mode !== 'escalate' && (
           <span className="care-time">
             <Icon name="clock" size={14} /> {time}
+            {done && (
+              <span className="care-done">
+                {' · '}
+                <Icon name="check" size={14} /> {t('note.written')}
+              </span>
+            )}
           </span>
         )}
       </span>
     </>
   )
   const showWhat = mode !== 'pick' || chosen || info
+  // In "pick" mode the action (write the note, open the game) comes once she has chosen the card.
+  const act = mode === 'pick' && !chosen ? undefined : action
   return (
     <article className={`care-tile ${mode}${chosen ? ' chosen' : ''}${disabled ? ' off' : ''}`}>
       <div className="care-tile-head">
@@ -340,12 +381,12 @@ function CareTile({ card, mode, chosen = false, disabled = false, onToggle, help
           <Icon name="info" size={20} />
         </button>
       </div>
-      {(showWhat || action) && (
+      {(showWhat || act) && (
         <div className="care-tile-body">
           {showWhat && <p lang="en">{card.what_en}</p>}
           {card.id === 'earth_window' && chosen && <EarthPhoto />}
           {info && <CardWhy card={card} />}
-          {action}
+          {act}
           {mode === 'pick' && chosen && onRate && (
             <div className="care-help">
               <span className="care-help-label">{t('boost.didItHelp')}</span>

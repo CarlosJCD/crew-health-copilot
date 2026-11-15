@@ -64,6 +64,8 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `src/index.css` | Design tokens (dark and light themes), layout and components. See "Design" below | Engineering |
 | `src/components/Logo.tsx`, `public/favicon.svg`, `public/icons/` | Logo (the ring is the O of ORBIT) and app icons | Engineering |
 | `src/lib/orbit.ts` | Maps each ORBIT state to the step of the Observe, Read, Boost, Iterate, Transmit loop shown on Today | Engineering |
+| `src/components/Intro.tsx` | First-visit introduction (the project, the ORBIT loop, domains and NASA's five hazards, states, modules, privacy); More > About ORBIT reopens it. Not shown on deep links | Engineering |
+| `src/components/PrivateNote.tsx` | Private notes, one per day, saved on the device only (Care card "Private note", More > Private notes) | Engineering |
 
 ## Rules and the ORBIT engine
 

@@ -1180,3 +1180,123 @@ div.tx-share-row { cursor: default; }
 .sheet .pain .where-summary { flex: 1; min-width: 0; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.1rem 0.7rem;
   font-size: 0.92rem; font-weight: 600; }
 .where-summary .link { min-height: 32px; font-weight: 400; }
+
+/* ---- Private note: one note per day, saved on the device as she types; earlier days under it ---- */
+.note { display: grid; gap: 0.6rem; }
+.sheet .note p { margin: 0; }
+.note-private { display: flex; align-items: flex-start; gap: 0.5rem; color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
+.note-private svg { flex: none; margin-top: 0.1rem; }
+.note-day { margin-top: 0.4rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.note-text { width: 100%; min-height: 9.5rem; resize: vertical; padding: 0.8rem 0.9rem; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font: inherit; font-size: 1rem; line-height: 1.5; }
+.note-text:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.note-text::placeholder { color: var(--muted); }
+.sheet .note .note-status { display: flex; align-items: center; gap: 0.35rem; min-height: 1.4rem; font-size: 0.82rem; }
+.note-earlier-title { margin: 0.8rem 0 0; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); }
+.note-none { font-size: 0.88rem; }
+.note-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.note-list details { border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+.note-list summary { display: flex; align-items: center; gap: 0.6rem; min-height: 44px; padding: 0.4rem 0.8rem; cursor: pointer; list-style: none; }
+.note-list summary::-webkit-details-marker { display: none; }
+.note-list summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 12px; }
+.note-list-day { flex: none; font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.note-list-first { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9rem; }
+.sheet .note-list details p { margin: 0; padding: 0 0.8rem 0.7rem; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.5; }
+.note-done { margin-top: 0.6rem; }
+.care-done { color: var(--text); }
+.sheet .play-head { padding: 0.7rem 0.8rem; }
+.note-list details[open] .note-list-first { visibility: hidden; }
+.sheet .tile-grid { gap: 0.4rem; }
+.sheet .tile { padding-inline: 0.2rem; font-size: 0.8rem; overflow-wrap: normal; word-break: keep-all; }
+@media (max-width: 420px) { .sheet .tile { font-size: 0.74rem; } }
+
+/* ---- Today: a bigger body, everything around it smaller, so nothing scrolls. The top bar, the state line,
+   the main button and the fine print shrink; from tablets up "For today", the tank and Front / Back sit right
+   beside the body (placed from the body's own width, so they stay next to it) instead of in rows above it.
+   --fig-h is still set from the screen height only, calibrated on the busiest story day. ---- */
+.app.route-body { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 0.15rem); }
+.app.route-body .topbar { padding: 0.35rem 0; margin-bottom: 0.15rem; }
+.app.route-body .topbar .wordmark { font-size: 1.45rem; }
+.app.route-body .hero { margin-top: 0; }
+.app.route-body .hero-state { font-size: clamp(1.3rem, 3.4vw, 1.75rem); gap: 0.45rem; line-height: 1.15; }
+.app.route-body .hero-sub { margin-top: 0.05rem; font-size: 0.86rem; line-height: 1.3; }
+.app.route-body .hero-who { margin-top: 0.05rem; font-size: 0.8rem; }
+.app.route-body .home, .app.route-body .home-main { gap: 0.1rem; }
+.app.route-body .paint-hint { margin: 0.05rem 0 0; font-size: 0.8rem; }
+.app.route-body .figure { margin-top: 0.1rem; }
+.app.route-body .home-actions { margin-top: 0.1rem; padding-top: 0.25rem; }
+.app.route-body .home-actions .button.big { min-height: 46px; padding-block: 0.45rem; font-size: 0.98rem; }
+.app.route-body .fineprint { margin: 0.05rem 0 0; font-size: 0.68rem; }
+@media (min-width: 720px) {
+  .app.route-body .figure-stage { position: relative; width: 100%; }
+  .app.route-body .figure-stage > .segmented { position: absolute; z-index: 3; top: 1.8rem; left: auto; right: calc(50% + var(--fig-h) * 0.25 + 1rem);
+    flex-direction: column; border-radius: 22px; }
+  .app.route-body .figure-stage > .segmented button { min-width: 0; width: 88px; min-height: 44px; padding: 0 0.4rem; font-size: 0.85rem; }
+  .app.route-body .today-strip { order: 0; position: absolute; z-index: 3; top: 1.8rem; left: calc(50% + var(--fig-h) * 0.25 + 1rem); right: auto;
+    transform: none; margin: 0; width: 150px; flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .app.route-body .today-strip .strip-btn { min-width: 0; flex-direction: column; align-items: flex-start; gap: 0.1rem; padding: 0.55rem 0.8rem;
+    border-radius: 18px; text-align: left; }
+  .app.route-body .today-strip .tank-mini { flex-direction: row; align-items: center; gap: 0.45rem; }
+}
+/* Calibrated on the busiest story day in English and Spanish (days 23 to 30): phones keep 346 px for the rest
+   of the screen, tablets and desktops 318 px. On phones the side buttons may overlap the empty corners of the
+   body's box (beside the head), so the width limit is looser. */
+.app.route-body { --fig-h: clamp(220px, calc(100dvh - 346px), 620px); }
+@media (max-width: 719px) { .app.route-body .figure { max-height: calc((100vw - 2 * 56px) / var(--ar, 0.5)); } }
+@media (min-width: 720px) { .app.route-body { --fig-h: clamp(260px, calc(100dvh - 318px), 760px); } }
+
+/* ---- Introduction: six short pages over the app on the first visit (and from More) ---- */
+.intro-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1rem;
+  background: color-mix(in oklab, #000 62%, transparent); animation: fade 0.2s ease-out; }
+:root[data-theme='light'] .intro-backdrop { background: rgba(23, 23, 27, 0.4); }
+.intro { width: min(100%, 560px); max-height: min(92dvh, 760px); display: flex; flex-direction: column; border-radius: 24px;
+  border: 1px solid var(--line); background: var(--panel); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); animation: rise 0.22s ease-out; }
+.intro:focus { outline: none; }
+.intro-top { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 1.2rem 0; min-height: 44px; }
+.intro-count { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.intro-skip { min-height: 44px; display: inline-flex; align-items: center; align-self: center; }
+.intro-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0.2rem 1.2rem 1rem; }
+.intro-body h2 { margin: 0.2rem 0 0.3rem; font-size: 1.45rem; line-height: 1.2; }
+.intro-lead { margin: 0 0 0.9rem; color: var(--muted); font-size: 0.92rem; line-height: 1.4; }
+.intro-sub { margin: 1.1rem 0 0.5rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); }
+.intro-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+.intro-row { display: flex; align-items: flex-start; gap: 0.8rem; }
+.intro-row > span:last-child { display: grid; gap: 0.1rem; min-width: 0; }
+.intro-row strong { font-family: var(--font-title); font-size: 0.98rem; }
+.intro-line { color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
+.intro-mark { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--panel-2); color: var(--text); }
+.intro-letter { font-family: var(--font-mono); font-weight: 600; font-size: 1.05rem; color: var(--accent); }
+.intro-shape { font-size: 1.1rem; line-height: 1; }
+.intro-welcome { display: grid; justify-items: center; gap: 0.5rem; text-align: center; padding-top: 0.6rem; }
+.intro-welcome svg { width: 84px; height: 84px; }
+.intro-welcome h2.intro-wordmark { margin: 0; font-size: 2.2rem; letter-spacing: 0.14em; }
+.intro-tagline { margin: 0; font-family: var(--font-title); font-weight: 600; font-size: 1.05rem; color: var(--accent); }
+.intro-welcome > p:not(.intro-tagline) { margin: 0.3rem 0 0; max-width: 42ch; line-height: 1.5; font-size: 0.95rem; }
+.intro-chips { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0.8rem 0 0; padding: 0; }
+.intro-chips li { padding: 0.25rem 0.75rem; border-radius: 999px; border: 1px solid var(--line); font-size: 0.78rem; color: var(--muted); }
+.intro-domains { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.intro-domains li { display: grid; justify-items: center; gap: 0.25rem; padding: 0.7rem 0.5rem; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--panel-2); text-align: center; }
+.intro-domains strong { font-family: var(--font-title); font-size: 0.95rem; }
+.intro-domains span { color: var(--muted); font-size: 0.76rem; line-height: 1.35; }
+.intro-demo { margin-top: 1.1rem; padding: 0.85rem 1rem; border-radius: 14px; border: 1px solid var(--line); background: var(--panel-2); }
+.intro-demo p { margin: 0 0 0.3rem; font-size: 0.9rem; line-height: 1.45; }
+.intro-demo p:last-child { margin: 0; font-size: 0.82rem; }
+.intro-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.8rem 1.2rem calc(1rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line); }
+.intro-dots { display: flex; gap: 0.35rem; }
+.intro-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--line); transition: background 0.2s, width 0.2s; }
+.intro-dots span.on { width: 20px; border-radius: 999px; background: var(--accent); }
+.intro-buttons { display: flex; gap: 0.5rem; }
+.intro-buttons .button { min-width: 6.5rem; }
+@media (max-width: 520px) {
+  .intro-backdrop { padding: 0; place-items: stretch; }
+  .intro { width: 100%; max-height: none; height: 100dvh; border-radius: 0; border: 0; }
+  .intro-domains { grid-template-columns: 1fr; }
+  .intro-domains li { grid-template-columns: auto auto 1fr; justify-items: start; align-items: center; text-align: left; gap: 0.6rem; }
+  .intro-buttons .button { min-width: 5.5rem; }
+}
+@media (prefers-reduced-motion: reduce) { .intro, .intro-backdrop { animation: none; } }
