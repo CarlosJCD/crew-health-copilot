@@ -29,6 +29,11 @@ node scripts/fetch-space-weather.mjs  # refresh the NASA DONKI snapshot (NASA_AP
 | `src/data/sample.ts` | Placeholder synthetic data; swap for the data-science JSON | Data science |
 | `src/lib/status.ts` | Traffic-light logic: catalog categories + deviation from the personal pre-flight baseline | Engineering + Data science |
 | `src/modules/registry.ts` | Module list and owners (drives navigation) | Engineering |
+| `src/index.css` | Design tokens (dark and light themes), layout and components. See "Design" below | Engineering |
+| `src/components/Logo.tsx`, `public/favicon.svg`, `public/icons/` | Logo (concept A, "domain ring") and app icons | Engineering |
+| `src/components/StatusSummary.tsx` | Top of Today: overall status, counts per domain, early signal | Engineering |
+| `src/components/IndicatorCard.tsx`, `DetailsPanel.tsx` | Indicator card, compact list of nominal indicators, details panel with numbers and sources | Engineering |
+| `src/lib/summary.ts` | Counts per status and domain, card order, plain-text summary for the Crew Medical Officer | Engineering |
 | `src/modules/*.tsx` | One file per module | See registry |
 | `public/sw.js` | Offline service worker | Engineering |
 | `src/data/validate.ts` | Checks `public/data/synthetic.json` row by row; problems appear in a notice on Today | Engineering |
@@ -91,6 +96,21 @@ Indicator ids and units (from the catalog; `unit` must match exactly):
 Save it as `public/data/synthetic.json`. If the file is missing the app uses its built-in placeholder;
 if some rows are invalid they are skipped and listed in a notice on the Today tab.
 
+## Design
+
+The visual language follows the public (CC0) tokens of the
+[NASA Horizon Design System](https://github.com/nasa/hds-core): carbon neutrals, NASA blue and red, and the
+Inter / Public Sans / DM Mono typefaces (SIL OFL, bundled with the app so it looks the same offline).
+The app uses no NASA insignia ("meatball"), logotype ("worm") or mission patch, does not use "NASA" in its
+name, and says in the footer that it is not affiliated with or endorsed by NASA.
+
+- Blue means "you can act on this" (links, buttons, the active tab).
+- Red only means **Act**, plus the pulse inside the logo. Never use it for navigation or decoration.
+- Status is always color + shape + word: ● Nominal, ▲ Watch, ■ Act, ○ No data.
+- Dark "Mission" theme by default (less glare in the cabin); the light "Day" theme is for projectors.
+- Today puts the summary first: overall status, counts per domain and the next escalation step.
+  Indicators at Act or Watch get a full card; nominal ones share a compact list.
+
 ## Rules for thresholds
 
 Every threshold needs a source. Leave `verified: false` until someone on the team has opened the source;
@@ -111,4 +131,9 @@ Required by the 2026 Project Submission Guide ("Code and data: must acknowledge 
 - The reference catalog (`knowledge.json`) was extracted from NASA and clinical documents with assistance from
   Claude (`captured_by` field); each value stays "unverified" until a team member checks the page and quote.
 - Literature and benchmark searches were assisted by Claude; every source is opened and checked by a team member before use.
-- No SI-generated images, audio or video so far. Any that are added must carry a visible watermark and no NASA branding.
+- The UI redesign (layout, design tokens, components) and the logo (concept A, "domain ring":
+  `src/components/Logo.tsx`, `public/favicon.svg`, `public/icons/`) were drawn with assistance from Claude
+  from the team's brief, and reviewed by the team. The logo is a vector drawing written as SVG code. Team decision
+  (Nov 2026): it is declared here and in the SVG metadata (`<desc>` in `public/favicon.svg`) instead of carrying a
+  visible watermark. It contains no NASA branding.
+- No SI-generated photos, audio or video so far. Any that are added must carry a visible watermark and no NASA branding.

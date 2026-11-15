@@ -1,17 +1,24 @@
-import { useMemo } from 'react'
-import type { Domain, Measurement, Scenario, Status } from '../data/types'
+import { useCallback, useMemo, useState, type CSSProperties } from 'react'
+import type { Domain, Measurement, Scenario } from '../data/types'
 import type { LoadedData } from '../data/sample'
 import { dayRange } from '../data/validate'
 import { INDICATORS } from '../data/indicators'
 import { useI18n } from '../i18n/context'
 import { MISSION_DAYS } from '../data/sample'
 import { evaluateDay } from '../lib/status'
-import { IndicatorCard } from '../components/IndicatorCard'
+import { escalationPlan, overallStatus } from '../lib/escalation'
+import { countStatuses, shareText, splitByAttention, summarizeDomains, type ShareLine } from '../lib/summary'
+import { missionDayCode } from '../lib/missionDay'
+import { IndicatorCard, IndicatorList, type IndicatorItem } from '../components/IndicatorCard'
+import { DetailsPanel } from '../components/DetailsPanel'
+import { DemoReplay } from '../components/DemoReplay'
 import { EscalationPanel } from '../components/EscalationPanel'
 import { SpaceWeatherPanel } from '../components/SpaceWeatherPanel'
-import { escalationPlan } from '../lib/escalation'
+import { StatusSummary } from '../components/StatusSummary'
+import { describeChange } from '../components/describe'
 
 interface Props {
+  appName: string
   data: LoadedData
   day: number
   onDayChange: (d: number) => void
@@ -20,13 +27,13 @@ interface Props {
 
 const DOMAINS: Domain[] = ['biological', 'cognitive-emotional', 'social', 'protective']
 
-/** "Mean reaction time (PVT-B)" → "mean reaction time (PVT-B)": keeps acronyms intact. */
-const lowerFirst = (s: string) => (/^[A-Z]{2}/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1))
-
-export function Dashboard({ data, day, onDayChange, scenario }: Props) {
-  const { t, tr } = useI18n()
+export function Dashboard({ appName, data, day, onDayChange, scenario }: Props) {
+  const i18n = useI18n()
+  const { t, tr, unit, num } = i18n
+  const [detailsId, setDetailsId] = useState<string>()
   const measurements = data.rows
   const range = dayRange(measurements) ?? MISSION_DAYS
+
   const byIndicator = useMemo(() => {
     const map = new Map<string, Measurement[]>()
     for (const m of measurements) {
@@ -38,38 +45,56 @@ export function Dashboard({ data, day, onDayChange, scenario }: Props) {
     return map
   }, [measurements])
 
+  const items: IndicatorItem[] = useMemo(
+    () =>
+      INDICATORS.map((def) => {
+        const rows = byIndicator.get(def.id) ?? []
+        const ev = evaluateDay(def, rows, day)
+        return { def, rows, ev, status: ev.status }
+      }),
+    [byIndicator, day],
+  )
+
+  const statuses = items.map((i) => i.status)
+  const counts = countStatuses(statuses)
+  const overall = overallStatus(statuses)
+  const domains = summarizeDomains(
+    items.map((i) => ({ domain: i.def.domain, status: i.status })),
+    DOMAINS,
+  )
   // Cross-domain early signal: how many domains have at least one indicator off-nominal today.
-  const flagged = useMemo(() => {
-    const domains = new Set<Domain>()
-    const ids: string[] = []
-    const statuses: Status[] = []
-    for (const def of INDICATORS) {
-      const s: Status = evaluateDay(def, byIndicator.get(def.id) ?? [], day).status
-      statuses.push(s)
-      if (s === 'watch' || s === 'act') {
-        domains.add(def.domain)
-        ids.push(def.id)
-      }
+  const flaggedDomains = domains.filter((d) => d.counts.act + d.counts.watch > 0).length
+  const plan = escalationPlan(statuses, scenario)
+  const dayLong = day < 0 ? t('day.pre', { n: day }) : t('day.mission', { n: day })
+
+  const line = (i: IndicatorItem): ShareLine => {
+    const current = i.rows.find((r) => r.day === day)
+    return {
+      label: tr(i.def.label),
+      value: current ? `${num(current.value, i.def.decimals ?? 0)} ${unit(i.def.unit)}` : '–',
+      detail: describeChange(i.def, i.ev, day, i18n)?.text ?? t(`status.${i.status}`),
     }
-    return { domains, ids, statuses }
-  }, [byIndicator, day])
+  }
+  const share = shareText(
+    [
+      t('share.header', { app: appName, mission: tr(scenario.name), day: missionDayCode(day) }),
+      t('share.overall', { status: t(`status.${overall}`) }),
+    ],
+    [
+      { title: t('status.act'), lines: items.filter((i) => i.status === 'act').map(line) },
+      { title: t('status.watch'), lines: items.filter((i) => i.status === 'watch').map(line) },
+    ],
+    t('share.none'),
+    t('esc.disclaimer'),
+  )
+
+  const jump = useCallback((domain: Domain) => {
+    document.getElementById(`domain-${domain}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
 
   return (
     <div className="dashboard">
-      <div className="day-control">
-        <label htmlFor="day">
-          {day < 0 ? t('day.pre', { n: day }) : t('day.mission', { n: day })}
-        </label>
-        <input
-          id="day"
-          type="range"
-          min={range.first}
-          max={range.last}
-          value={day}
-          onChange={(e) => onDayChange(Number(e.target.value))}
-        />
-        <span className="hint">{data.origin === 'file' ? t('day.hintFile') : t('day.hint')}</span>
-      </div>
+      <DemoReplay day={day} range={range} onChange={onDayChange} fromFile={data.origin === 'file'} />
 
       {data.errors.length > 0 && (
         <details className="data-issues">
@@ -82,37 +107,56 @@ export function Dashboard({ data, day, onDayChange, scenario }: Props) {
         </details>
       )}
 
-      {flagged.domains.size >= 2 && (
-        <section className="signal" role="status">
-          <h2>{t('signal.title', { n: flagged.domains.size })}</h2>
-          <p>
-            {t('signal.body', {
-              list: INDICATORS.filter((d) => flagged.ids.includes(d.id))
-                .map((d) => lowerFirst(tr(d.label)))
-                .join(', '),
-            })}
-          </p>
-        </section>
-      )}
+      <div className="summary-row">
+        <StatusSummary
+          dayLabel={dayLong}
+          overall={overall}
+          counts={counts}
+          domains={domains}
+          flaggedDomains={flaggedDomains}
+          onJump={jump}
+        />
+        <EscalationPanel plan={plan} shareText={share}>
+          <SpaceWeatherPanel />
+        </EscalationPanel>
+      </div>
 
-      <SpaceWeatherPanel />
-
-      {DOMAINS.map((domain) => {
-        const defs = INDICATORS.filter((d) => d.domain === domain)
-        if (!defs.length) return null
-        return (
-          <section key={domain} className="domain">
-            <h2>{t(`domain.${domain}`)}</h2>
-            <div className="grid">
-              {defs.map((def) => (
-                <IndicatorCard key={def.id} def={def} rows={byIndicator.get(def.id) ?? []} day={day} />
+      <div className="domains">
+        {DOMAINS.map((domain) => {
+          const domainItems = items.filter((i) => i.def.domain === domain)
+          if (!domainItems.length) return null
+          const { attention, rest } = splitByAttention(domainItems)
+          const tiles = attention.length + (rest.length ? 1 : 0)
+          const summary = domains.find((d) => d.domain === domain)
+          return (
+            <section
+              key={domain}
+              id={`domain-${domain}`}
+              className="domain"
+              aria-labelledby={`domain-title-${domain}`}
+              style={{ '--span': Math.min(4, tiles), '--span-md': Math.min(2, tiles) } as CSSProperties}
+            >
+              <div className="domain-head">
+                <h2 id={`domain-title-${domain}`}>{t(`domain.${domain}`)}</h2>
+                {summary && (
+                  <span className="counts">
+                    {summary.counts.act > 0 && <span>■ {summary.counts.act} {t('status.act').toLowerCase()}</span>}
+                    {summary.counts.watch > 0 && <span>▲ {summary.counts.watch} {t('status.watch').toLowerCase()}</span>}
+                    {summary.counts.nominal > 0 && <span>● {summary.counts.nominal} {t('status.nominal').toLowerCase()}</span>}
+                    {summary.counts['no-data'] > 0 && <span>○ {summary.counts['no-data']} {t('status.no-data').toLowerCase()}</span>}
+                  </span>
+                )}
+              </div>
+              {attention.map((item) => (
+                <IndicatorCard key={item.def.id} item={item} day={day} onDetails={setDetailsId} />
               ))}
-            </div>
-          </section>
-        )
-      })}
+              {rest.length > 0 && <IndicatorList items={rest} day={day} onDetails={setDetailsId} />}
+            </section>
+          )
+        })}
+      </div>
 
-      <EscalationPanel plan={escalationPlan(flagged.statuses, scenario)} />
+      <DetailsPanel item={items.find((i) => i.def.id === detailsId)} day={day} onClose={() => setDetailsId(undefined)} />
     </div>
   )
 }

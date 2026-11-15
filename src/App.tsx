@@ -3,7 +3,10 @@ import { DEFAULT_SCENARIO_ID, SCENARIOS } from './data/scenarios'
 import { loadMeasurements, MISSION_DAYS, type LoadedData } from './data/sample'
 import { dayRange } from './data/validate'
 import { LanguageToggle } from './components/LanguageToggle'
-import { ScenarioSelector } from './components/ScenarioSelector'
+import { Logo } from './components/Logo'
+import { MissionBar } from './components/MissionBar'
+import { ThemeToggle } from './components/ThemeToggle'
+import { useTheme } from './lib/theme'
 import { useI18n } from './i18n/context'
 import { Dashboard } from './modules/Dashboard'
 import { Placeholder } from './modules/Placeholder'
@@ -11,6 +14,12 @@ import { DEFAULT_MODULE, MODULES } from './modules/registry'
 
 // Working title. Final name is decided in Phase 4; change it here only.
 export const APP_NAME = 'Crew Health Copilot'
+
+/** "Crew Health Copilot" → ["Crew Health", "Copilot"]: the last word is set small in the wordmark. */
+function wordmark(name: string): [string, string] {
+  const i = name.lastIndexOf(' ')
+  return i > 0 ? [name.slice(0, i), name.slice(i + 1)] : [name, '']
+}
 
 function readHash(): string {
   const id = window.location.hash.replace(/^#\/?/, '')
@@ -30,6 +39,7 @@ export default function App() {
   const [data, setData] = useState<LoadedData>({ rows: [], origin: 'generated', errors: [] })
   const [day, setDay] = useState(MISSION_DAYS.last)
   const [online, setOnline] = useState(navigator.onLine)
+  const [theme, setTheme] = useTheme()
 
   useEffect(() => {
     const onHash = () => setModuleId(readHash())
@@ -57,12 +67,14 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="logo" aria-hidden="true">◐</span>
-          <span>{APP_NAME}</span>
-          <span className={`net ${online ? 'on' : 'off'}`}>{online ? t('net.online') : t('net.offline')}</span>
+          <Logo />
+          <span className="brand-name">{wordmark(APP_NAME)[0]}</span>
+          <span className="brand-sub">{wordmark(APP_NAME)[1]}</span>
         </div>
-        <div className="topbar-controls">
-          <ScenarioSelector scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} />
+        <MissionBar scenarios={SCENARIOS} value={scenario.id} onChange={setScenarioId} day={day} />
+        <div className="topbar-end">
+          <span className={`net ${online ? 'on' : 'off'}`}>● {online ? t('net.online') : t('net.offline')}</span>
+          <ThemeToggle theme={theme} onChange={setTheme} />
           <LanguageToggle />
         </div>
       </header>
@@ -77,7 +89,7 @@ export default function App() {
 
       <main>
         {active.id === 'today' ? (
-          <Dashboard data={data} day={day} onDayChange={setDay} scenario={scenario} />
+          <Dashboard appName={APP_NAME} data={data} day={day} onDayChange={setDay} scenario={scenario} />
         ) : (
           <Placeholder module={active} />
         )}

@@ -1,119 +1,110 @@
-import { useState } from 'react'
-import type { IndicatorDef, Measurement, SourceRef } from '../data/types'
+import type { IndicatorDef, Measurement } from '../data/types'
 import { useI18n } from '../i18n/context'
-import { evaluateDay, STATUS_SYMBOL } from '../lib/status'
+import type { Evaluation } from '../lib/status'
+import { describeChange } from './describe'
+import { DeviationMeter } from './DeviationMeter'
 import { Sparkline } from './Sparkline'
+import { StatusPill } from './StatusPill'
 
-interface Props {
+export interface IndicatorItem {
   def: IndicatorDef
   rows: Measurement[]
+  ev: Evaluation
+  status: Evaluation['status']
+}
+
+interface CardProps {
+  item: IndicatorItem
   day: number
+  onDetails: (id: string) => void
 }
 
-function Source({ source }: { source: SourceRef }) {
-  const { t, tr } = useI18n()
-  return (
-    <span className={source.verified ? 'source' : 'source pending'}>
-      {source.url ? (
-        <a href={source.url} target="_blank" rel="noreferrer">
-          {tr(source.label)}
-        </a>
-      ) : (
-        tr(source.label)
-      )}
-      {/* Pending placeholders already say so; flag only real citations not yet checked. */}
-      {!source.verified && source.url && ` ${t('card.unverified')}`}
-    </span>
-  )
-}
-
-/** Traffic-light card: status is shown with color AND a shape AND a word, so it reads without color. */
-export function IndicatorCard({ def, rows, day }: Props) {
-  const { t, tr, unit, num } = useI18n()
-  const [open, setOpen] = useState(false)
-  const ev = evaluateDay(def, rows, day)
-  const { status, baseline, observed, expected, z, category } = ev
-  const visible = rows.filter((r) => r.day <= day)
+/** Full card for an indicator at Watch or Act: value, one plain sentence, deviation meter, trend, next step. */
+export function IndicatorCard({ item, day, onDetails }: CardProps) {
+  const i18n = useI18n()
+  const { t, tr, unit, num } = i18n
+  const { def, rows, ev, status } = item
   const current = rows.find((r) => r.day === day)
-  const statusLabel = t(`status.${status}`)
-  const d = def.decimals ?? 0
-  const u = unit(def.unit)
   const label = tr(def.label)
-  const signed = (x: number, decimals: number) => {
-    const r = Number(x.toFixed(decimals))
-    return r === 0 ? num(0, decimals) : `${r > 0 ? '+' : ''}${num(r, decimals)}`
-  }
-  const shifted = day >= 0 && def.inflightShift !== 0
+  const change = current ? describeChange(def, ev, day, i18n) : undefined
 
   return (
     <article className={`card status-${status}`}>
       <header className="card-head">
         <h3>{label}</h3>
-        <span className="badge" aria-label={t('status.aria', { status: statusLabel })}>
-          <span aria-hidden="true">{STATUS_SYMBOL[status]}</span> {statusLabel}
-        </span>
+        <StatusPill status={status} />
       </header>
-
       <p className="value">
-        {current ? num(current.value, d) : '–'}
-        <span className="unit"> {u}</span>
+        <span className="value-num">{current ? num(current.value, def.decimals ?? 0) : '–'}</span>
+        <span className="unit">{unit(def.unit)}</span>
       </p>
-
-      {current && observed !== undefined && def.smoothN > 1 && (
-        <p className="delta">{t('card.avg', { n: def.smoothN, value: `${num(observed, d)} ${u}` })}</p>
-      )}
-
-      {current && def.evaluateOn === 'changePct' && ev.changePct !== undefined && (
-        <p className="delta">{t('card.change', { pct: signed(ev.changePct, 1) })}</p>
-      )}
-
-      {current && observed !== undefined && expected !== undefined && (
+      {change && (
         <p className="delta">
-          {t(shifted ? 'card.vsExpected' : 'card.vsBaseline', {
-            delta: signed(observed - expected, d),
-            mean: num(expected, d),
-          })}
-          {z !== undefined && Math.abs(z) >= 1 ? ` · ${t('card.sd', { z: num(Math.abs(z), 1) })}` : ''}
+          <span className="dir" aria-hidden="true">
+            {change.dir}
+          </span>
+          {change.text}
         </p>
       )}
-
-      {current && category && <p className="category">{t('card.category', { label: tr(category.label) })}</p>}
-
+      {current && ev.z !== undefined && <DeviationMeter z={ev.z} cutoffs={def.baselineSd} worseWhen={def.worseWhen} />}
       <Sparkline
-        values={visible.map((r) => ({ day: r.day, value: r.value }))}
-        baseline={baseline}
+        values={rows.filter((r) => r.day <= day).map((r) => ({ day: r.day, value: r.value }))}
+        baseline={ev.baseline}
         currentDay={day}
         ariaLabel={t('card.trend', { label })}
       />
-
       <p className="next-step">{t(`action.${status}`)}</p>
-
-      <button className="link" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        {open ? t('card.hide') : t('card.why')}
+      <button type="button" className="link" onClick={() => onDetails(def.id)} aria-haspopup="dialog">
+        {t('card.details')} ›
       </button>
-      {open && (
-        <div className="details">
-          <p>{tr(def.explainer)}</p>
-          <p>
-            <strong>{t('card.how')}</strong> {tr(def.method)}
-          </p>
-          {category && (
-            <p>
-              <strong>{t('card.cutoff')}</strong> {category.quote && <q lang="en">{category.quote}</q>}{' '}
-              <Source source={category.source} />
-            </p>
-          )}
-          <p>
-            <strong>{t('card.sources')}</strong>{' '}
-            {def.sources.map((s, i) => (
-              <span key={i}>
-                {i > 0 && ' · '}
-                <Source source={s} />
-              </span>
-            ))}
-          </p>
-        </div>
-      )}
+    </article>
+  )
+}
+
+/** Nominal and no-data indicators of a domain, one row each, so they do not take a full card. */
+export function IndicatorList({ items, day, onDetails }: { items: IndicatorItem[]; day: number; onDetails: (id: string) => void }) {
+  const { t, tr, unit, num } = useI18n()
+  const allNominal = items.every((i) => i.status === 'nominal')
+  return (
+    <article className="card card-list">
+      <header className="card-head">
+        <h3>{t(allNominal ? 'list.nominal' : 'list.mixed')}</h3>
+        <span className="pill status-nominal" aria-hidden="true">
+          ● {items.filter((i) => i.status === 'nominal').length}
+        </span>
+      </header>
+      <ul>
+        {items.map(({ def, rows, ev, status }) => {
+          const current = rows.find((r) => r.day === day)
+          const label = tr(def.label)
+          return (
+            <li key={def.id}>
+              <button
+                type="button"
+                className={`list-row status-${status}`}
+                onClick={() => onDetails(def.id)}
+                aria-haspopup="dialog"
+                aria-label={`${label}: ${current ? `${num(current.value, def.decimals ?? 0)} ${unit(def.unit)}` : ''} ${t(`status.${status}`)}`}
+              >
+                <span className="row-name">
+                  {status === 'no-data' && <span className="shape" aria-hidden="true">○ </span>}
+                  {label}
+                </span>
+                <span className="row-val">
+                  {current ? num(current.value, def.decimals ?? 0) : '–'} <small>{unit(def.unit)}</small>
+                </span>
+                <Sparkline
+                  mini
+                  values={rows.filter((r) => r.day <= day).map((r) => ({ day: r.day, value: r.value }))}
+                  baseline={ev.baseline}
+                  currentDay={day}
+                  ariaLabel=""
+                />
+              </button>
+            </li>
+          )
+        })}
+      </ul>
     </article>
   )
 }
