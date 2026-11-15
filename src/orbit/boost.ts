@@ -52,6 +52,9 @@ export const CARDS: Record<string, BoostCard> = Object.fromEntries(
 )
 
 export const TRIGGERS = library.triggers as unknown as Trigger[]
+/** Studies Psychology based Boost's design on (offer little, at the right moment; she chooses). */
+export const DESIGN_BASIS = library.design_basis as BoostSource[]
+
 export const DISPLAY = library.display_rules as {
   max_cards_shown: number
   max_choices: number

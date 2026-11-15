@@ -3,6 +3,7 @@ import {
   BOOST_DISCLAIMER,
   boostPlan,
   CARDS,
+  DESIGN_BASIS,
   DISPLAY,
   downrankedCards,
   type BoostDay,
@@ -131,6 +132,21 @@ export function Boost({ demo, day, log, onLogChange, careActions }: Props) {
       {!askedYes && plan.offered.length > 0 && (
         <section aria-labelledby="offered">
           <h2 id="offered">{t('boost.choose', { n: DISPLAY.max_choices, chosen: today.chosen.length })}</h2>
+          {/* Why the limit: Psychology's design basis, and an honest note that the number itself is a design choice. */}
+          <p className="choose-why">
+            <strong>{t('boost.whyTwoTitle', { n: DISPLAY.max_choices })}</strong> {t('boost.whyTwo', { n: DISPLAY.max_choices })}{' '}
+            <span className="choose-basis">
+              {t('boost.whyTwoBasis')}{' '}
+              {DESIGN_BASIS.map((s, i) => (
+                <span key={s.cite}>
+                  {i > 0 && ' · '}
+                  <a href={s.url} target="_blank" rel="noreferrer">
+                    {s.cite}
+                  </a>
+                </span>
+              ))}
+            </span>
+          </p>
           <div className="grid">
             {plan.offered.map((c) => {
               const chosen = today.chosen.includes(c.id)
