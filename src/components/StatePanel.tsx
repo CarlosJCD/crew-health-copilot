@@ -3,6 +3,7 @@ import { STATE_ESCALATION, type DayResult } from '../orbit/engine'
 import { useI18n } from '../i18n/context'
 import type { StringKey } from '../i18n/strings'
 import { ORBIT_STEPS, orbitStep } from '../lib/orbit'
+import { L } from '../i18n/content'
 
 /** Today's ORBIT state, what ORBIT says, who sees it, and what reaches Earth given the delay. */
 export function StatePanel({ result, scenario }: { result: DayResult; scenario: Scenario }) {
@@ -27,7 +28,7 @@ export function StatePanel({ result, scenario }: { result: DayResult; scenario: 
       </ol>
       <p className="orbit-heading">{t(`orbit.heading.${step as 'observe' | 'boost' | 'transmit'}`)}</p>
       <h2 id="state-title">{t(`state.${result.state}`)}</h2>
-      <p className="state-text" lang="en">{esc.en}</p>
+      <p className="state-text">{L(esc.en, lang)}</p>
       {result.state === 'EARLY_SIGNAL' && <p className="state-why">{t('state.days')}</p>}
       <p className="state-who">
         <strong>{t('state.to')}</strong> {t(who)}

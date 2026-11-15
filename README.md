@@ -60,6 +60,7 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `src/data/knowledge.json` | Data team's reference catalog (`datos_nasav1.json`): plausible ranges used to check `demo-data.json`, NASA sources, physics | Data science |
 | `src/data/spaceWeather.ts`, `scripts/fetch-space-weather.mjs` | NASA DONKI snapshot (flares and SEP events) | Engineering |
 | `src/i18n/strings.ts` | Interface text in English (default) and Spanish. Rule texts come from the JSON, in English | Everyone who adds text |
+| `src/i18n/content-es.json`, `content.ts`, `dynamic.ts` | Spanish for the texts of the data files (rules, Boost library, pulse, pain, game, scenarios, demo story), which stay unchanged in English, and templates for the sentences the code builds from them (card reasons, packet lines). `content.test.ts` names any text left without Spanish | Everyone who adds text |
 | `public/sw.js` | Offline service worker | Engineering |
 | `src/index.css` | Design tokens (dark and light themes), layout and components. See "Design" below | Engineering |
 | `src/components/Logo.tsx`, `public/favicon.svg`, `public/icons/` | Logo (the ring is the O of ORBIT) and app icons | Engineering |

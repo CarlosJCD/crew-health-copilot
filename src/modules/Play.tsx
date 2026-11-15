@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { BOARDS, closest, groupOf, shuffled, type Group } from '../orbit/constellations'
 import { useI18n } from '../i18n/context'
+import { useContent } from '../i18n/content'
+import { boardEs, tileEs } from '../i18n/dynamic'
 
 interface Props {
   /** Boards completed on this device (leisure log only; nothing is measured). */
@@ -15,7 +17,8 @@ interface Props {
 
 /** Constellations, free mode: group 16 tiles into 4 sets. No timer, no score. */
 export function Play({ completed, onComplete, initialBoard = 0, initialSolved = false, heading = true }: Props) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  const c = useContent()
   const [boardIndex, setBoardIndex] = useState(Math.min(Math.max(initialBoard, 0), BOARDS.length - 1))
   const board = BOARDS[boardIndex]
   const [solved, setSolved] = useState<Group[]>(initialSolved ? board.groups : [])
@@ -57,20 +60,20 @@ export function Play({ completed, onComplete, initialBoard = 0, initialSolved = 
         {heading && <h2>{t('play.title')}</h2>}
         <div className="actions" role="group" aria-label={t('play.boards')}>
           {BOARDS.map((b, i) => (
-            <button key={b.board} type="button" className="button secondary" aria-pressed={i === boardIndex} onClick={() => choose(i)} lang="en">
-              {b.board}
+            <button key={b.board} type="button" className="button secondary" aria-pressed={i === boardIndex} onClick={() => choose(i)}>
+              {boardEs(b.board, lang)}
             </button>
           ))}
         </div>
-        <p lang="en">{board.intro_en}</p>
+        <p>{c(board.intro_en)}</p>
         <p className="muted">{t('play.note', { n: completed })}</p>
       </section>
 
       {solved.map((g) => (
-        <article key={g.name_en} className="solved-group" lang="en">
-          <h3>{g.name_en}</h3>
-          <p className="tiles-line">{g.tiles.join(' · ')}</p>
-          <p>{g.fact_en}</p>
+        <article key={g.name_en} className="solved-group">
+          <h3>{c(g.name_en)}</h3>
+          <p className="tiles-line">{g.tiles.map((x) => tileEs(x, lang)).join(' · ')}</p>
+          <p>{c(g.fact_en)}</p>
           <p className="muted">
             <a href={g.source} target="_blank" rel="noreferrer">
               {t('play.source')}
@@ -92,8 +95,8 @@ export function Play({ completed, onComplete, initialBoard = 0, initialSolved = 
         <section aria-label={t('play.tiles')}>
           <div className="tile-grid">
             {remaining.map((tile) => (
-              <button key={tile} type="button" className="tile" aria-pressed={selected.includes(tile)} onClick={() => toggle(tile)} lang="en">
-                {tile}
+              <button key={tile} type="button" className="tile" aria-pressed={selected.includes(tile)} onClick={() => toggle(tile)}>
+                {tileEs(tile, lang)}
               </button>
             ))}
           </div>
@@ -110,8 +113,8 @@ export function Play({ completed, onComplete, initialBoard = 0, initialSolved = 
           </div>
           {message && <p role="status">{message}</p>}
           {unsolved.slice(0, hints).map((g) => (
-            <p key={g.name_en} className="muted" lang="en">
-              {t('play.hintLabel')} {g.hint_en}
+            <p key={g.name_en} className="muted">
+              {t('play.hintLabel')} {c(g.hint_en)}
             </p>
           ))}
         </section>

@@ -61,7 +61,7 @@ const notShared = (share: ShareSettings) =>
 
 function privacyLine(share: ShareSettings): string {
   const hidden = notShared(share)
-  return hidden.length ? `Not shared by her choice: ${hidden.join(', ')}.` : 'She chose to share Body, Mind and Crew.'
+  return hidden.length ? `Not shared, by choice: ${hidden.join(', ')}.` : 'Shared by choice: Body, Mind and Crew.'
 }
 
 /** Onboard packet she chooses to send to the crew medical officer. `pain` = her pain reports of the day (Body). */

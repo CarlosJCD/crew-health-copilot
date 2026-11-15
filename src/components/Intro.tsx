@@ -141,7 +141,7 @@ const PAGES: ((p: PageProps) => ReactNode)[] = [
         <p className="intro-lead">{t('intro.loopLead')}</p>
         <ol className="intro-list">
           {LOOP.map((s) => (
-            <Row key={s} mark={<span className="intro-letter">{s[0].toUpperCase()}</span>} title={<span lang="en">{s[0].toUpperCase() + s.slice(1)}</span>}>
+            <Row key={s} mark={<span className="intro-letter">{s[0].toUpperCase()}</span>} title={t(`orbit.${s}`)}>
               {t(`intro.loop.${s}`)}
             </Row>
           ))}

@@ -6,6 +6,7 @@ import { HEAT, heatColor, heatOn, type ZoneHeat } from '../orbit/heat'
 import { BRUSH, INTENSITY_COLORS, toViewerSide, type BodyView, type PainLog } from '../orbit/pain'
 import { useI18n } from '../i18n/context'
 import { useFigure } from '../lib/figure'
+import { symptomEs } from '../i18n/dynamic'
 
 interface Props {
   day: number
@@ -18,7 +19,7 @@ interface Props {
  * unless she logs that zone again. Display only; the engine does not use it.
  */
 export function SymptomHeatmap({ day, painLog, symptomLog }: Props) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [figure] = useFigure()
   const [view, setView] = useState<BodyView>('front')
   const other: BodyView = view === 'front' ? 'back' : 'front'
@@ -101,7 +102,7 @@ export function SymptomHeatmap({ day, painLog, symptomLog }: Props) {
       {heat.noPlace.length > 0 && (
         <p className="muted">
           {t('heat.noPlace')}{' '}
-          <span lang="en">{heat.noPlace.map((s) => `${s.symptom} (${s.day})`).join(', ')}</span>
+          <span>{heat.noPlace.map((s) => `${symptomEs(s.symptom, lang)} (${s.day})`).join(', ')}</span>
         </p>
       )}
     </div>

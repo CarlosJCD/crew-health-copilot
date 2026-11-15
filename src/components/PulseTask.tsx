@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fill, isPractice, nextInterval, PULSE, PULSE_SPEC, scoreSession, type PulseResult, type PulseSession, type Trial } from '../orbit/pulse'
 import { useI18n } from '../i18n/context'
+import { useContent } from '../i18n/content'
 
 const TRIAL_RUN_MS = 30_000
 
@@ -125,6 +126,7 @@ type Mode = 'idle' | 'running' | 'trial'
 /** Pulse mode card in Mind: intro, start, skip, and the message after a session (texts from pulse-spec.json). */
 export function PulseTask({ day, baselineMs, sessions, onSessionsChange }: Props) {
   const { t } = useI18n()
+  const c = useContent()
   const [mode, setMode] = useState<Mode>('idle')
   const [message, setMessage] = useState<{ lines: string[] } | undefined>()
   const today = sessions.filter((s) => s.day === day)
@@ -143,8 +145,8 @@ export function PulseTask({ day, baselineMs, sessions, onSessionsChange }: Props
       result.median_ms === null
         ? [t('pulse.noResult', { n: PULSE.minValid })]
         : practice
-          ? [fill(PULSE_SPEC.after_practice_session_en, { n: counted })]
-          : [fill(PULSE_SPEC.after_session_en, { median_ms: result.median_ms, baseline_ms: baselineMs ?? '–' })]
+          ? [fill(c(PULSE_SPEC.after_practice_session_en), { n: counted })]
+          : [fill(c(PULSE_SPEC.after_session_en), { median_ms: result.median_ms, baseline_ms: baselineMs ?? '–' })]
     lines.push(t('pulse.details', { lapses: result.lapses, early: result.false_starts }))
     setMessage({ lines })
     setMode('idle')
@@ -165,7 +167,7 @@ export function PulseTask({ day, baselineMs, sessions, onSessionsChange }: Props
 
   return (
     <div className="pulse-intro">
-      <p lang="en">{PULSE_SPEC.intro_en}</p>
+      <p>{c(PULSE_SPEC.intro_en)}</p>
       <button type="button" className="button wide" onClick={() => (setMessage(undefined), setMode('running'))}>
         {t('pulse.start')}
       </button>
@@ -173,12 +175,12 @@ export function PulseTask({ day, baselineMs, sessions, onSessionsChange }: Props
         <button type="button" className="button secondary" onClick={() => (setMessage(undefined), setMode('trial'))}>
           {t('pulse.trial')}
         </button>
-        <button type="button" className="link" onClick={() => setMessage({ lines: [PULSE_SPEC.after_skip_en] })}>
+        <button type="button" className="link" onClick={() => setMessage({ lines: [c(PULSE_SPEC.after_skip_en)] })}>
           {t('pulse.skip')}
         </button>
       </div>
       {message && (
-        <div role="status" lang="en" className="pulse-message">
+        <div role="status" className="pulse-message">
           {message.lines.map((l) => (
             <p key={l}>{l}</p>
           ))}

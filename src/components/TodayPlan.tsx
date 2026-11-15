@@ -5,6 +5,8 @@ import { todaySuggestions, triggerLabel, type Because, type Reminder } from '../
 import { useI18n } from '../i18n/context'
 import type { StringKey } from '../i18n/strings'
 import { SuggestionCard } from './SuggestionCard'
+import { L } from '../i18n/content'
+import { triggerEs } from '../i18n/dynamic'
 
 interface Props {
   day: number
@@ -30,7 +32,7 @@ export function TodayPlan({ day, plan, reminders, painLog, chosen, onToggle, onP
   const { red, items } = todaySuggestions(plan, day, painLog)
   const where = (e: PainEvent) => e.regions.map((r) => regionLabel(r, lang)).join(', ')
   const because = (b: Because) =>
-    b.kind === 'trigger' ? triggerLabel(b.trigger) : t('plan.becausePain', { where: where(b.event).toLowerCase(), day: b.day })
+    b.kind === 'trigger' ? triggerEs(triggerLabel(b.trigger), lang) : t('plan.becausePain', { where: where(b.event).toLowerCase(), day: b.day })
 
   return (
     <section className="card plan-today" aria-labelledby="plan-title">
@@ -54,9 +56,9 @@ export function TodayPlan({ day, plan, reminders, painLog, chosen, onToggle, onP
                 <span>
                   {t(REMINDER[r.id].text)}
                   {r.id === 'did_it_help' && (
-                    <span className="muted" lang="en">
+                    <span className="muted">
                       {' '}
-                      ({r.cards.map((id) => CARDS[id]?.title_en ?? id).join(', ')})
+                      ({r.cards.map((id) => L(CARDS[id]?.title_en ?? id, lang)).join(', ')})
                     </span>
                   )}
                 </span>

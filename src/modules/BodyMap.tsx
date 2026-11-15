@@ -21,6 +21,8 @@ import { PainPanel } from '../components/PainPanel'
 import { PaintSurface } from '../components/PainPainter'
 import { Sheet } from '../components/Sheet'
 import { TodayPlan } from '../components/TodayPlan'
+import { L } from '../i18n/content'
+import { symptomEs } from '../i18n/dynamic'
 
 interface Props {
   demo: LoadedDemo
@@ -75,7 +77,7 @@ const listText = (items: string[], and: string) => (items.length < 2 ? items.joi
 export function BodyMap(props: Props) {
   const { demo, day, log, painLog, onPainChange, checkins, pulseSessions, boostLog, onBoostLogChange, care, theme = 'dark' } = props
   const fig = theme === 'light' ? FIGURE_LIGHT : FIGURE
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [figure] = useFigure()
   const [view, setView] = useState<BodyView>('front')
   const [strokes, setStrokes] = useState<PaintStroke[]>([])
@@ -140,7 +142,7 @@ export function BodyMap(props: Props) {
   // Eyes, skin and symptoms with no zone: they have no place on the figure, so they are listed under it
   // (the most recent day of each).
   const offFigure = [...new Map([...heat.noPlace].sort((a, b) => a.day - b.day).map((n) => [n.symptom, n])).values()].sort((a, b) => b.day - a.day)
-  const offText = offFigure.map((n) => `${cap(n.symptom)} (${ago(n.day)})`)
+  const offText = offFigure.map((n) => `${cap(symptomEs(n.symptom, lang))} (${ago(n.day)})`)
   const summary = [...heatRows, ...(offText.length ? [`${t('heat.noPlace')} ${offText.join(', ')}`] : [])].join('; ') || t('home.heatNone')
 
   return (
@@ -167,8 +169,8 @@ export function BodyMap(props: Props) {
 
         {state === 'RED_PHYSICAL' && (
           <section className="cmo-card" role="alert" aria-labelledby="cmo-title">
-            <h2 id="cmo-title" lang="en">{CARDS.cmo_now?.title_en}</h2>
-            <p lang="en">{CARDS.cmo_now?.what_en}</p>
+            <h2 id="cmo-title">{L(CARDS.cmo_now?.title_en, lang)}</h2>
+            <p>{L(CARDS.cmo_now?.what_en, lang)}</p>
           </section>
         )}
 
@@ -226,7 +228,7 @@ export function BodyMap(props: Props) {
           />
           {offText.length > 0 && (
             <p className="also-logged" aria-hidden="true">
-              <span className="muted">{t('heat.noPlace')}</span> <span lang="en">{offText.slice(0, 3).join(' · ')}</span>
+              <span className="muted">{t('heat.noPlace')}</span> <span>{offText.slice(0, 3).join(' · ')}</span>
               {offText.length > 3 && <span className="muted"> {t('home.more', { n: offText.length - 3 })}</span>}
             </p>
           )}

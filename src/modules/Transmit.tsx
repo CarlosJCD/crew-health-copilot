@@ -18,6 +18,8 @@ import type { StringKey } from '../i18n/strings'
 import { painPacketLines, type PainDay } from '../orbit/pain'
 import { Icon, type IconName } from '../components/Icon'
 import { InfoTip } from '../components/InfoTip'
+import { packetLineEs } from '../i18n/dynamic'
+import { scenarioName } from '../orbit/display'
 
 interface Props {
   demo: LoadedDemo
@@ -153,11 +155,11 @@ export function Transmit({ demo, day, scenario, share, onShareChange, outbox, on
                   </span>
                 </div>
                 {suggested && !sent && <span className="tx-suggested">{t('tx.suggested')}</span>}
-                <div className="tx-preview" lang="en">
-                  <p>{draft.title}</p>
+                <div className="tx-preview">
+                  <p>{packetLineEs(draft.title, lang)}</p>
                   <ul>
                     {draft.lines.map((l) => (
-                      <li key={l}>{l}</li>
+                      <li key={l}>{packetLineEs(l, lang)}</li>
                     ))}
                   </ul>
                 </div>
@@ -199,7 +201,7 @@ export function Transmit({ demo, day, scenario, share, onShareChange, outbox, on
                   <Icon name={RECIPIENT_ICON[p.to]} size={16} />
                 </span>
                 <div>
-                  <strong lang="en">{p.title}</strong>
+                  <strong>{packetLineEs(p.title, lang)}</strong>
                   {status(p)}
                 </div>
               </li>
@@ -222,9 +224,9 @@ function SignalPath({ scenario, live }: { scenario: Scenario; live: boolean }) {
   const reply = delayText(scenario.one_way_delay_s * 2)[lang]
   const groundFirst = scenario.first_responder === 'ground_and_cmo'
   return (
-    <div className="tx-path" role="group" aria-label={live ? t('tx.live', { scenario: scenario.label_en }) : t('tx.delay', { scenario: scenario.label_en, delay, reply })}>
-      <p className="tx-path-label" lang="en">
-        {scenario.label_en}
+    <div className="tx-path" role="group" aria-label={live ? t('tx.live', { scenario: scenarioName(scenario)[lang] }) : t('tx.delay', { scenario: scenarioName(scenario)[lang], delay, reply })}>
+      <p className="tx-path-label">
+        {scenarioName(scenario)[lang]}
       </p>
       <div className="tx-path-track" aria-hidden="true">
         <span className="tx-node">

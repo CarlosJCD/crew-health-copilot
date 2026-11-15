@@ -1,5 +1,6 @@
 import { dayRange, STORY_DAYS, type LoadedDemo } from '../orbit/demoData'
 import { useI18n } from '../i18n/context'
+import { L } from '../i18n/content'
 
 interface Props {
   demo: LoadedDemo
@@ -9,7 +10,7 @@ interface Props {
 
 /** Persona line, the day control (every day of the file; the demo story is 23 to 30) with the mission log, and dataset problems. */
 export function DayControl({ demo, day, onDayChange }: Props) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { data } = demo
   const record = data.days.find((d) => d.day === day)
   const { first, last } = dayRange(data)
@@ -34,8 +35,8 @@ export function DayControl({ demo, day, onDayChange }: Props) {
           {inStory ? t('day.story', STORY_DAYS) : t('day.history', STORY_DAYS)}
         </span>
         {record && record.events.length > 0 && (
-          <p className="log" lang="en">
-            <strong>{t('day.log')}</strong> {record.events.join(' · ')}
+          <p className="log">
+            <strong>{t('day.log')}</strong> {record.events.map((e) => L(e, lang)).join(' · ')}
           </p>
         )}
       </div>

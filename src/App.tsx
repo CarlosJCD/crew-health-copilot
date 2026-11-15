@@ -12,6 +12,7 @@ import { LanguageToggle } from './components/LanguageToggle'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { Icon, type IconName } from './components/Icon'
 import { Intro } from './components/Intro'
+import { L } from './i18n/content'
 import { PrivateNoteSheet, type Notes } from './components/PrivateNote'
 import { Sheet } from './components/Sheet'
 import { Logo } from './components/Logo'
@@ -62,7 +63,7 @@ const TESTING = new URLSearchParams(window.location.search).has('test') || /[?&]
 type DayNotice = { asked: number; day: number; moved: 'legacy' | 'clamped' }
 
 export default function App() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [route, setRoute] = useState(readRoute)
   const [scenarioId, setScenarioId] = useStoredJson('orbit.scenario', DEFAULT_SCENARIO_ID)
   const [loaded, setLoaded] = useState<LoadedDemo>({ data: BUILT_IN_DEMO, origin: 'built-in', errors: [] })
@@ -201,7 +202,7 @@ export default function App() {
       )}
       {playing && record && record.events.length > 0 && (
         <p className="story-log" aria-live="polite">
-          <strong>{t('more.log', { n: day })}</strong> <span lang="en">{record.events.join(' · ')}</span>
+          <strong>{t('more.log', { n: day })}</strong> <span>{record.events.map((e) => L(e, lang)).join(' · ')}</span>
         </p>
       )}
 
@@ -364,7 +365,7 @@ export default function App() {
           <p className="muted small">{t('more.who', { name: demo.data.persona.name, role: demo.data.persona.role })}</p>
           {record && record.events.length > 0 && (
             <p className="small">
-              <strong>{t('more.log', { n: day })}</strong> <span lang="en">{record.events.join(' · ')}</span>
+              <strong>{t('more.log', { n: day })}</strong> <span>{record.events.map((e) => L(e, lang)).join(' · ')}</span>
             </p>
           )}
           {/* Testing (only with ?test): clears every symptom and pain she logged (all days), nothing else. */}
