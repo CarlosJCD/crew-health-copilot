@@ -26,8 +26,8 @@ describe('body systems', () => {
     expect(systemRisks(system('eyes'))[0]).toMatch(/SANS/)
   })
 
-  it('color: day 124 heart is yellow (resting heart rate), eyes stay green', () => {
-    const r = evaluateDay(BUILT_IN_DEMO, 124)
+  it('color: day 26 heart is yellow (resting heart rate), eyes stay green', () => {
+    const r = evaluateDay(BUILT_IN_DEMO, 26)
     expect(systemColor(system('heart'), r, [])).toBe('yellow')
     expect(systemColor(system('eyes'), r, [])).toBe('green')
   })
@@ -35,19 +35,38 @@ describe('body systems', () => {
 
 describe('logging a symptom on the body map', () => {
   it('adds it to the day so the engine sees it: an alarm sign turns the day red (physical)', () => {
-    const data = applySymptoms(BUILT_IN_DEMO, { 121: ['vision change'] })
-    const r = evaluateDay(data, 121)
+    const data = applySymptoms(BUILT_IN_DEMO, { 23: ['vision change'] })
+    const r = evaluateDay(data, 23)
     expect(r.state).toBe('RED_PHYSICAL')
     expect(systemColor(system('eyes'), r, ['vision change'])).toBe('red')
   })
 
   it('dizziness with a resting heart rate under 60 is red; on its own it is not an alarm', () => {
-    const low = { ...BUILT_IN_DEMO, days: BUILT_IN_DEMO.days.map((d) => (d.day === 121 ? { ...d, hr: 55 } : d)) }
-    expect(evaluateDay(applySymptoms(low, { 121: ['dizziness'] }), 121).indicators.hr.color).toBe('red')
-    expect(evaluateDay(applySymptoms(BUILT_IN_DEMO, { 121: ['dizziness'] }), 121).indicators.symptoms.color).toBe('green')
+    const low = { ...BUILT_IN_DEMO, days: BUILT_IN_DEMO.days.map((d) => (d.day === 23 ? { ...d, hr: 55 } : d)) }
+    expect(evaluateDay(applySymptoms(low, { 23: ['dizziness'] }), 23).indicators.hr.color).toBe('red')
+    expect(evaluateDay(applySymptoms(BUILT_IN_DEMO, { 23: ['dizziness'] }), 23).indicators.symptoms.color).toBe('green')
   })
 
   it('leaves the data untouched when nothing was logged', () => {
     expect(applySymptoms(BUILT_IN_DEMO, {})).toBe(BUILT_IN_DEMO)
+  })
+})
+
+describe('body systems on the anatomical figure', () => {
+  it('paint only zones drawn on the front view, each zone in one system at most', async () => {
+    const { VIEW_PARTS } = await import('./pain')
+    const front = new Set<string>([...VIEW_PARTS.front, 'hair'])
+    const all = SYSTEMS.flatMap((s) => s.zones)
+    for (const z of all) expect(front.has(z), z).toBe(true)
+    expect(new Set(all).size).toBe(all.length)
+  })
+
+  it('a tap on a zone selects its system; arms belong to none', async () => {
+    const { systemOfZone } = await import('./body')
+    expect(systemOfZone('chest')).toBe('heart')
+    expect(systemOfZone('hair')).toBe('brain')
+    expect(systemOfZone('abs')).toBe('gut')
+    expect(systemOfZone('quadriceps')).toBe('musculoskeletal')
+    expect(systemOfZone('biceps')).toBeUndefined()
   })
 })

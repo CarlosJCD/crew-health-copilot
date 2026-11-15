@@ -5,7 +5,7 @@ import { LANGS } from '../i18n/strings'
 export function LanguageToggle() {
   const { lang, setLang, t } = useI18n()
   return (
-    <div className="segmented" role="group" aria-label={t('lang.switchTo')}>
+    <div className="lang-toggle" role="group" aria-label={t('lang.switchTo')}>
       {LANGS.map((l) => (
         <button
           key={l}

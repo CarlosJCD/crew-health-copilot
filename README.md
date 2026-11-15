@@ -12,7 +12,7 @@ for Astronauts on Space Missions".
 - Repository: https://github.com/CarlosJCD/orbit
 
 > **Synthetic data, not a diagnostic tool.** ORBIT supports decisions; it does not diagnose.
-> The demo follows a fictional astronaut, Lena Ortiz, on days 121 to 128 of a Mars transit.
+> The demo follows a fictional astronaut, Lena Ortiz, on days 23 to 30 of a Mars transit (the mission starts on day 1; the handoff's days 121 to 128, renumbered).
 
 ## Run
 
@@ -29,7 +29,7 @@ node scripts/build-engine-bundle.mjs  # engine as one ES module for the data tea
 ```
 
 Deep links open a module on a given day, and optionally a card's "Why?":
-`#/today?day=125`, `#/today?day=121&why=temp`, `#/transmit?day=125`, `#/mind?day=125`, `#/body?day=124`,
+`#/today?day=27`, `#/today?day=23&why=temp`, `#/transmit?day=27`, `#/mind?day=27`, `#/body?day=26`,
 `#/play?board=1&solved=1`.
 
 ## Structure
@@ -40,18 +40,21 @@ Deep links open a module on a given day, and optionally a card's "Why?":
 | `src/orbit/boost/orbit-boost-library.json`, `src/orbit/boost/boost-cards.json` | Boost library (Psychology, unchanged): cards with sources and confidence, triggers per indicator, display rules, safety question | Psychology 2 |
 | `src/orbit/boost.ts`, `src/modules/Boost.tsx` | Boost: safety question, "check first", up to 4 cards, she chooses up to 2, "Did it help?", 24 h follow-up, protective-factor count | Engineering |
 | `src/orbit/pulse-spec.json`, `src/orbit/pulse.ts`, `src/components/PulseTask.tsx` | Pulse mode: 3-minute PVT-B-style task (1 to 4 s waits, false start under 100 ms, lapse at 355 ms, median of valid responses, at least 20). A session replaces that day's value for the engine; a 30 s trial run saves nothing. Not a validated PVT-B | Psychology 1 (spec), Engineering |
-| `public/data/demo-data.json` | Data team's demo data (days 107 to 128), loaded by the app; `src/orbit/demoFile.test.ts` checks it against the acceptance table | Data science |
+| `public/data/demo-data.json` | Data team's demo data (days 1 to 30), loaded by the app; `src/orbit/demoFile.test.ts` checks it against the acceptance table | Data science |
 | `src/orbit/constellations.json`, `src/orbit/constellations.ts`, `src/modules/Play.tsx` | Constellations free mode: 2 boards of 16 tiles with NASA planetary data, hint, fact and source per group. No timer, no score | Psychology 1 (content), Engineering |
-| `src/orbit/body.ts`, `src/modules/BodyMap.tsx` | Body map: 6 systems with state, what ORBIT watches, HRP risk and the fixed symptom vocabulary | Engineering |
+| `src/orbit/body.ts`, `src/modules/BodyMap.tsx` | **Today, the first screen** (route `#/body`): today's state, the protective-factors tank, the heat map of symptom history as the only figure with For today beside it, and "Does something hurt or bother you?". Astronauts have little medical background and little time, so the numbers are one tap away in Metrics (route `#/today`). `body.ts` keeps the six systems and the fixed symptom vocabulary | Engineering |
+| `src/orbit/pain.ts`, `src/orbit/pain-spec.json`, `src/components/PainPanel.tsx`, `PainDetails.tsx`, `MuscleSelector.tsx`, `PainPainter.tsx` | "Does something hurt or bother you?" Psychology's report flow, with symptoms logged where she feels them: after the zone she picks pain and/or the zone's symptoms from the fixed vocabulary (`REGION_SYMPTOMS`: dizziness, eye irritation, sore throat, palpitations, nausea, skin rash; team criterion), then (`pain-spec.json` v0.1, unchanged): where (exact muscle or painted area, side, front or back; eyes and skin by button), up to 3 words, NRS 0 to 10, when it started and whether it comes and goes, what was happening, and whether moving or pressing makes it worse. ORBIT never labels tissue or names a cause. Head, eyes and chest ask the alarm question before saving; 3 or more nerve-like words show "Worth mentioning to your medical officer"; headaches show the cabin CO2 check. Same region on more than 2 days in a row is yellow; red only for confirmed alarm signs. Body data goes with the medical officer packet; the stress context is Mind. Figure: `react-muscle-highlighter` (MIT) | Engineering (spec: Psychology 1 and 2) |
+| `src/orbit/plan.ts`, `src/components/TodayPlan.tsx`, `SuggestionCard.tsx`, `BoostCardBody.tsx` | **For today**, beside the body: reminders (Boost safety question, daily check-in, pulse mode daily or every other day, "Did it help?" for yesterday, pain from the last 2 days not logged again) and suggested self-care she can choose right there (same choice as Boost, up to 2). Suggestions are Boost library cards only: Boost's plan for the day plus the cards of recent pain contexts (stress, short sleep, long workstation task map to existing triggers; team criterion, P1 review). A confirmed alarm sign or a red day shows only the crew medical officer. ORBIT never prescribes treatment. When everything is in her usual range nothing is suggested here (Psychology 1, Nov 15); the green cards stay in Boost. After logging a pain, its suggestions appear under it | Engineering (cards: Psychology) |
+| `src/orbit/heat.ts`, `src/components/SymptomHeatmap.tsx` | **Symptom history** on the body map (switch "Today's state / Symptom history"): every pain and symptom she logged warms its zone; warmth halves every 2 days unless she logs that zone again, and goes cold after a few days. Picked muscles keep their side; painted strokes keep their shape. Display only, not used by the engine. Cooling numbers and the place of each symptom button are team criterion (P1 review) | Engineering |
 | `src/orbit/care.ts`, `src/components/CareTank.tsx` | Gamification without punishment: the "protective factors used" tank (check-ins, Boost actions and ratings, pulse sessions, Constellations boards). Only fills up; no performance points, no comparison, nothing resets | Engineering |
 | `src/orbit/scenarios.json` | Four scenarios: one-way delay, estimated dose, first responder, ground contact (handoff 2.2) | Psychology + Data science |
 | `src/orbit/config.ts` | Typed reader for both files; lists every param the engine needs | Engineering |
 | `src/orbit/engine.ts` | ORBIT engine: one rule per indicator, Body / Mind / Crew roll-up, state (GREEN, YELLOW, EARLY_SIGNAL, RED_PHYSICAL, RED_PSYCH) | Data science + Engineering |
-| `src/orbit/engine.test.ts` | Acceptance table of the handoff (days 121 to 128) plus rules the story does not exercise | Data science + Engineering |
+| `src/orbit/engine.test.ts` | Acceptance table of the handoff (days 23 to 30; handoff days 121 to 128) plus rules the story does not exercise | Data science + Engineering |
 | `src/orbit/demoData.ts` | `demo-data.json` contract, checks, and the built-in copy of the demo story | Data science |
-| `src/modules/Today.tsx` | Rings, state, cards with "Why?", day control, radiation context | Engineering |
+| `src/modules/Today.tsx` | **Metrics** tab (route `#/today`): rings, state, cards with "Why?", day control, radiation context | Engineering |
 | `src/orbit/transmit.ts`, `src/modules/Transmit.tsx` | Outbox with the scenario delay, privacy switches, packets (share with the crew medical officer, weekly summary, escalation) | Engineering |
-| `src/orbit/checkin.ts`, `src/modules/Mind.tsx` | Daily check-in (4 sliders) and "I want to talk to someone today"; answers replace that day's values on the device | Engineering (items: Psychology 2) |
+| `src/orbit/checkin.ts`, `src/modules/Mind.tsx`, `src/components/InfoTip.tsx` | Daily check-in (4 sliders, each with a "?" tooltip: what it means, 0 and 10, and the yellow rule read from the rules file; texts pending P2 review) and "I want to talk to someone today"; answers replace that day's values on the device | Engineering (items: Psychology 2) |
 | `src/components/SepReplay.tsx`, `public/data/donki-sep-2024-05.json` | Replay of the real solar particle event of May 9, 2024 in the radiation layer | Engineering |
 | `src/modules/registry.ts` | Module list and owners (drives navigation) | Engineering |
 | `src/data/knowledge.json` | Data team's reference catalog (`datos_nasav1.json`): plausible ranges used to check `demo-data.json`, NASA sources, physics | Data science |
@@ -99,7 +102,7 @@ leave the device. Everything the app stores (check-ins, outbox, switches) stays 
 ## Demo data (`public/data/demo-data.json`)
 
 Data science generates it (handoff 2.3). If the file is missing, the app uses its built-in copy of the story:
-days 121 to 128 with the exact values of the handoff, days 107 to 120 as seeded noise around the baseline.
+days 23 to 30 with the exact values of the handoff (its days 121 to 128), days 1 to 22 as seeded noise around the baseline.
 
 ```json
 {
@@ -109,7 +112,7 @@ days 121 to 128 with the exact values of the handoff, days 107 to 120 as seeded 
                              "mood": [7, 0.6], "stress": [4, 0.7], "fatigue": [4, 0.7], "crew_climate": [7, 0.5],
                              "pulse_ms": [320, 12], "contact": [2, 0.6], "exercise_prescription_min": 120 } },
   "days": [
-    { "day": 121, "sleep_h": 6.6, "hr": 58, "sbp": 114, "dbp": 73, "temp": 38.0, "mood": 7, "stress": 4, "fatigue": 4,
+    { "day": 23, "sleep_h": 6.6, "hr": 58, "sbp": 114, "dbp": 73, "temp": 38.0, "mood": 7, "stress": 4, "fatigue": 4,
       "crew_climate": 7, "pulse_ms": 318, "contact": 2, "exercise_min": 120, "glucose": 89,
       "symptoms": [], "screen": null, "events": [], "talk_request": false }
   ]
@@ -159,11 +162,10 @@ name, and says in the footer that it is not affiliated with or endorsed by NASA.
   plus the pulse inside the logo. Status is always color + shape + word: ● green, ▲ yellow, ■ red, ○ no data.
 - Dark "Mission" theme by default (less glare in the cabin); the light "Day" theme is for projectors.
 - Wordmark: the logo ring is the O of ORBIT. The favicon and app icons use the ring alone.
-- The header always shows the mission, the mission day and the one-way signal delay to Earth.
-- Today opens with the Body, Mind and Crew rings next to the ORBIT state. The state shows the
-  O-R-B-I-T loop with today's letter: GREEN → **O**bserve; YELLOW and EARLY_SIGNAL → **B**oost (then
-  **I**terate in 24 h); RED_PHYSICAL and RED_PSYCH → **T**ransmit. Verbs stay in English in both languages.
-- The demo replay is framed and labelled as a demo, with a play button for the story days.
+- The ORBIT state panel shows the O-R-B-I-T loop with today's letter: GREEN → **O**bserve; YELLOW and
+  EARLY_SIGNAL → **B**oost (then **I**terate in 24 h); RED_PHYSICAL and RED_PSYCH → **T**ransmit. Verbs stay in
+  English in both languages, with the Spanish gloss next to them.
+- Trend lines show the first and last day of the series under the line.
 
 ## Deploy
 

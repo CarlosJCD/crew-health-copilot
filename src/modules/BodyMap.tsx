@@ -1,183 +1,307 @@
-import { useMemo, useState, type KeyboardEvent } from 'react'
-import { isRedFlag, SYSTEMS, systemColor, systemRisks, type SymptomLog, type SystemId } from '../orbit/body'
-import { getIndicator, type Color } from '../orbit/config'
-import { COLOR_SYMBOL } from '../orbit/display'
+import { useCallback, useMemo, useState } from 'react'
+import type { SymptomLog } from '../orbit/body'
+import { RULES, type Color, type DomainId, type Scenario } from '../orbit/config'
+import { COLOR_SYMBOL, FIGURE, FIGURE_LIGHT, partKey } from '../orbit/display'
+import type { Theme } from '../lib/theme'
 import type { LoadedDemo } from '../orbit/demoData'
-import { evaluateDay } from '../orbit/engine'
+import { evaluateDay, STATE_ESCALATION, worstColor, type DayResult, type OrbitState } from '../orbit/engine'
+import { heatColor, heatOn, type ZoneHeat } from '../orbit/heat'
+import { toViewerSide, type BodyView, type PainDay, type PainLog, type PaintStroke } from '../orbit/pain'
+import { boostPlan, CARDS, DISPLAY, downrankedCards, type BoostLog } from '../orbit/boost'
+import type { Checkins } from '../orbit/checkin'
+import type { PulseSession } from '../orbit/pulse'
+import { TANK_SIZE, type CareSummary } from '../orbit/care'
+import { remindersFor, type Reminder } from '../orbit/plan'
 import { useI18n } from '../i18n/context'
+import type { StringKey } from '../i18n/strings'
+import { useFigure } from '../lib/figure'
+import { CareTank } from '../components/CareTank'
+import { PainPanel } from '../components/PainPanel'
+import { PaintSurface } from '../components/PainPainter'
+import { Sheet } from '../components/Sheet'
+import { TodayPlan } from '../components/TodayPlan'
 
 interface Props {
   demo: LoadedDemo
   day: number
+  onDayChange: (d: number) => void
+  scenario: Scenario
+  /** Symptoms logged with the old per-system buttons (still warm the heat map). */
   log: SymptomLog
-  onLogChange: (log: SymptomLog) => void
+  painLog: PainLog
+  onPainChange: (pain: PainDay) => void
+  checkins: Checkins
+  pulseSessions: PulseSession[]
+  boostLog: BoostLog
+  onBoostLogChange: (log: BoostLog) => void
+  /** Protective factors used: the tank, compact on the phone and whole beside the body on wide screens. */
+  care: CareSummary
+  theme?: Theme
 }
 
-/** Hotspot position of each system on the figure (viewBox 0 0 200 400). */
-const SPOTS: Record<SystemId, { x: number; y: number; r: number }> = {
-  brain: { x: 100, y: 34, r: 13 },
-  eyes: { x: 100, y: 62, r: 9 },
-  heart: { x: 114, y: 136, r: 14 },
-  immune: { x: 44, y: 186, r: 12 },
-  gut: { x: 100, y: 196, r: 15 },
-  musculoskeletal: { x: 82, y: 300, r: 13 },
+/** Main button of the day for the non-green states. Green follows what is still pending (see `greenAction`). */
+const CTA: Record<Exclude<OrbitState, 'GREEN'>, { text: StringKey; href: string }> = {
+  YELLOW: { text: 'home.cta.YELLOW', href: '#/boost' },
+  EARLY_SIGNAL: { text: 'home.cta.EARLY_SIGNAL', href: '#/boost' },
+  RED_PHYSICAL: { text: 'home.contactCmo', href: '#/transmit' },
+  RED_PSYCH: { text: 'home.cta.RED_PSYCH', href: '#/mind' },
 }
 
-/** Six-system human figure. Each system shows its state, what ORBIT watches, its HRP risk, and symptom buttons. */
-export function BodyMap({ demo, day, log, onLogChange }: Props) {
+/** On a green day the main button is the next thing still pending, or "All done for today". */
+function greenAction(reminders: Reminder[]): { text: StringKey; href?: string; pain?: boolean } {
+  const next = reminders[0]
+  if (!next) return { text: 'home.cta.done' }
+  if (next.id === 'safety') return { text: 'home.cta.safety', href: '#/boost' }
+  if (next.id === 'checkin') return { text: 'home.cta.GREEN', href: '#/mind' }
+  if (next.id === 'pulse') return { text: 'home.cta.pulse', href: '#/mind' }
+  if (next.id === 'did_it_help') return { text: 'home.cta.help', href: '#/boost' }
+  return { text: 'home.cta.painAgain', pain: true }
+}
+
+/** "a, b and c" in the current language. */
+const listText = (items: string[], and: string) => (items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} ${and} ${items.at(-1)}`)
+
+/**
+ * Home: the body is the screen. Today's state in one line with what changed and who sees it, the medical
+ * officer first on a red day, "For today" and the tank one tap away (each opens in a panel), and
+ * the figure as a heat map of what she logged, where she draws what hurts.
+ */
+export function BodyMap(props: Props) {
+  const { demo, day, log, painLog, onPainChange, checkins, pulseSessions, boostLog, onBoostLogChange, care, theme = 'dark' } = props
+  const fig = theme === 'light' ? FIGURE_LIGHT : FIGURE
   const { t } = useI18n()
-  const [selected, setSelected] = useState<SystemId>('heart')
+  const [figure] = useFigure()
+  const [view, setView] = useState<BodyView>('front')
+  const [strokes, setStrokes] = useState<PaintStroke[]>([])
+  const [painOpen, setPainOpen] = useState(false)
+  const [planOpen, setPlanOpen] = useState(false)
+  const [tankOpen, setTankOpen] = useState(false)
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
   const record = data.days.find((d) => d.day === day)
-  const symptomsToday = record?.symptoms ?? []
-  const logged = log[day] ?? []
-  const colors = Object.fromEntries(SYSTEMS.map((s) => [s.id, systemColor(s, result, symptomsToday)])) as Record<SystemId, Color>
-  const system = SYSTEMS.find((s) => s.id === selected)!
-  const name = (id: SystemId) => t(`body.${id}`)
+  const state = result.state
+  const overall: Color = worstColor(Object.values(result.domains))
+  const heat = useMemo(() => heatOn(day, view, painLog, log), [day, view, painLog, log])
+  const otherView: BodyView = view === 'front' ? 'back' : 'front'
+  const otherWarm = useMemo(() => heatOn(day, otherView, painLog, log).zones.length, [day, otherView, painLog, log])
+  const sideName = (v: BodyView) => t(v === 'front' ? 'home.front' : 'home.back')
 
-  const add = (symptom: string) => {
-    const s = symptom.trim().toLowerCase()
-    if (s && !logged.includes(s)) onLogChange({ ...log, [day]: [...logged, s] })
+  // Boost's plan for the day and the reminders ("For today"), shared with Care.
+  const plan = useMemo(
+    () => boostPlan(result, record, data.persona, downrankedCards(boostLog), data.days.filter((d) => d.day <= day)),
+    [result, record, data, boostLog, day],
+  )
+  const reminders = remindersFor({ day, checkins, pulseSessions, boostLog, painLog, plan })
+  const boostToday = boostLog[day] ?? { chosen: [], helped: {} }
+  const toggleCard = (id: string) => {
+    const chosen = boostToday.chosen.includes(id)
+      ? boostToday.chosen.filter((c) => c !== id)
+      : boostToday.chosen.length < DISPLAY.max_choices
+        ? [...boostToday.chosen, id]
+        : boostToday.chosen
+    onBoostLogChange({ ...boostLog, [day]: { ...boostToday, chosen } })
   }
-  const remove = (symptom: string) => onLogChange({ ...log, [day]: logged.filter((s) => s !== symptom) })
-  const keyActivate = (id: SystemId) => (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      setSelected(id)
-    }
-  }
+  const closePain = useCallback(() => setPainOpen(false), [])
+  const closePlan = useCallback(() => setPlanOpen(false), [])
+  const closeTank = useCallback(() => setTankOpen(false), [])
+  const clearPaint = useCallback(() => setStrokes([]), [])
+  const openPain = useCallback(() => {
+    setPlanOpen(false)
+    setPainOpen(true)
+  }, [])
+  const drew = strokes.length > 0
+
+  const esc = RULES.escalation[STATE_ESCALATION[state]]
+  const cta = state === 'GREEN' ? greenAction(reminders) : CTA[state]
+
+  const todayPlan = (
+    <TodayPlan
+      day={day}
+      plan={plan}
+      reminders={reminders}
+      painLog={painLog}
+      chosen={boostToday.chosen}
+      onToggle={toggleCard}
+      onPainAgain={openPain}
+    />
+  )
+
+  // What she logged where, in words (the heat map is not only color).
+  const ago = (d: number) => (day - d === 0 ? t('heat.today') : day - d === 1 ? t('heat.agoOne') : t('heat.ago', { n: day - d }))
+  const heatRows = heatByDay(heat.zones).map(({ day: d, zones }) =>
+    t('home.heatRow', { zones: zoneList(zones, (z) => t(partKey(z.zone))), day: d, ago: ago(d) }),
+  )
+  const summary = heatRows.length ? heatRows.join('; ') : t('home.heatNone')
 
   return (
-    <div className="bodymap">
-      <section className="bodymap-figure" aria-label={t('body.title', { day })}>
-        <h2>{t('body.title', { day })}</h2>
-        <svg viewBox="0 0 200 400" className="figure" role="group" aria-label={t('body.figure')}>
-          <g className="silhouette" aria-hidden="true">
-            <circle cx="100" cy="46" r="32" />
-            <rect x="90" y="76" width="20" height="14" rx="4" />
-            <rect x="62" y="88" width="76" height="140" rx="26" />
-            <rect x="34" y="96" width="22" height="120" rx="11" />
-            <rect x="144" y="96" width="22" height="120" rx="11" />
-            <rect x="68" y="222" width="28" height="150" rx="13" />
-            <rect x="104" y="222" width="28" height="150" rx="13" />
-          </g>
-          {SYSTEMS.map((s) => {
-            const p = SPOTS[s.id]
-            const c = colors[s.id]
-            return (
-              <g
-                key={s.id}
-                className={`spot color-${c}${selected === s.id ? ' selected' : ''}`}
-                role="button"
-                tabIndex={0}
-                aria-pressed={selected === s.id}
-                aria-label={`${name(s.id)}: ${t(`color.${c}`)}`}
-                onClick={() => setSelected(s.id)}
-                onKeyDown={keyActivate(s.id)}
-              >
-                <circle cx={p.x} cy={p.y} r={p.r} />
-                <text x={p.x} y={p.y + 4} textAnchor="middle" aria-hidden="true">
-                  {COLOR_SYMBOL[c]}
-                </text>
-              </g>
-            )
-          })}
-        </svg>
-        <ul className="system-list">
-          {SYSTEMS.map((s) => (
-            <li key={s.id}>
-              <button type="button" className={`system-btn color-${colors[s.id]}`} aria-pressed={selected === s.id} onClick={() => setSelected(s.id)}>
-                <span aria-hidden="true">{COLOR_SYMBOL[colors[s.id]]}</span> {name(s.id)} · {t(`color.${colors[s.id]}`)}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+    <div className={`home state-${state}`}>
+      <div className="home-main">
+        <section className="hero" aria-labelledby="home-state">
+          <h1 id="home-state" className="hero-state">
+            <span className="shape" aria-hidden="true">{COLOR_SYMBOL[overall]}</span>
+            {t(`home.state.${state}`)}
+          </h1>
+          <p className="hero-sub" role="status" aria-live="polite">{subLine(result, t)}</p>
+          {state !== 'GREEN' && (
+            <p className="hero-who">
+              <strong>{t('state.to')}</strong> {t(`who.${esc.to}` as StringKey)}
+              {esc.offer_share_with && (
+                <>
+                  {' · '}
+                  <a href="#/transmit">{t('home.share')}</a>
+                </>
+              )}
+            </p>
+          )}
+        </section>
 
-      <section className={`bodymap-detail card color-${colors[selected]}`} aria-live="polite">
-        <header className="card-head">
-          <h2>{name(selected)}</h2>
-          <span className="badge">
-            <span aria-hidden="true">{COLOR_SYMBOL[colors[selected]]}</span> {t(`color.${colors[selected]}`)}
-          </span>
-        </header>
-
-        {system.indicators.length > 0 ? (
-          <>
-            <h3>{t('body.watches')}</h3>
-            <ul className="watch-list">
-              {system.indicators.map((id) => {
-                const def = getIndicator(id)
-                const r = result.indicators[id]
-                return (
-                  <li key={id}>
-                    <strong lang="en">{def.label_en}</strong> · {t(`color.${r?.color ?? 'none'}`)}
-                    <br />
-                    <span lang="en">{r?.reason}</span>
-                    <br />
-                    <span className="muted">
-                      {t('body.how')} <span lang="en">{def.input}</span>
-                    </span>
-                  </li>
-                )
-              })}
-            </ul>
-          </>
-        ) : (
-          <p className="muted">{t('body.noIndicator')}</p>
+        {state === 'RED_PHYSICAL' && (
+          <section className="cmo-card" role="alert" aria-labelledby="cmo-title">
+            <h2 id="cmo-title" lang="en">{CARDS.cmo_now?.title_en}</h2>
+            <p lang="en">{CARDS.cmo_now?.what_en}</p>
+          </section>
         )}
 
-        <p>
-          <strong>{t('card.risk')}</strong>{' '}
-          {systemRisks(system).map((risk, i) => (
-            <span key={risk}>
-              {i > 0 && ' · '}
-              <a href="https://www.nasa.gov/hrp/risks/" target="_blank" rel="noreferrer" lang="en">
-                {risk}
-              </a>
-            </span>
-          ))}
-        </p>
-
-        <h3>{t('body.log')}</h3>
-        {system.symptoms.length > 0 && (
-          <div className="actions symptom-buttons">
-            {system.symptoms.map((s) => (
-              <button
-                key={s}
-                type="button"
-                className={`button secondary${isRedFlag(s) ? ' alarm' : ''}`}
-                aria-pressed={logged.includes(s)}
-                onClick={() => (logged.includes(s) ? remove(s) : add(s))}
-                lang="en"
-              >
-                {isRedFlag(s) && <span aria-hidden="true">■ </span>}
-                {s}
+        <section className="figure-stage" aria-labelledby="figure-title">
+          <h2 id="figure-title" className="sr-only">{t('home.figureTitle')}</h2>
+          <p className="paint-hint">{t('home.paintHint')}</p>
+          <div className="today-strip">
+            <button type="button" className="strip-btn" onClick={() => setPlanOpen(true)}>
+              <strong>{t('plan.title')}</strong>
+              <span className="muted long">{reminders.length ? t('home.planCount', { n: reminders.length }) : t('home.planNone')}</span>
+              <span className="muted short" aria-hidden="true">{reminders.length}</span>
+            </button>
+            <button type="button" className="strip-btn tank-mini" onClick={() => setTankOpen(true)} aria-label={t('care.level', { n: care.level, size: TANK_SIZE })}>
+              <svg viewBox="0 0 12 20" aria-hidden="true">
+                <rect x="1" y="1" width="10" height="18" rx="3" className="tank-shell" />
+                <rect x="2.5" y={2.5 + 15 * (1 - care.level / TANK_SIZE)} width="7" height={15 * (care.level / TANK_SIZE)} rx="2" className="tank-fill" />
+              </svg>
+              <span className="long">{t('home.tank', { n: care.level, size: TANK_SIZE })}</span>
+              <span className="short" aria-hidden="true">{care.level}/{TANK_SIZE}</span>
+            </button>
+          </div>
+          <div className="segmented" role="group" aria-label={t('home.view')}>
+            {(['front', 'back'] as const).map((v) => (
+              <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}>
+                {sideName(v)}
+                {v !== view && otherWarm > 0 && <span className="warm-dot" aria-label={t('home.warmThere', { n: otherWarm })} />}
               </button>
             ))}
           </div>
-        )}
-        <p className="muted">{t('body.alarmNote')}</p>
 
-        {logged.length > 0 && (
-          <div role="status">
-            <p>
-              <strong>{t('body.logged', { day })}</strong>{' '}
-              {logged.map((s) => (
-                <button key={s} type="button" className="chip" onClick={() => remove(s)} aria-label={t('body.remove', { s })}>
-                  {s} ✕
+          <PaintSurface
+            key={`${view}-${theme}-${figure}`}
+            className="figure"
+            view={view}
+            size="m"
+            scale={1.6}
+            strokes={strokes}
+            onChange={setStrokes}
+            label={t('home.paintFigure', { view: sideName(view), summary })}
+            base={heat.zones.map((z) => ({ slug: z.zone, color: heatColor(z.warmth), ...(z.side ? { side: toViewerSide(z.side, view) } : {}) }))}
+            baseDots={heat.dots.map((d) => ({ ...d, color: heatColor(d.warmth) }))}
+            fill={fig.fill}
+            border={fig.border}
+          />
+
+        </section>
+
+        <div className="home-actions">
+          {drew ? (
+            <>
+              <button type="button" className="button primary big" onClick={() => setPainOpen(true)}>
+                {t('home.nextFeel')}
+              </button>
+              <div className="paint-tools">
+                <button type="button" className="button ghost" onClick={() => setStrokes(strokes.slice(0, -1))}>
+                  {t('home.undo')}
                 </button>
-              ))}
-            </p>
-            {logged.some(isRedFlag) && (
-              <p>
-                {t('body.redNow')} <a href="#/boost">{t('body.openBoost')}</a> · <a href="#/transmit">{t('boost.openTransmit')}</a>
-              </p>
-            )}
-          </div>
-        )}
-      </section>
+                <button type="button" className="button ghost" onClick={clearPaint}>
+                  {t('home.clear')}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {'pain' in cta && cta.pain ? (
+                <button type="button" className="button primary big" onClick={openPain}>
+                  {t(cta.text)}
+                </button>
+              ) : cta.href ? (
+                <a className="button primary big" href={cta.href}>
+                  {t(cta.text)}
+                </a>
+              ) : (
+                <span className="button primary big done" aria-disabled="true">
+                  {t(cta.text)}
+                </span>
+              )}
+              {/* Keyboard and screen-reader path to the same report (the figure is drawn with a finger or a mouse). */}
+              <button type="button" className="sr-only-focusable" onClick={() => setPainOpen(true)}>
+                {t('home.logList')}
+              </button>
+            </>
+          )}
+        </div>
+        <p className="fineprint">{t('home.notDiag')}</p>
+      </div>
+
+      {planOpen && (
+        <Sheet onClose={closePlan} title={t('plan.title')}>
+          {todayPlan}
+        </Sheet>
+      )}
+
+      {tankOpen && (
+        <Sheet onClose={closeTank} title={t('home.tankTitle')}>
+          <CareTank care={care} />
+          <a className="button ghost wide" href="#/boost">
+            {t('nav.care')}
+          </a>
+        </Sheet>
+      )}
+
+      {painOpen && (
+        <Sheet onClose={closePain} title={t('home.painTitle')}>
+          <PainPanel
+            day={day}
+            pain={painLog[day]}
+            onChange={onPainChange}
+            chosen={boostToday.chosen}
+            onToggleCard={toggleCard}
+            painted={strokes}
+            onSaved={clearPaint}
+            onDone={closePain}
+            brush={false}
+          />
+        </Sheet>
+      )}
     </div>
   )
+}
+
+/** The state line with real data: which indicators moved, which domains changed. */
+function subLine(result: DayResult, t: ReturnType<typeof useI18n>['t']): string {
+  const and = t('home.and')
+  if (result.state === 'YELLOW' && result.flagged.length) {
+    return t('home.sub.YELLOW2', { what: result.flagged.map((id) => t(`ind.${id}` as StringKey)).join(' · ') })
+  }
+  if (result.state === 'EARLY_SIGNAL' && result.flaggedDomains.length) {
+    const domains = listText(result.flaggedDomains.map((d: DomainId) => t(`domain.${d}`)), and)
+    return t('home.sub.EARLY2', { domains })
+  }
+  return t(`home.sub.${result.state}`)
+}
+
+/** Warm zones grouped by the day they were logged, newest first. */
+function heatByDay(zones: ZoneHeat[]): { day: number; zones: ZoneHeat[] }[] {
+  const byDay = new Map<number, ZoneHeat[]>()
+  for (const z of zones) byDay.set(z.day, [...(byDay.get(z.day) ?? []), z])
+  return [...byDay.entries()].sort((a, b) => b[0] - a[0]).map(([day, zs]) => ({ day, zones: zs }))
+}
+
+/** "Chest, abdomen": the first name as written, the rest in lower case. */
+function zoneList(zones: ZoneHeat[], name: (z: ZoneHeat) => string): string {
+  const names = [...new Set(zones.map(name))]
+  return names.map((n, i) => (i === 0 ? n : n.toLowerCase())).join(', ')
 }

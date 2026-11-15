@@ -39,13 +39,13 @@ describe('sessions feed the engine', () => {
   })
 
   it("replaces that day's pulse value with her latest real session", () => {
-    const data = applyPulse(BUILT_IN_DEMO, [session(121, 380), session(122, 390)])
-    expect(data.days.find((d) => d.day === 122)?.pulse_ms).toBe(390)
-    expect(evaluateDay(data, 122).indicators.pulse.color).toBe('yellow') // 2 of the last 3 above 344 ms
+    const data = applyPulse(BUILT_IN_DEMO, [session(23, 380), session(24, 390)])
+    expect(data.days.find((d) => d.day === 24)?.pulse_ms).toBe(390)
+    expect(evaluateDay(data, 24).indicators.pulse.color).toBe('yellow') // 2 of the last 3 above 344 ms
   })
 
   it('ignores practice sessions and sessions without a result', () => {
-    expect(applyPulse(BUILT_IN_DEMO, [session(121, 380, true), session(122, null)])).toBe(BUILT_IN_DEMO)
+    expect(applyPulse(BUILT_IN_DEMO, [session(23, 380, true), session(24, null)])).toBe(BUILT_IN_DEMO)
   })
 
   it('counts practice only until 5 scored sessions, and never when a baseline exists', () => {

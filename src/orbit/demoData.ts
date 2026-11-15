@@ -1,7 +1,8 @@
 // Demo data contract (handoff section 2.3) and the built-in copy of the demo story.
 // Data science generates public/data/demo-data.json; when it exists and is valid the app uses it.
-// Until then the app uses BUILT_IN_DEMO: days 121 to 128 with the exact values of handoff
-// section 4, and days 107 to 120 as small seeded noise around the baseline (always green).
+// Until then the app uses BUILT_IN_DEMO: the mission starts on day 1; days 23 to 30 carry the exact
+// values of handoff section 4 (handoff days 121 to 128, renumbered), and days 1 to 22 are small seeded
+// noise around the baseline (always green).
 import { KNOWLEDGE } from '../data/knowledge'
 
 /** [mean, standard deviation] */
@@ -72,8 +73,17 @@ export const NUMERIC_FIELDS: NumericField[] = [
   'crew_climate', 'pulse_ms', 'contact', 'exercise_min', 'glucose',
 ]
 
-/** Story days the day control replays (handoff: 121 to 128). */
-export const STORY_DAYS = { first: 121, last: 128 }
+/** Story days of the demo (handoff days 121 to 128, renumbered so the mission starts on day 1). */
+export const STORY_DAYS = { first: 23, last: 30 }
+
+/**
+ * Days the day control can reach: every day in the loaded file (1 to 30 in the data team's file), so
+ * testers can also visit her history before the story.
+ */
+export function dayRange(data: DemoData): { first: number; last: number } {
+  const days = data.days.map((d) => d.day)
+  return days.length ? { first: Math.min(...days), last: Math.max(...days) } : STORY_DAYS
+}
 
 // ---------------------------------------------------------------------------------------------
 // Built-in demo (handoff sections 2.3 and 4)
@@ -104,29 +114,29 @@ type StoryRow = [day: number, sleep: number, hr: number, sbp: number, dbp: numbe
 
 // Handoff section 4, exact values.
 const STORY: StoryRow[] = [
-  [121, 6.6, 58, 114, 73, 38.0, 7, 4, 4, 7, 318, 2, 120],
-  [122, 6.4, 59, 113, 72, 37.9, 7, 5, 4, 7, 322, 0, 110],
-  [123, 5.2, 62, 115, 74, 37.9, 6, 5, 5, 7, 352, 0, 115],
-  [124, 5.4, 69, 117, 75, 38.0, 5, 7, 6, 6, 356, 0, 100],
-  [125, 5.3, 70, 118, 76, 38.0, 4, 7, 6, 6, 360, 0, 90],
-  [126, 6.3, 63, 115, 74, 37.9, 6, 5, 5, 7, 338, 2, 120],
-  [127, 6.5, 60, 113, 73, 37.9, 6, 4, 4, 7, 325, 2, 120],
-  [128, 6.6, 59, 112, 72, 37.9, 7, 4, 4, 7, 320, 2, 120],
+  [23, 6.6, 58, 114, 73, 38.0, 7, 4, 4, 7, 318, 2, 120],
+  [24, 6.4, 59, 113, 72, 37.9, 7, 5, 4, 7, 322, 0, 110],
+  [25, 5.2, 62, 115, 74, 37.9, 6, 5, 5, 7, 352, 0, 115],
+  [26, 5.4, 69, 117, 75, 38.0, 5, 7, 6, 6, 356, 0, 100],
+  [27, 5.3, 70, 118, 76, 38.0, 4, 7, 6, 6, 360, 0, 90],
+  [28, 6.3, 63, 115, 74, 37.9, 6, 5, 5, 7, 338, 2, 120],
+  [29, 6.5, 60, 113, 73, 37.9, 6, 4, 4, 7, 325, 2, 120],
+  [30, 6.6, 59, 112, 72, 37.9, 7, 4, 4, 7, 320, 2, 120],
 ]
 
 // Story events in English (app text), from Psychology's package of Nov 14, 20:45 (section 2.3).
 // Her adult sister replaces the daughter of the first script (2026 guide: no persons under 18).
 const EVENTS: Record<number, string[]> = {
-  122: ["Tomorrow her shift moves 3 hours earlier"],
-  123: ["Shift change"],
-  125: ["Early signal. She says she missed her sister's birthday call; she picks a protected sleep window and a video message with a puzzle for her sister"],
-  126: ["Her sister's reply arrives"],
-  127: ["ORBIT asks: did it help?"],
-  128: ["Weekly check: PHQ-2 = 1, GAD-2 = 2", "Weekly summary: one early signal, resolved onboard"],
+  24: ["Tomorrow her shift moves 3 hours earlier"],
+  25: ["Shift change"],
+  27: ["Early signal. She says she missed her sister's birthday call; she picks a protected sleep window and a video message with a puzzle for her sister"],
+  28: ["Her sister's reply arrives"],
+  29: ["ORBIT asks: did it help?"],
+  30: ["Weekly check: PHQ-2 = 1, GAD-2 = 2", "Weekly summary: one early signal, resolved onboard"],
 }
 
 // Weekly fasting glucose (synthetic, inside the green range). Proposed: the handoff example has no glucose.
-const GLUCOSE: Record<number, number> = { 107: 88, 114: 90, 121: 89, 128: 87 }
+const GLUCOSE: Record<number, number> = { 2: 89, 9: 88, 16: 90, 23: 89, 30: 87 }
 
 function mulberry32(seed: number) {
   return () => {
@@ -141,12 +151,12 @@ function mulberry32(seed: number) {
 const round = (x: number, decimals = 0) => Number(x.toFixed(decimals))
 
 function buildDemo(): DemoData {
-  const rand = mulberry32(121)
+  const rand = mulberry32(121) // same seed as before: the background noise keeps its values
   const b = PERSONA.baseline
   // Noise of at most ±0.5 SD keeps every pre-story day green.
   const near = ([m, sd]: MeanSd, decimals = 0) => round(m + (rand() * 2 - 1) * 0.5 * sd, decimals)
   const days: DayRecord[] = []
-  for (let day = 107; day <= 120; day++) {
+  for (let day = 1; day < STORY_DAYS.first; day++) {
     days.push({
       day,
       sleep_h: near(b.sleep_h, 1),
@@ -158,9 +168,9 @@ function buildDemo(): DemoData {
       stress: near(b.stress),
       fatigue: near(b.fatigue),
       crew_climate: near(b.crew_climate),
-      // Handoff: days 119 and 120 must sit inside the band (319 and 321 ms) with contact 2.
-      pulse_ms: day === 119 ? 319 : day === 120 ? 321 : near(b.pulse_ms),
-      contact: day >= 119 ? 2 : near(b.contact),
+      // Handoff: the two days before the story (21 and 22) sit inside the band (319 and 321 ms) with contact 2.
+      pulse_ms: day === 21 ? 319 : day === 22 ? 321 : near(b.pulse_ms),
+      contact: day >= 21 ? 2 : near(b.contact),
       exercise_min: round(b.exercise_prescription_min + (rand() * 2 - 1) * 5),
       glucose: GLUCOSE[day] ?? null,
       symptoms: [],
@@ -185,7 +195,7 @@ function buildDemo(): DemoData {
       exercise_min: exercise,
       glucose: GLUCOSE[day] ?? null,
       symptoms: [],
-      screen: day === 128 ? { phq2: 1, gad2: 2 } : null,
+      screen: day === 30 ? { phq2: 1, gad2: 2 } : null,
       events: EVENTS[day] ?? [],
     })
   }

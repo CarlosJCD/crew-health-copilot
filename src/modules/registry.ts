@@ -13,11 +13,24 @@ export interface ModuleInfo {
 
 export const MODULES: ModuleInfo[] = [
   {
-    id: 'today',
+    id: 'body',
     label: { en: 'Today', es: 'Hoy' },
     summary: {
-      en: 'Body, Mind and Crew rings, the ORBIT state and every indicator against your own baseline.',
-      es: 'Anillos de Cuerpo, Mente y Tripulación, el estado ORBIT y cada indicador frente a tu propia línea base.',
+      en: 'First screen: today\'s state, the protective-factors tank, the heat map of symptoms on the body with For today beside it, and logging what she feels where she feels it.',
+      es: 'Primera pantalla: el estado del día, el tanque de factores protectores, el mapa de calor de síntomas sobre el cuerpo con Para hoy al lado, y registrar lo que siente donde lo siente.',
+    },
+    owner: { en: 'Engineering', es: 'Ingeniería' },
+    planned: [
+      { en: 'Clickable SVG figure with HRP risks', es: 'Figura SVG que se puede tocar, con riesgos HRP' },
+      { en: 'Tap to log a symptom', es: 'Tocar para registrar un síntoma' },
+    ],
+  },
+  {
+    id: 'today',
+    label: { en: 'Metrics', es: 'Métricas' },
+    summary: {
+      en: 'Every number one tap away: Body, Mind and Crew rings, the ORBIT state and each indicator against your own baseline.',
+      es: 'Todos los números a un toque: anillos de Cuerpo, Mente y Tripulación, el estado ORBIT y cada indicador frente a tu propia línea base.',
     },
     owner: { en: 'Engineering', es: 'Ingeniería' },
     planned: [],
@@ -49,19 +62,6 @@ export const MODULES: ModuleInfo[] = [
     ],
   },
   {
-    id: 'body',
-    label: { en: 'Body map', es: 'Figura humana' },
-    summary: {
-      en: 'Human figure with six systems: brain and mood, eyes, heart and vessels, bone and muscle, immune and skin, gut and nutrition.',
-      es: 'Figura humana con seis sistemas: cerebro y ánimo, ojos, corazón y vasos, hueso y músculo, inmune y piel, intestino.',
-    },
-    owner: { en: 'Engineering', es: 'Ingeniería' },
-    planned: [
-      { en: 'Clickable SVG figure with HRP risks', es: 'Figura SVG que se puede tocar, con riesgos HRP' },
-      { en: 'Tap to log a symptom', es: 'Tocar para registrar un síntoma' },
-    ],
-  },
-  {
     id: 'mind',
     label: { en: 'Mind', es: 'Mente' },
     summary: {
@@ -86,4 +86,5 @@ export const MODULES: ModuleInfo[] = [
   },
 ]
 
-export const DEFAULT_MODULE = 'today'
+// The body is the first screen: astronauts have little medical background and little time to read numbers.
+export const DEFAULT_MODULE = 'body'

@@ -1,0 +1,621 @@
+{
+ "version": "0.1",
+ "date": "2026-11-14",
+ "status": "Proposal. P1 only if the body map ships tonight (intensity + qualities on tap). Everything else is roadmap.",
+ "disclaimer_en": "ORBIT records where pain is, how strong it is and what it feels like. It does not name a cause or diagnose. Patterns are offered to her; nothing is applied without her choice.",
+ "privacy": {
+  "body": "region, side, intensity, qualities, duration, worse_on_move_or_press: part of Body status (goes to the crew medical officer like the rest of Body)",
+  "mind": "context 'Stressful moment today': part of Mind (private unless she switches Mind on)"
+ },
+ "intensity": {
+  "scale": "NRS 0-10",
+  "prompt_en": "How strong is it right now?",
+  "anchors_en": {
+   "0": "No pain",
+   "10": "Worst pain you can imagine"
+  },
+  "verbal_label_en": {
+   "0": "None",
+   "1-3": "Mild",
+   "4-6": "Moderate",
+   "7-10": "Severe"
+  },
+  "verbal_label_note": "Display label only; scoring uses the number (team criterion)",
+  "sources": [
+   {
+    "cite": "Dworkin et al., 2008 (IMMPACT)",
+    "url": "https://doi.org/10.1016/j.jpain.2007.09.005"
+   },
+   {
+    "cite": "Hjermstad et al., 2011",
+    "url": "https://doi.org/10.1016/j.jpainsymman.2010.08.016"
+   }
+  ]
+ },
+ "regions": [
+  {
+   "id": "head",
+   "label_en": "Head",
+   "system": "brain_mood",
+   "sided": false
+  },
+  {
+   "id": "eyes",
+   "label_en": "Eyes",
+   "system": "eyes",
+   "sided": true
+  },
+  {
+   "id": "neck",
+   "label_en": "Neck",
+   "system": "bone_muscle",
+   "sided": false
+  },
+  {
+   "id": "shoulder",
+   "label_en": "Shoulder",
+   "system": "bone_muscle",
+   "sided": true
+  },
+  {
+   "id": "chest",
+   "label_en": "Chest",
+   "system": "heart_vessels",
+   "sided": false
+  },
+  {
+   "id": "upper_back",
+   "label_en": "Upper back",
+   "system": "bone_muscle",
+   "sided": false
+  },
+  {
+   "id": "lower_back",
+   "label_en": "Lower back",
+   "system": "bone_muscle",
+   "sided": false
+  },
+  {
+   "id": "abdomen",
+   "label_en": "Belly",
+   "system": "gut",
+   "sided": false
+  },
+  {
+   "id": "arm",
+   "label_en": "Arm or elbow",
+   "system": "bone_muscle",
+   "sided": true
+  },
+  {
+   "id": "hand_wrist",
+   "label_en": "Hand or wrist",
+   "system": "bone_muscle",
+   "sided": true
+  },
+  {
+   "id": "hip",
+   "label_en": "Hip or pelvis",
+   "system": "bone_muscle",
+   "sided": true
+  },
+  {
+   "id": "leg",
+   "label_en": "Leg or knee",
+   "system": "bone_muscle",
+   "sided": true
+  },
+  {
+   "id": "foot_ankle",
+   "label_en": "Foot or ankle",
+   "system": "bone_muscle",
+   "sided": true
+  },
+  {
+   "id": "skin",
+   "label_en": "Skin (any area)",
+   "system": "immune_skin",
+   "sided": false
+  }
+ ],
+ "regions_note": "Ask side (left, right, both) and front or back; the CHOIR body map showed most mismatches in back and shoulders.",
+ "qualities": [
+  {
+   "id": "sharp",
+   "label_en": "Sharp or stabbing",
+   "es": "punzante",
+   "family": "sharp_stabbing",
+   "nerve_like": false
+  },
+  {
+   "id": "aching",
+   "label_en": "Aching",
+   "es": "sordo, molesto",
+   "family": "dull_aching",
+   "nerve_like": false
+  },
+  {
+   "id": "throbbing",
+   "label_en": "Throbbing",
+   "es": "pulsátil",
+   "family": "pounding_pulsing",
+   "nerve_like": false
+  },
+  {
+   "id": "tight",
+   "label_en": "Tight or pulling",
+   "es": "tirante",
+   "family": "pulling_tugging",
+   "nerve_like": false
+  },
+  {
+   "id": "tingling",
+   "label_en": "Tingling or pins and needles",
+   "es": "hormigueo",
+   "family": "promis_pq_neuro",
+   "nerve_like": true
+  },
+  {
+   "id": "numb",
+   "label_en": "Numb",
+   "es": "entumecido",
+   "family": "promis_pq_neuro",
+   "nerve_like": true
+  },
+  {
+   "id": "stinging",
+   "label_en": "Stinging",
+   "es": "piquete, picadura",
+   "family": "promis_pq_neuro",
+   "nerve_like": true
+  },
+  {
+   "id": "electric",
+   "label_en": "Electric",
+   "es": "toque eléctrico",
+   "family": "promis_pq_neuro",
+   "nerve_like": true
+  },
+  {
+   "id": "burning",
+   "label_en": "Burning",
+   "es": "ardor",
+   "family": "dn4_descriptor",
+   "nerve_like": true
+  }
+ ],
+ "qualities_max_choices": 3,
+ "qualities_sources": [
+  {
+   "cite": "Revicki et al., 2014 (PROMIS pain quality, 6 families)",
+   "url": "https://doi.org/10.1007/s11136-013-0467-9"
+  },
+  {
+   "cite": "Askew et al., 2016 (PROMIS PQ-Neuro)",
+   "url": "https://doi.org/10.1016/j.jval.2016.02.009"
+  },
+  {
+   "cite": "Bouhassira et al., 2005 (DN4)",
+   "url": "https://doi.org/10.1016/j.pain.2004.12.010"
+  }
+ ],
+ "contexts": [
+  {
+   "id": "exercise",
+   "label_en": "During or after exercise"
+  },
+  {
+   "id": "eva",
+   "label_en": "During or after EVA"
+  },
+  {
+   "id": "translation",
+   "label_en": "Moving between modules or handling cargo"
+  },
+  {
+   "id": "impact",
+   "label_en": "Bump or impact"
+  },
+  {
+   "id": "waking",
+   "label_en": "On waking or sleep position"
+  },
+  {
+   "id": "workstation",
+   "label_en": "Long task at a workstation"
+  },
+  {
+   "id": "stress",
+   "label_en": "Stressful moment today",
+   "domain": "mind"
+  },
+  {
+   "id": "short_sleep",
+   "label_en": "Short sleep last night"
+  },
+  {
+   "id": "unknown",
+   "label_en": "Not sure"
+  }
+ ],
+ "contexts_sources": [
+  {
+   "cite": "Scheuring et al., 2009 (in-flight injuries: hands, exercise, EVA)",
+   "url": "https://doi.org/10.3357/ASEM.2270.2009"
+  },
+  {
+   "cite": "Pellegrino et al., 2018 (stress and sleep as perceived triggers)",
+   "url": "https://doi.org/10.1177/0333102417727535"
+  }
+ ],
+ "report_flow": [
+  {
+   "step": 1,
+   "id": "region",
+   "prompt_en": "Where does it hurt?",
+   "type": "body_map_tap + side + front_or_back"
+  },
+  {
+   "step": 2,
+   "id": "qualities",
+   "prompt_en": "What does it feel like? Pick up to 3.",
+   "type": "multi_select",
+   "options": "qualities"
+  },
+  {
+   "step": 3,
+   "id": "intensity",
+   "prompt_en": "How strong is it right now?",
+   "type": "nrs_0_10"
+  },
+  {
+   "step": 4,
+   "id": "timing",
+   "prompt_en": "When did it start?",
+   "type": "single_select",
+   "options_en": [
+    "Today",
+    "1 to 2 days ago",
+    "More than 2 days ago"
+   ],
+   "also_en": "Is it constant or does it come and go?"
+  },
+  {
+   "step": 5,
+   "id": "context",
+   "prompt_en": "What was happening?",
+   "type": "multi_select",
+   "options": "contexts"
+  },
+  {
+   "step": 6,
+   "id": "mechanics",
+   "prompt_en": "Does it get worse when you move or press on it?",
+   "type": "single_select",
+   "options_en": [
+    "Yes",
+    "No",
+    "Not sure"
+   ],
+   "note": "For the medical officer; never shown to her as a label"
+  }
+ ],
+ "report_flow_target_seconds": 30,
+ "report_flow_team_criterion": true,
+ "safety": {
+  "red_flags": "Use orbit-indicators.json symptoms.params.red_flags unchanged; the safety question runs before saving and before any card",
+  "headache_first": [
+   "Ask the red-flag question (severe headache, vision change)",
+   "Check cabin CO2 with the crew before offering self-care"
+  ],
+  "nerve_like_rule": {
+   "if_selected_gte": 3,
+   "text_en": "Worth mentioning to your medical officer.",
+   "level": "not an alarm",
+   "team_criterion": true,
+   "note": "Inspired by the 7-item DN4 interview cut-off of 3; not validated in this format"
+  },
+  "post_flight_spine": {
+   "applies": "first 30 days after landing (team criterion)",
+   "trigger": "new neck or back pain",
+   "question_en": "Any numbness, tingling or weakness in an arm or leg?",
+   "if_yes": "flight surgeon",
+   "status": "pending physician review",
+   "sources": [
+    {
+     "cite": "Johnston et al., 2010",
+     "url": "https://doi.org/10.3357/ASEM.2427.2010"
+    },
+    {
+     "cite": "Belavý et al., 2016",
+     "url": "https://doi.org/10.1007/s00586-015-3917-y"
+    }
+   ]
+  },
+  "co2_source": {
+   "cite": "Law et al., 2014, J Occup Environ Med 56(5):477-83 (DOI not verified; NASA abstract)",
+   "url": "https://ntrs.nasa.gov/citations/20160012725"
+  }
+ },
+ "rules": {
+  "yellow": [
+   "A pain lasting more than 2 days (existing symptoms rule)",
+   "Usual intensity in a region rises by 2 points or 30 % (team criterion, based on Farrar et al., 2001)"
+  ],
+  "red": "Only the existing red flags",
+  "never_red_on_its_own": [
+   "nerve-like words",
+   "a pattern"
+  ],
+  "sources": [
+   {
+    "cite": "Farrar et al., 2001",
+    "url": "https://doi.org/10.1016/S0304-3959(01)00349-9"
+   }
+  ]
+ },
+ "weekly": {
+  "instrument": "PEG (3 items, public domain)",
+  "show_if": "any pain logged in the last 7 days",
+  "joins": "weekly check (PHQ-2, GAD-2)",
+  "items_en": [
+   "What number best describes your pain on average in the past week?",
+   "What number best describes how, during the past week, pain has interfered with your enjoyment of life?",
+   "What number best describes how, during the past week, pain has interfered with your general activity?"
+  ],
+  "source": {
+   "cite": "Krebs et al., 2009",
+   "url": "https://doi.org/10.1007/s11606-009-0981-1"
+  }
+ },
+ "baseline": {
+  "pre_flight_days": 14,
+  "valid_if_days_with_data_gte": 10,
+  "in_flight_rolling_window_days": 28,
+  "exclude_yellow_and_red_days": true,
+  "statistic": "median and MAD for skewed data (pain, contact); mean and SD elsewhere",
+  "show_n_with_every_average": true,
+  "max_gap_days_without_data": 1,
+  "team_criterion": [
+   "valid_if_days_with_data_gte",
+   "exclude_yellow_and_red_days",
+   "statistic"
+  ],
+  "minimums": [
+   {
+    "indicator": "pain",
+    "rule": "Personal average only with 4 or more days with ratings; with no pain the baseline is 0 plus the count of pain days",
+    "sources": [
+     {
+      "cite": "Jensen and McFarland, 1993",
+      "url": "https://doi.org/10.1016/0304-3959(93)90148-I"
+     },
+     {
+      "cite": "de la Vega et al., 2024",
+      "url": "https://doi.org/10.1016/j.jpain.2024.01.339"
+     }
+    ]
+   },
+   {
+    "indicator": "bp",
+    "rule": "3 valid days minimum, 7 optimal, first day discarded",
+    "sources": [
+     {
+      "cite": "Kyriakoulis et al., 2022",
+      "url": "https://doi.org/10.1097/HJH.0000000000003157"
+     },
+     {
+      "cite": "Stergiou et al., 2021",
+      "url": "https://doi.org/10.1097/HJH.0000000000002843"
+     }
+    ]
+   },
+   {
+    "indicator": "sleep",
+    "rule": "7 nights or more",
+    "sources": [
+     {
+      "cite": "Aili et al., 2017",
+      "url": "https://doi.org/10.5664/jcsm.6384"
+     }
+    ]
+   },
+   {
+    "indicator": "hrv",
+    "rule": "3 or more valid days per week for a weekly average",
+    "sources": [
+     {
+      "cite": "Plews et al., 2014",
+      "url": "https://doi.org/10.1123/IJSPP.2013-0455"
+     }
+    ]
+   },
+   {
+    "indicator": "hr",
+    "rule": "28-day rolling baseline in flight",
+    "sources": [
+     {
+      "cite": "Mishra et al., 2020",
+      "url": "https://doi.org/10.1038/s41551-020-00640-6"
+     }
+    ]
+   },
+   {
+    "indicator": "temp",
+    "rule": "Recalculate in flight with the rolling window; core temperature plateaued around day 75",
+    "sources": [
+     {
+      "cite": "Stahn et al., 2017",
+      "url": "https://doi.org/10.1038/s41598-017-15560-w"
+     }
+    ]
+   }
+  ]
+ },
+ "phases": [
+  {
+   "id": "pre_flight",
+   "window": "last 14 days before launch",
+   "note": "Personal baseline"
+  },
+  {
+   "id": "adaptation",
+   "window": "flight days 1 to 14",
+   "note_en": "Common in the first weeks.",
+   "note": "Back pain and early headaches are expected; rules stay on; not mixed into the stable baseline",
+   "sources": [
+    {
+     "cite": "Kerstman et al., 2012",
+     "url": "https://doi.org/10.3357/ASEM.2876.2012"
+    },
+    {
+     "cite": "van Oosterhout et al., 2024",
+     "url": "https://doi.org/10.1212/WNL.0000000000209224"
+    }
+   ]
+  },
+  {
+   "id": "stable_flight",
+   "window": "flight day 15 onward",
+   "note": "28-day rolling baseline"
+  },
+  {
+   "id": "eva",
+   "window": "morning of EVA, after EVA, next morning",
+   "focus": [
+    "hand_wrist",
+    "shoulder",
+    "foot_ankle"
+   ],
+   "note": "0.26 injuries per EVA; compare with her pre-EVA record",
+   "sources": [
+    {
+     "cite": "Scheuring et al., 2009",
+     "url": "https://doi.org/10.3357/ASEM.2270.2009"
+    }
+   ]
+  },
+  {
+   "id": "post_flight",
+   "window": "first 30 days after landing (team criterion)",
+   "note": "Compare with pre-flight baseline; spine question for new neck or back pain"
+  }
+ ],
+ "heatmap": {
+  "unit": "region x phase x week",
+  "color": "median intensity",
+  "opacity": "number of pain days",
+  "filters": [
+   "phase",
+   "week",
+   "context"
+  ],
+  "label_example_en": "Lower back: 6 days, usual 2/10, mostly on waking",
+  "never_label_en": [
+   "back problem",
+   "injury",
+   "disorder"
+  ],
+  "roadmap": true
+ },
+ "simple_correlations": {
+  "form": "counts, not predictions",
+  "example_en": "Headache on 4 of 6 days after short sleep, and on 1 of 20 other days",
+  "first_variable": "sleep the night before",
+  "source": {
+   "cite": "Tang et al., 2012",
+   "url": "https://doi.org/10.5665/sleep.1830"
+  },
+  "roadmap": true
+ },
+ "personal_patterns": {
+  "roadmap": true,
+  "team_criterion": true,
+  "outcome": "pain in the same region within 24 h after a precursor combination",
+  "precursors": [
+   "checkin.stress yellow",
+   "hr yellow",
+   "sleep yellow",
+   "stress drop after a yellow stress day (let-down)"
+  ],
+  "min_data_days": 30,
+  "min_events": 3,
+  "window_days": 30,
+  "contrast": "pain at least twice as frequent after the combination as on other days",
+  "confirm_text_en": "The last {n} times you had {precursor}, a {region} pain followed within a day. Does that match your experience?",
+  "active_only_if_confirmed": true,
+  "offer_when_precursor_returns": {
+   "cards": [
+    "breathe",
+    "micro_break",
+    "wind_down"
+   ],
+   "text_en": "This combination came before your {region} pain {n} times. Want to try 4 minutes of Breathe now?",
+   "auto_apply": false
+  },
+  "safety_before_cards": [
+   "red-flag question",
+   "cabin CO2 check for headaches"
+  ],
+  "iterate": {
+   "ask": "Did it help?",
+   "retire_if": "3 offers in a row with no fewer pain events",
+   "she_can_delete": true
+  },
+  "allowed_words_en": [
+   "pattern",
+   "came before",
+   "may be linked"
+  ],
+  "never_words_en": [
+   "caused by",
+   "diagnosis",
+   "disorder"
+  ],
+  "why_not_ml_en": "Personal network models recover little with 75 to 100 observations; a transparent rule is safer for one person.",
+  "sources": [
+   {
+    "cite": "Pellegrino et al., 2018",
+    "url": "https://doi.org/10.1177/0333102417727535"
+   },
+   {
+    "cite": "Lipton et al., 2014",
+    "url": "https://doi.org/10.1212/WNL.0000000000000332"
+   },
+   {
+    "cite": "Houle et al., 2017, Headache 57(7):1041-50 (DOI not verified)",
+    "url": null
+   },
+   {
+    "cite": "Nestoriuc et al., 2008",
+    "url": "https://doi.org/10.1037/0022-006X.76.3.379"
+   },
+   {
+    "cite": "Mansueto et al., 2023",
+    "url": "https://doi.org/10.1037/met0000466"
+   },
+   {
+    "cite": "Nahum-Shani et al., 2018",
+    "url": "https://doi.org/10.1007/s12160-016-9830-8"
+   }
+  ]
+ },
+ "demo_optional": {
+  "owner": "data",
+  "priority": "P2",
+  "event_day": 124,
+  "event": {
+   "region": "head",
+   "intensity": 3,
+   "qualities": [
+    "aching"
+   ],
+   "contexts": [
+    "stress",
+    "short_sleep"
+   ],
+   "timing": "Today"
+  },
+  "note": "A one-day symptom does not turn the card yellow, so the acceptance table does not change"
+ }
+}
