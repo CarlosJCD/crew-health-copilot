@@ -15,7 +15,6 @@ import { remindersFor, type Reminder } from '../orbit/plan'
 import { useI18n } from '../i18n/context'
 import type { StringKey } from '../i18n/strings'
 import { useFigure } from '../lib/figure'
-import { useMedia } from '../lib/useMedia'
 import { CareTank } from '../components/CareTank'
 import { PainPanel } from '../components/PainPanel'
 import { PaintSurface } from '../components/PainPainter'
@@ -64,7 +63,7 @@ const listText = (items: string[], and: string) => (items.length < 2 ? items.joi
 
 /**
  * Home: the body is the screen. Today's state in one line with what changed and who sees it, the medical
- * officer first on a red day, "For today" and the tank one tap away (beside the body on wide screens), and
+ * officer first on a red day, "For today" and the tank one tap away (each opens in a panel), and
  * the figure as a heat map of what she logged, where she draws what hurts.
  */
 export function BodyMap(props: Props) {
@@ -72,12 +71,11 @@ export function BodyMap(props: Props) {
   const fig = theme === 'light' ? FIGURE_LIGHT : FIGURE
   const { t } = useI18n()
   const [figure] = useFigure()
-  /** Wide screens: "For today" and the tank sit beside the body; on a phone they open from one row. */
-  const wide = useMedia('(min-width: 1024px)')
   const [view, setView] = useState<BodyView>('front')
   const [strokes, setStrokes] = useState<PaintStroke[]>([])
   const [painOpen, setPainOpen] = useState(false)
   const [planOpen, setPlanOpen] = useState(false)
+  const [tankOpen, setTankOpen] = useState(false)
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
   const record = data.days.find((d) => d.day === day)
@@ -105,6 +103,7 @@ export function BodyMap(props: Props) {
   }
   const closePain = useCallback(() => setPainOpen(false), [])
   const closePlan = useCallback(() => setPlanOpen(false), [])
+  const closeTank = useCallback(() => setTankOpen(false), [])
   const clearPaint = useCallback(() => setStrokes([]), [])
   const openPain = useCallback(() => {
     setPlanOpen(false)
@@ -163,21 +162,19 @@ export function BodyMap(props: Props) {
           </section>
         )}
 
-        {!wide && (
         <div className="today-strip">
           <button type="button" className="strip-btn" onClick={() => setPlanOpen(true)}>
             <strong>{t('plan.title')}</strong>
             <span className="muted">{reminders.length ? t('home.planCount', { n: reminders.length }) : t('home.planNone')}</span>
           </button>
-          <a className="strip-btn tank-mini" href="#/boost" aria-label={t('care.level', { n: care.level, size: TANK_SIZE })}>
+          <button type="button" className="strip-btn tank-mini" onClick={() => setTankOpen(true)} aria-label={t('care.level', { n: care.level, size: TANK_SIZE })}>
             <svg viewBox="0 0 12 20" aria-hidden="true">
               <rect x="1" y="1" width="10" height="18" rx="3" className="tank-shell" />
               <rect x="2.5" y={2.5 + 15 * (1 - care.level / TANK_SIZE)} width="7" height={15 * (care.level / TANK_SIZE)} rx="2" className="tank-fill" />
             </svg>
             {t('home.tank', { n: care.level, size: TANK_SIZE })}
-          </a>
+          </button>
         </div>
-        )}
 
         <section className="figure-stage" aria-labelledby="figure-title">
           <h2 id="figure-title" className="sr-only">{t('home.figureTitle')}</h2>
@@ -260,18 +257,18 @@ export function BodyMap(props: Props) {
         <p className="fineprint">{t('home.notDiag')}</p>
       </div>
 
-      {/* Wide screens: "For today" and the tank beside the body. */}
-      {wide && (
-        <aside className="home-side" aria-label={t('plan.title')}>
-          <CareTank care={care} />
-          {todayPlan}
-        </aside>
-      )}
-
       {planOpen && (
         <Sheet onClose={closePlan} title={t('plan.title')}>
-          <CareTank care={care} />
           {todayPlan}
+        </Sheet>
+      )}
+
+      {tankOpen && (
+        <Sheet onClose={closeTank} title={t('home.tankTitle')}>
+          <CareTank care={care} />
+          <a className="button ghost wide" href="#/boost">
+            {t('nav.care')}
+          </a>
         </Sheet>
       )}
 

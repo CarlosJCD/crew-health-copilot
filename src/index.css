@@ -605,16 +605,15 @@ h1, h2, h3, .wordmark, .hero-state, .button { font-family: var(--font-title); }
   .home-actions .paint-tools { flex: 1; }
 }
 
-/* Wide screens: a side rail instead of the bottom bar, and "For today" beside the body. */
+/* Wide screens: the navigation is a floating island on the left instead of the bottom bar. */
 @media (min-width: 1024px) {
-  .app { max-width: 1240px; padding: 0 1.5rem 1.5rem calc(96px + 1.5rem); }
-  .bottom-nav { top: 0; right: auto; width: 96px; height: auto; flex-direction: column; justify-content: center; gap: 0.5rem;
-    border-top: 0; border-right: 1px solid var(--line); padding: 1rem 0; }
-  .bottom-nav a, .bottom-nav button { flex: 0 0 auto; padding: 0.6rem 0; margin: 0 8px; }
-  .home { grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); align-items: start; column-gap: 2rem; }
-  .home-main { display: grid; justify-items: center; gap: 0.4rem; }
-  .home-side { position: sticky; top: 84px; max-height: calc(100dvh - 100px); overflow: auto; text-align: left; display: grid; gap: 1rem; }
-  .home-side .care, .home-side .plan-today { margin: 0; }
+  .app { max-width: 1100px; padding: 0 1.5rem 1.5rem calc(96px + 2rem); }
+  .bottom-nav { top: 50%; bottom: auto; left: 1rem; right: auto; transform: translateY(-50%); width: 84px; height: auto;
+    flex-direction: column; justify-content: center; gap: 0.35rem; padding: 0.6rem 0; border: 1px solid var(--line);
+    border-radius: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+  .bottom-nav a, .bottom-nav button { flex: 0 0 auto; padding: 0.6rem 0; margin: 0 8px; border-radius: 18px; }
+  .bottom-nav [aria-current='page'] { background: color-mix(in oklab, var(--accent) 14%, transparent); }
   .home-actions { bottom: 1rem; }
 }
+:root[data-theme='light'] .bottom-nav { box-shadow: 0 10px 30px rgba(23, 23, 27, 0.12); }
 .home-main { width: 100%; display: grid; justify-items: center; gap: 0.4rem; }
