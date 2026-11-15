@@ -10,12 +10,12 @@ describe('care tank (protective factors used)', () => {
 
   it('counts only looking-after-yourself actions, and the days they happened', () => {
     const s = careSummary({
-      checkins: { 124: { mood: 5, stress: 7, fatigue: 6, crew_climate: 6 } },
+      checkins: { 26: { mood: 5, stress: 7, fatigue: 6, crew_climate: 6 } },
       boostLog: {
-        125: { chosen: ['sleep_window', 'message_home'], helped: { sleep_window: 'Yes', message_home: 'Skip' } },
-        126: { chosen: ['sleep_window'], helped: { sleep_window: 'A little' } },
+        27: { chosen: ['sleep_window', 'message_home'], helped: { sleep_window: 'Yes', message_home: 'Skip' } },
+        28: { chosen: ['sleep_window'], helped: { sleep_window: 'A little' } },
       },
-      pulseSessions: [{ id: 'p', day: 125, at: 1, practice: false, result: { median_ms: 330, response_speed: 3, lapses: 0, false_starts: 0, valid: 40 } }],
+      pulseSessions: [{ id: 'p', day: 27, at: 1, practice: false, result: { median_ms: 330, response_speed: 3, lapses: 0, false_starts: 0, valid: 40 } }],
       boardsDone: 1,
     })
     // 1 check-in + 3 chosen + 2 answers (Skip does not count) + 1 pulse session + 1 board

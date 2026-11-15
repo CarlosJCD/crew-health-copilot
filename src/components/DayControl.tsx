@@ -7,7 +7,7 @@ interface Props {
   onDayChange: (d: number) => void
 }
 
-/** Persona line, the day control (every day of the file; the demo story is 121 to 128) with the mission log, and dataset problems. */
+/** Persona line, the day control (every day of the file; the demo story is 23 to 30) with the mission log, and dataset problems. */
 export function DayControl({ demo, day, onDayChange }: Props) {
   const { t } = useI18n()
   const { data } = demo

@@ -118,16 +118,16 @@ describe('a pain report', () => {
 
 describe('pain and the engine', () => {
   it('chest pain is red only if she confirms an alarm sign', () => {
-    const quiet = applyPain(BUILT_IN_DEMO, { 121: day(event({ regions: ['chest'] })) })
-    expect(evaluateDay(quiet, 121).state).not.toBe('RED_PHYSICAL')
-    const alarm = applyPain(BUILT_IN_DEMO, { 121: day(event({ regions: ['chest'], alarms: ['chest pain'] })) })
-    expect(evaluateDay(alarm, 121).state).toBe('RED_PHYSICAL')
+    const quiet = applyPain(BUILT_IN_DEMO, { 23: day(event({ regions: ['chest'] })) })
+    expect(evaluateDay(quiet, 23).state).not.toBe('RED_PHYSICAL')
+    const alarm = applyPain(BUILT_IN_DEMO, { 23: day(event({ regions: ['chest'], alarms: ['chest pain'] })) })
+    expect(evaluateDay(alarm, 23).state).toBe('RED_PHYSICAL')
   })
 
   it('a pain in the same region on 3 days in a row turns the symptoms rule yellow (more than 2 days)', () => {
     const d = day(event({}))
-    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 121: d, 122: d }), 122).indicators.symptoms.color).toBe('green')
-    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 121: d, 122: d, 123: d }), 123).indicators.symptoms.color).toBe('yellow')
+    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 23: d, 24: d }), 24).indicators.symptoms.color).toBe('green')
+    expect(evaluateDay(applyPain(BUILT_IN_DEMO, { 23: d, 24: d, 25: d }), 25).indicators.symptoms.color).toBe('yellow')
   })
 
   it('an empty log leaves the data untouched', () => {

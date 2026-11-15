@@ -193,7 +193,7 @@ export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, class
     <div
       ref={box}
       className={`${className} paintable`}
-      style={{ aspectRatio: FIGURE_ASPECT[figure][view] }}
+      style={{ aspectRatio: FIGURE_ASPECT[figure][view], ['--ar' as string]: FIGURE_ASPECT[figure][view] }}
       onPointerDown={start}
       onPointerMove={move}
       onPointerUp={end}

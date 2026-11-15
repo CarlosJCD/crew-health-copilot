@@ -26,8 +26,8 @@ describe('body systems', () => {
     expect(systemRisks(system('eyes'))[0]).toMatch(/SANS/)
   })
 
-  it('color: day 124 heart is yellow (resting heart rate), eyes stay green', () => {
-    const r = evaluateDay(BUILT_IN_DEMO, 124)
+  it('color: day 26 heart is yellow (resting heart rate), eyes stay green', () => {
+    const r = evaluateDay(BUILT_IN_DEMO, 26)
     expect(systemColor(system('heart'), r, [])).toBe('yellow')
     expect(systemColor(system('eyes'), r, [])).toBe('green')
   })
@@ -35,16 +35,16 @@ describe('body systems', () => {
 
 describe('logging a symptom on the body map', () => {
   it('adds it to the day so the engine sees it: an alarm sign turns the day red (physical)', () => {
-    const data = applySymptoms(BUILT_IN_DEMO, { 121: ['vision change'] })
-    const r = evaluateDay(data, 121)
+    const data = applySymptoms(BUILT_IN_DEMO, { 23: ['vision change'] })
+    const r = evaluateDay(data, 23)
     expect(r.state).toBe('RED_PHYSICAL')
     expect(systemColor(system('eyes'), r, ['vision change'])).toBe('red')
   })
 
   it('dizziness with a resting heart rate under 60 is red; on its own it is not an alarm', () => {
-    const low = { ...BUILT_IN_DEMO, days: BUILT_IN_DEMO.days.map((d) => (d.day === 121 ? { ...d, hr: 55 } : d)) }
-    expect(evaluateDay(applySymptoms(low, { 121: ['dizziness'] }), 121).indicators.hr.color).toBe('red')
-    expect(evaluateDay(applySymptoms(BUILT_IN_DEMO, { 121: ['dizziness'] }), 121).indicators.symptoms.color).toBe('green')
+    const low = { ...BUILT_IN_DEMO, days: BUILT_IN_DEMO.days.map((d) => (d.day === 23 ? { ...d, hr: 55 } : d)) }
+    expect(evaluateDay(applySymptoms(low, { 23: ['dizziness'] }), 23).indicators.hr.color).toBe('red')
+    expect(evaluateDay(applySymptoms(BUILT_IN_DEMO, { 23: ['dizziness'] }), 23).indicators.symptoms.color).toBe('green')
   })
 
   it('leaves the data untouched when nothing was logged', () => {

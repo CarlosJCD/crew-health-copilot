@@ -40,7 +40,7 @@ const NAV: { id: string; icon: IconName; label: 'nav.home' | 'nav.care' | 'nav.m
   { id: 'transmit', icon: 'send', label: 'nav.send' },
 ]
 
-/** Route from the hash: `#/today?day=125&why=temp`, `#/play?board=2&solved=1` (deep links for the deck and the demo). */
+/** Route from the hash: `#/today?day=27&why=temp`, `#/play?board=2&solved=1` (deep links for the deck and the demo). */
 function readRoute(): { id: string; day?: number; why?: string; board?: number; solved?: boolean } {
   const [path, query = ''] = window.location.hash.replace(/^#\/?/, '').split('?')
   const params = new URLSearchParams(query)
@@ -59,7 +59,8 @@ export default function App() {
   const [route, setRoute] = useState(readRoute)
   const [scenarioId, setScenarioId] = useStoredJson('orbit.scenario', DEFAULT_SCENARIO_ID)
   const [loaded, setLoaded] = useState<LoadedDemo>({ data: BUILT_IN_DEMO, origin: 'built-in', errors: [] })
-  const [day, setDay] = useState(route.day ?? STORY_DAYS.first)
+  // The mission starts on day 1; the demo story is days 23 to 30.
+  const [day, setDay] = useState(route.day ?? 1)
   const [online, setOnline] = useState(navigator.onLine)
   const [checkins, setCheckins] = useStoredJson<Checkins>('orbit.checkins', {})
   const [share, setShare] = useStoredJson<ShareSettings>('orbit.share', DEFAULT_SHARE)
@@ -122,15 +123,19 @@ export default function App() {
   const record = demo.data.days.find((d) => d.day === day)
   const closeMore = useCallback(() => setMoreOpen(false), [])
 
-  // Demo replay: one mission day every 2.5 s from 121 to 128, then it stops.
+  // Demo replay: from where she is to the last day; quiet days before the story pass quickly (0.7 s),
+  // story days take 2.5 s each.
   useEffect(() => {
     if (!playing) return
-    const id = window.setTimeout(() => {
-      if (day >= STORY_DAYS.last) setPlaying(false)
-      else setDay(day + 1)
-    }, 2500)
+    const id = window.setTimeout(
+      () => {
+        if (day >= last) setPlaying(false)
+        else setDay(day + 1)
+      },
+      day < STORY_DAYS.first - 1 ? 700 : 2500,
+    )
     return () => window.clearTimeout(id)
-  }, [playing, day])
+  }, [playing, day, last])
 
   return (
     <div className={`app route-${active.id}`}>
@@ -249,7 +254,7 @@ export default function App() {
                 type="button"
                 className="icon-btn"
                 onClick={() => {
-                  if (!playing && !(day >= STORY_DAYS.first && day < STORY_DAYS.last)) setDay(STORY_DAYS.first)
+                  if (!playing && day >= last) setDay(first)
                   setPlaying(!playing)
                 }}
                 aria-label={playing ? t('home.pause') : t('home.play')}

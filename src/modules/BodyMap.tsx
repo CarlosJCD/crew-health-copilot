@@ -6,7 +6,7 @@ import type { Theme } from '../lib/theme'
 import type { LoadedDemo } from '../orbit/demoData'
 import { evaluateDay, STATE_ESCALATION, worstColor, type DayResult, type OrbitState } from '../orbit/engine'
 import { heatColor, heatOn, type ZoneHeat } from '../orbit/heat'
-import { INTENSITY_COLORS, toViewerSide, type BodyView, type PainDay, type PainLog, type PaintStroke } from '../orbit/pain'
+import { toViewerSide, type BodyView, type PainDay, type PainLog, type PaintStroke } from '../orbit/pain'
 import { boostPlan, CARDS, DISPLAY, downrankedCards, type BoostLog } from '../orbit/boost'
 import type { Checkins } from '../orbit/checkin'
 import type { PulseSession } from '../orbit/pulse'
@@ -162,22 +162,24 @@ export function BodyMap(props: Props) {
           </section>
         )}
 
-        <div className="today-strip">
-          <button type="button" className="strip-btn" onClick={() => setPlanOpen(true)}>
-            <strong>{t('plan.title')}</strong>
-            <span className="muted">{reminders.length ? t('home.planCount', { n: reminders.length }) : t('home.planNone')}</span>
-          </button>
-          <button type="button" className="strip-btn tank-mini" onClick={() => setTankOpen(true)} aria-label={t('care.level', { n: care.level, size: TANK_SIZE })}>
-            <svg viewBox="0 0 12 20" aria-hidden="true">
-              <rect x="1" y="1" width="10" height="18" rx="3" className="tank-shell" />
-              <rect x="2.5" y={2.5 + 15 * (1 - care.level / TANK_SIZE)} width="7" height={15 * (care.level / TANK_SIZE)} rx="2" className="tank-fill" />
-            </svg>
-            {t('home.tank', { n: care.level, size: TANK_SIZE })}
-          </button>
-        </div>
-
         <section className="figure-stage" aria-labelledby="figure-title">
           <h2 id="figure-title" className="sr-only">{t('home.figureTitle')}</h2>
+          <p className="paint-hint">{t('home.paintHint')}</p>
+          <div className="today-strip">
+            <button type="button" className="strip-btn" onClick={() => setPlanOpen(true)}>
+              <strong>{t('plan.title')}</strong>
+              <span className="muted long">{reminders.length ? t('home.planCount', { n: reminders.length }) : t('home.planNone')}</span>
+              <span className="muted short" aria-hidden="true">{reminders.length}</span>
+            </button>
+            <button type="button" className="strip-btn tank-mini" onClick={() => setTankOpen(true)} aria-label={t('care.level', { n: care.level, size: TANK_SIZE })}>
+              <svg viewBox="0 0 12 20" aria-hidden="true">
+                <rect x="1" y="1" width="10" height="18" rx="3" className="tank-shell" />
+                <rect x="2.5" y={2.5 + 15 * (1 - care.level / TANK_SIZE)} width="7" height={15 * (care.level / TANK_SIZE)} rx="2" className="tank-fill" />
+              </svg>
+              <span className="long">{t('home.tank', { n: care.level, size: TANK_SIZE })}</span>
+              <span className="short" aria-hidden="true">{care.level}/{TANK_SIZE}</span>
+            </button>
+          </div>
           <div className="segmented" role="group" aria-label={t('home.view')}>
             {(['front', 'back'] as const).map((v) => (
               <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}>
@@ -186,7 +188,6 @@ export function BodyMap(props: Props) {
               </button>
             ))}
           </div>
-          <p className="paint-hint">{t('home.paintHint')}</p>
 
           <PaintSurface
             key={`${view}-${theme}-${figure}`}
@@ -203,19 +204,6 @@ export function BodyMap(props: Props) {
             border={fig.border}
           />
 
-          <div className="heat-key" aria-hidden="true">
-            <span>{t('heat.recent')}</span>
-            <span className="heat-bar" style={{ background: `linear-gradient(90deg, ${[...INTENSITY_COLORS].reverse().join(', ')}, ${fig.fill})` }} />
-            <span>{t('heat.older')}</span>
-          </div>
-          <p className="heat-note">{t('home.heatNote')}</p>
-          {heatRows.length > 0 && (
-            <ul className="heat-rows">
-              {heatRows.slice(0, 3).map((r) => (
-                <li key={r}>{r}</li>
-              ))}
-            </ul>
-          )}
         </section>
 
         <div className="home-actions">
@@ -248,8 +236,9 @@ export function BodyMap(props: Props) {
                   {t(cta.text)}
                 </span>
               )}
-              <button type="button" className="button ghost big" onClick={() => setPainOpen(true)}>
-                {t('home.log')}
+              {/* Keyboard and screen-reader path to the same report (the figure is drawn with a finger or a mouse). */}
+              <button type="button" className="sr-only-focusable" onClick={() => setPainOpen(true)}>
+                {t('home.logList')}
               </button>
             </>
           )}

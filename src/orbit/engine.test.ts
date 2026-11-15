@@ -10,7 +10,7 @@ describe('orbit-indicators.json', () => {
   })
 })
 
-describe('acceptance: Lena, Mars transit, days 121 to 128 (handoff section 5)', () => {
+describe('acceptance: Lena, Mars transit, days 23 to 30 (handoff section 5)', () => {
   it.each(ACCEPTANCE)('day %i is %s', (day, state, body, mind, crew, yellow) => {
     const r = evaluateDay(BUILT_IN_DEMO, day)
     expect(r.state).toBe(state)
@@ -18,19 +18,19 @@ describe('acceptance: Lena, Mars transit, days 121 to 128 (handoff section 5)', 
     expect([...r.flagged].sort()).toEqual([...yellow].sort())
   })
 
-  it('explains that 38.0 °C on day 121 is her in-flight normal, not a fever', () => {
-    const r = evaluateDay(BUILT_IN_DEMO, 121).indicators.temp
+  it('explains that 38.0 °C on day 23 is her in-flight normal, not a fever', () => {
+    const r = evaluateDay(BUILT_IN_DEMO, 23).indicators.temp
     expect(r.color).toBe('green')
     expect(r.reason).toMatch(/normal for you in flight/)
   })
 
   it('keeps the noise days before the story green', () => {
-    for (let day = 107; day <= 120; day++) expect(evaluateDay(BUILT_IN_DEMO, day).state, `day ${day}`).toBe('GREEN')
+    for (let day = 1; day <= 22; day++) expect(evaluateDay(BUILT_IN_DEMO, day).state, `day ${day}`).toBe('GREEN')
   })
 })
 
 // Rules the demo story does not exercise.
-const base = BUILT_IN_DEMO.days.find((d) => d.day === 121) as DayRecord
+const base = BUILT_IN_DEMO.days.find((d) => d.day === 23) as DayRecord
 const withDays = (...changes: Partial<DayRecord>[]): DemoData => ({
   ...BUILT_IN_DEMO,
   days: changes.map((c, i) => ({ ...base, events: [], ...c, day: 200 + i })),
@@ -40,8 +40,8 @@ const lastDay = (data: DemoData) => evaluateDay(data, data.days.at(-1)!.day)
 describe('v0.3 rules (questions 18 and 19)', () => {
   const day = (d: number, change: Partial<DayRecord> = {}): DayRecord => ({ ...base, events: [], ...change, day: d })
 
-  it('says how many days in a row she has been without contact (4 on day 125)', () => {
-    expect(evaluateDay(BUILT_IN_DEMO, 125).indicators.contact.reason).toBe('4 days in a row without contact.')
+  it('says how many days in a row she has been without contact (4 on day 27)', () => {
+    expect(evaluateDay(BUILT_IN_DEMO, 27).indicators.contact.reason).toBe('4 days in a row without contact.')
   })
 
   it('one missing day does not break a run; two missing days start it again', () => {
