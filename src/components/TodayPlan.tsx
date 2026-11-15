@@ -87,7 +87,8 @@ export function TodayPlan({ day, plan, reminders, painLog, chosen, onToggle, onP
           ))}
         </div>
       )}
-      <p className="hint">{t('plan.disclaimer', { n: DISPLAY.max_choices })}</p>
+      {/* On a red day there is nothing to choose: the medical officer comes first. */}
+      {!red && <p className="hint">{t('plan.disclaimer', { n: DISPLAY.max_choices })}</p>}
     </section>
   )
 }

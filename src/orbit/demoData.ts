@@ -85,6 +85,24 @@ export function dayRange(data: DemoData): { first: number; last: number } {
   return days.length ? { first: Math.min(...days), last: Math.max(...days) } : STORY_DAYS
 }
 
+/** The first numbering of the data (story on days 121 to 128) minus this is the current one (23 to 30). */
+export const LEGACY_DAY_OFFSET = 98
+
+/**
+ * The day a link asks for, as a day of the file. Links from the first numbering (the script, the test
+ * cases and the deck say `day=125`) go to the same story day now (27); any other day outside the file goes
+ * to the nearest day it has. `moved` says why the day shown is not the one asked for.
+ */
+export function resolveDay(
+  requested: number,
+  range: { first: number; last: number },
+): { day: number; moved?: 'legacy' | 'clamped' } {
+  if (requested >= range.first && requested <= range.last) return { day: requested }
+  const legacy = requested - LEGACY_DAY_OFFSET
+  if (legacy >= range.first && legacy <= range.last) return { day: legacy, moved: 'legacy' }
+  return { day: Math.min(range.last, Math.max(range.first, requested)), moved: 'clamped' }
+}
+
 // ---------------------------------------------------------------------------------------------
 // Built-in demo (handoff sections 2.3 and 4)
 

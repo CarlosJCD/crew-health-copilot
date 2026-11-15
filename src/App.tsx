@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DEFAULT_SCENARIO_ID, SCENARIOS } from './orbit/config'
 import type { BoostLog } from './orbit/boost'
 import { applyCheckins, type Checkins } from './orbit/checkin'
-import { BUILT_IN_DEMO, dayRange, loadDemoData, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
+import { BUILT_IN_DEMO, dayRange, loadDemoData, resolveDay, STORY_DAYS, type LoadedDemo } from './orbit/demoData'
 import { DEFAULT_SHARE, type Packet, type ShareSettings } from './orbit/transmit'
 import { applyPulse, type PulseSession } from './orbit/pulse'
 import { applySymptoms, type SymptomLog } from './orbit/body'
@@ -54,13 +54,22 @@ function readRoute(): { id: string; day?: number; why?: string; board?: number; 
   }
 }
 
+/** Testers open `?test` (or `#/body?test=1`) to see the testing tools; the published demo hides them. */
+const TESTING = new URLSearchParams(window.location.search).has('test') || /[?&]test=1\b/.test(window.location.hash)
+
+/** A day the link asked for that is not the day shown (old numbering or outside the file). */
+type DayNotice = { asked: number; day: number; moved: 'legacy' | 'clamped' }
+
 export default function App() {
   const { t } = useI18n()
   const [route, setRoute] = useState(readRoute)
   const [scenarioId, setScenarioId] = useStoredJson('orbit.scenario', DEFAULT_SCENARIO_ID)
   const [loaded, setLoaded] = useState<LoadedDemo>({ data: BUILT_IN_DEMO, origin: 'built-in', errors: [] })
-  // The mission starts on day 1; the demo story is days 23 to 30.
-  const [day, setDay] = useState(route.day ?? 1)
+  // The mission starts on day 1 and the demo story is days 23 to 30: the app opens on the first story day,
+  // and a link's day is read as a day of the file (old links with days 121 to 128 still land on the story).
+  const [start] = useState(() => (route.day === undefined ? undefined : resolveDay(route.day, dayRange(BUILT_IN_DEMO))))
+  const [day, setDay] = useState(start?.day ?? STORY_DAYS.first)
+  const [dayNotice, setDayNotice] = useState<DayNotice | null>(start?.moved && route.day !== undefined ? { asked: route.day, day: start.day, moved: start.moved } : null)
   const [online, setOnline] = useState(navigator.onLine)
   const [checkins, setCheckins] = useStoredJson<Checkins>('orbit.checkins', {})
   const [share, setShare] = useStoredJson<ShareSettings>('orbit.share', DEFAULT_SHARE)
@@ -78,31 +87,6 @@ export default function App() {
   const [figure, setFigure] = useFigure()
   const [playing, setPlaying] = useState(false)
 
-  useEffect(() => {
-    const onHash = () => {
-      const r = readRoute()
-      // A new screen opens at the top, not at the scroll position of the one before.
-      setRoute((prev) => {
-        if (prev.id !== r.id) window.scrollTo(0, 0)
-        return r
-      })
-      if (r.day !== undefined) setDay(r.day)
-    }
-    const onOnline = () => setOnline(true)
-    const onOffline = () => setOnline(false)
-    window.addEventListener('hashchange', onHash)
-    window.addEventListener('online', onOnline)
-    window.addEventListener('offline', onOffline)
-    loadDemoData().then((result) => {
-      setLoaded(result)
-      if (result.errors.length) console.warn('demo-data.json problems:', result.errors)
-    })
-    return () => {
-      window.removeEventListener('hashchange', onHash)
-      window.removeEventListener('online', onOnline)
-      window.removeEventListener('offline', onOffline)
-    }
-  }, [])
 
   // Her check-in answers, pulse sessions, logged symptoms and pain replace or add to that day's values,
   // so every module sees the same data.
@@ -121,6 +105,41 @@ export default function App() {
   const active = MODULES.find((m) => m.id === route.id) ?? MODULES[0]
   // The arrows reach every day of the file (her history before the story too); play replays the story.
   const { first, last } = dayRange(demo.data)
+  const rangeRef = useRef({ first, last })
+  useEffect(() => {
+    rangeRef.current = { first, last }
+  }, [first, last])
+
+  useEffect(() => {
+    const onHash = () => {
+      const r = readRoute()
+      // A new screen opens at the top, not at the scroll position of the one before.
+      setRoute((prev) => {
+        if (prev.id !== r.id) window.scrollTo(0, 0)
+        return r
+      })
+      if (r.day !== undefined) {
+        const resolved = resolveDay(r.day, rangeRef.current)
+        setDay(resolved.day)
+        setDayNotice(resolved.moved ? { asked: r.day, day: resolved.day, moved: resolved.moved } : null)
+      }
+    }
+    const onOnline = () => setOnline(true)
+    const onOffline = () => setOnline(false)
+    window.addEventListener('hashchange', onHash)
+    window.addEventListener('online', onOnline)
+    window.addEventListener('offline', onOffline)
+    loadDemoData().then((result) => {
+      setLoaded(result)
+      if (result.errors.length) console.warn('demo-data.json problems:', result.errors)
+    })
+    return () => {
+      window.removeEventListener('hashchange', onHash)
+      window.removeEventListener('online', onOnline)
+      window.removeEventListener('offline', onOffline)
+    }
+  }, [])
+
   const inStory = day >= STORY_DAYS.first && day <= STORY_DAYS.last
   const record = demo.data.days.find((d) => d.day === day)
   const closeMore = useCallback(() => {
@@ -146,7 +165,10 @@ export default function App() {
   return (
     <div className={`app route-${active.id}`}>
       <header className="topbar">
-        <span className="topbar-side" aria-hidden="true" />
+        {/* The day of the demo, always in sight; it opens More, where the day control is. */}
+        <button type="button" className="topbar-side day-chip" onClick={() => setMoreOpen(true)} aria-label={t('home.dayOpen', { n: day })}>
+          {t('home.day', { n: day })}
+        </button>
         {/* Wordmark in the center: the logo ring is the O of ORBIT (design proposal, variant V2). */}
         <a className="wordmark" href="#/body" aria-label={APP_NAME} title={APP_EXPANSION}>
           <Logo />
@@ -158,6 +180,14 @@ export default function App() {
         </span>
       </header>
       {!online && <p className="offline-bar" role="status">{t('net.offlineLong')}</p>}
+      {dayNotice && (
+        <p className="day-notice" role="status">
+          <span>{t(dayNotice.moved === 'legacy' ? 'day.movedLegacy' : 'day.movedClamped', { asked: dayNotice.asked, day: dayNotice.day })}</span>
+          <button type="button" className="icon-btn" onClick={() => setDayNotice(null)} aria-label={t('home.close')}>
+            ✕
+          </button>
+        </p>
+      )}
       {playing && record && record.events.length > 0 && (
         <p className="story-log" aria-live="polite">
           <strong>{t('more.log', { n: day })}</strong> <span lang="en">{record.events.join(' · ')}</span>
@@ -295,33 +325,35 @@ export default function App() {
               <strong>{t('more.log', { n: day })}</strong> <span lang="en">{record.events.join(' · ')}</span>
             </p>
           )}
-          {/* Testing: clears every symptom and pain she logged (all days), nothing else. */}
-          <div className="more-row reset-row">
-            {!confirmReset ? (
-              <button type="button" className="button ghost" disabled={symptomCount === 0} onClick={() => setConfirmReset(true)}>
-                {t('more.resetSymptoms')}
-              </button>
-            ) : (
-              <>
-                <span className="small">{t('more.resetConfirm', { n: symptomCount })}</span>
-                <button
-                  type="button"
-                  className="button danger"
-                  onClick={() => {
-                    setPainLog({})
-                    setSymptomLog({})
-                    setConfirmReset(false)
-                  }}
-                >
-                  {t('more.resetYes')}
+          {/* Testing (only with ?test): clears every symptom and pain she logged (all days), nothing else. */}
+          {TESTING && (
+            <div className="more-row reset-row">
+              {!confirmReset ? (
+                <button type="button" className="button ghost" disabled={symptomCount === 0} onClick={() => setConfirmReset(true)}>
+                  {t('more.resetSymptoms')}
                 </button>
-                <button type="button" className="button ghost" onClick={() => setConfirmReset(false)}>
-                  {t('more.resetNo')}
-                </button>
-              </>
+              ) : (
+                <>
+                  <span className="small">{t('more.resetConfirm', { n: symptomCount })}</span>
+                  <button
+                    type="button"
+                    className="button danger"
+                    onClick={() => {
+                      setPainLog({})
+                      setSymptomLog({})
+                      setConfirmReset(false)
+                    }}
+                  >
+                    {t('more.resetYes')}
+                  </button>
+                  <button type="button" className="button ghost" onClick={() => setConfirmReset(false)}>
+                    {t('more.resetNo')}
+                  </button>
+                </>
             )}
             {symptomCount === 0 && <span className="muted small">{t('more.resetNone')}</span>}
           </div>
+          )}
           {demo.errors.length > 0 && <p className="small warn">{t('data.issues', { n: demo.errors.length })}</p>}
           <p className="muted small">{t('footer')}</p>
         </Sheet>

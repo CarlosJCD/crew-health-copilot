@@ -774,3 +774,54 @@ html:has(.app.route-body), body:has(.app.route-body) { overflow: hidden; height:
 .spark-axis span { position: absolute; top: 0; white-space: nowrap; }
 .spark-axis .first { left: 0; }
 .spark-axis .last { right: 0; }
+
+/* ===================================================================================================
+   UI/UX review, second round (commit e03e214, Nov 15)
+   =================================================================================================== */
+
+/* N4: the day of the demo, always in sight on the left of the top bar; it opens More (day control). */
+.topbar .day-chip { justify-self: start; min-height: 40px; padding: 0 0.85rem; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--panel); color: var(--muted); font: inherit; font-family: var(--font-title); font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+.topbar .day-chip:hover { color: var(--text); border-color: var(--accent); }
+/* N3: a link with an old or missing day says which day it shows instead. */
+.day-notice { display: flex; align-items: center; justify-content: center; gap: 0.3rem; width: fit-content; max-width: 100%; margin: 0 auto 0.4rem;
+  padding: 0 0.2rem 0 0.9rem; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font-size: 0.85rem; }
+
+/* N5: the list path, a link-styled button inside the hint above the body (its touch area grows without
+   moving the line). N7: the "?" next to it explains the colors. */
+.link-btn { display: inline-block; margin: -0.7rem 0; padding: 0.7rem 0.1rem; border: 0; background: none; color: var(--accent);
+  font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.paint-hint .infotip { vertical-align: middle; }
+.paint-hint .infotip-text { left: auto; right: -0.4rem; text-align: left; }
+
+/* N6: what has no place on the figure (eyes, skin, symptoms with no zone), listed under it. */
+.also-logged { position: relative; z-index: 1; margin: 0.15rem 0 0; font-size: 0.82rem; }
+
+/* N12: the share link keeps its line but gets a 44 px touch area. */
+.hero-who a { padding-block: 0.8rem; }
+
+/* N2: a way to the medical officer from every step of the report. */
+.pain-serious { margin: 0.9rem 0 0.2rem; font-size: 0.9rem; }
+.pain-serious a { color: var(--act); font-weight: 600; padding-block: 0.85rem; }
+
+/* N8: inside a panel the "where" tools are one column, whatever the window width. */
+.sheet .pain-work { grid-template-columns: 1fr; }
+.sheet .pain-mode .actions { flex-wrap: wrap; }
+.sheet #pain-zone { min-width: 0; max-width: 100%; }
+
+/* N11: on phones the tank says what it is, like "For today". */
+@media (max-width: 719px) { .app.route-body .today-strip .tank-mini .short { line-height: 1.15; } }
+
+/* P1: from tablets up, "For today" and the tank sit right above the body instead of floating at the edge
+   of the window. */
+@media (min-width: 720px) {
+  .app.route-body .today-strip { order: -1; position: static; transform: none; flex-direction: row; justify-content: center; width: auto; margin: 0.2rem 0 0.3rem; }
+  .app.route-body .today-strip .strip-btn { min-width: 150px; }
+}
+@media (min-width: 720px) and (max-width: 1023px) { .app.route-body { padding-left: 1rem; padding-right: 1rem; } }
+
+/* N13: on wide screens the labels of the side navigation are readable (11 px instead of 9). */
+@media (min-width: 1024px) {
+  .bottom-nav { width: 70px; }
+  .bottom-nav a, .bottom-nav button { width: 60px; height: 58px; font-size: 0.68rem; }
+}
