@@ -2,10 +2,12 @@ import { CARDS } from '../orbit/boost'
 import { TANK_SIZE, type CareSummary } from '../orbit/care'
 import { getIndicator } from '../orbit/config'
 import { useI18n } from '../i18n/context'
+import { useContent } from '../i18n/content'
 
 /** "Protective factors used": a tank that only fills up (no color, positive feedback only). */
 export function CareTank({ care }: { care: CareSummary }) {
   const { t } = useI18n()
+  const c = useContent()
   const def = getIndicator('protective')
   const fill = care.level / TANK_SIZE
   const H = 80
@@ -16,7 +18,7 @@ export function CareTank({ care }: { care: CareSummary }) {
         <rect x="7" y={13 + H * (1 - fill)} width="26" height={Math.max(0, H * fill)} rx="7" className="tank-fill" />
       </svg>
       <div>
-        <h2 id="care-title" lang="en">{def.label_en}</h2>
+        <h2 id="care-title">{c(def.label_en)}</h2>
         {care.actions === 0 ? (
           <p className="muted">{t('care.empty')}</p>
         ) : (
@@ -34,12 +36,12 @@ export function CareTank({ care }: { care: CareSummary }) {
             {care.helped.length > 0 && (
               <p>
                 {t('care.helped')}{' '}
-                <span lang="en">{care.helped.map((id) => CARDS[id]?.title_en ?? id).join(' · ')}</span>
+                <span>{care.helped.map((id) => c(CARDS[id]?.title_en ?? id)).join(' · ')}</span>
               </p>
             )}
           </>
         )}
-        <p className="muted" lang="en">{def.why_en}</p>
+        <p className="muted">{c(def.why_en)}</p>
       </div>
     </section>
   )

@@ -3,6 +3,7 @@ import { getIndicator } from '../orbit/config'
 import { COLOR_SYMBOL } from '../orbit/display'
 import { isModel, loadSepReplay, type SepReplay as Replay } from '../data/spaceWeather'
 import { useI18n } from '../i18n/context'
+import { L } from '../i18n/content'
 
 /**
  * Replays the real solar particle event of May 9, 2024 (NASA DONKI) in the radiation layer.
@@ -39,10 +40,10 @@ export function SepReplay() {
             <span aria-hidden="true">{COLOR_SYMBOL.yellow}</span> <strong>{t('sep.status')}</strong>{' '}
             {t('sep.since', { time: when(first.time) })}
           </p>
-          <p lang="en">
-            <strong>{t('card.action')}</strong> {radiation.action_en}
+          <p>
+            <strong>{t('card.action')}</strong> {L(radiation.action_en, lang)}
           </p>
-          <p lang="en" className="muted">{radiation.rule_en}</p>
+          <p className="muted">{L(radiation.rule_en, lang)}</p>
           <ol className="replay-list">
             {storm.map((e) => (
               <li key={e.id}>

@@ -18,7 +18,7 @@ describe('privacy', () => {
     const closed = cmoShare(day27, DEFAULT_SHARE).lines.join('\n')
     expect(closed).toMatch(/Body: yellow \(Sleep, Resting heart rate\)/)
     expect(closed).not.toMatch(/^Mind:/m)
-    expect(closed).toMatch(/Not shared by her choice: Mind, Crew/)
+    expect(closed).toMatch(/Not shared, by choice: Mind, Crew/)
     expect(cmoShare(day27, { mind: true, crew: true }).lines.join('\n')).toMatch(/Mind: yellow/)
   })
 })

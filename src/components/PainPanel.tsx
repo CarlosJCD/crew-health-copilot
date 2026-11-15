@@ -28,6 +28,7 @@ import { BoostCardBody } from './BoostCardBody'
 import { Icon } from './Icon'
 import { PainDetails } from './PainDetails'
 import { WherePicker } from './WherePicker'
+import { symptomEs } from '../i18n/dynamic'
 
 interface Props {
   day: number
@@ -149,9 +150,8 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
                 className="button secondary"
                 aria-pressed={feels.symptoms.includes(s)}
                 onClick={() => setFeels((f) => ({ ...f, symptoms: f.symptoms.includes(s) ? f.symptoms.filter((x) => x !== s) : [...f.symptoms, s] }))}
-                lang="en"
               >
-                {cap(s)}
+                {cap(symptomEs(s, lang))}
               </button>
             ))}
             {/* What she wrote herself: shown as chips she can tap again to remove. */}
@@ -257,10 +257,9 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
                 className="button secondary alarm"
                 aria-pressed={alarms.includes(s)}
                 onClick={() => setAlarms((a) => (a.includes(s) ? a.filter((x) => x !== s) : [...a, s]))}
-                lang="en"
               >
                 <span aria-hidden="true">■ </span>
-                {cap(s)}
+                {cap(symptomEs(s, lang))}
               </button>
             ))}
           </div>
@@ -352,7 +351,7 @@ export function PainPanel({ day, pain, onChange, chosen, onToggleCard, painted =
           </ul>
           {painSymptoms(today).length > 0 && (
             <p className="hint">
-              {t('pain.loggedAs')} <span lang="en">{painSymptoms(today).join(', ')}</span>
+              {t('pain.loggedAs')} <span>{painSymptoms(today).map((x) => symptomEs(x, lang)).join(', ')}</span>
             </p>
           )}
         </section>

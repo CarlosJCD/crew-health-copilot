@@ -7,6 +7,7 @@ import { Icon } from '../components/Icon'
 import { InfoTip } from '../components/InfoTip'
 import { PulseTask } from '../components/PulseTask'
 import { useI18n } from '../i18n/context'
+import { useContent } from '../i18n/content'
 
 interface Props {
   demo: LoadedDemo
@@ -34,6 +35,7 @@ function worseRule(item: CheckinItem): { dir: 'lower' | 'higher'; n: number } {
  */
 export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onPulseSessionsChange }: Props) {
   const { t } = useI18n()
+  const c = useContent()
   const record = demo.data.days.find((d) => d.day === day)
   const base = demo.data.persona.baseline
   const saved = checkins[day]
@@ -145,7 +147,7 @@ export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onP
         )}
         <details className="mind-more">
           <summary>{t('mind.howRead')}</summary>
-          <p lang="en">{getIndicator('checkin').why_en}</p>
+          <p>{c(getIndicator('checkin').why_en)}</p>
           {saved && (
             <button type="button" className="link" onClick={reset}>
               {t('mind.reset')}
@@ -208,9 +210,9 @@ export function Mind({ demo, day, checkins, onCheckinsChange, pulseSessions, onP
         />
         <details className="mind-more">
           <summary>{t('mind.pulseAbout')}</summary>
-          <p lang="en">{getIndicator('pulse').why_en}</p>
-          <p className="muted" lang="en">
-            {PULSE_SPEC.same_time_of_day_en} {PULSE_SPEC.note_en}
+          <p>{c(getIndicator('pulse').why_en)}</p>
+          <p className="muted">
+            {c(PULSE_SPEC.same_time_of_day_en)} {c(PULSE_SPEC.note_en)}
           </p>
           {pulseRecord && <p className="muted">{t('mind.pulseToday', { ms: pulseRecord })}</p>}
         </details>

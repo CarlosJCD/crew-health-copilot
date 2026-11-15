@@ -5,6 +5,8 @@ import type { DayRecord, DemoData, MeanSd, NumericField } from '../orbit/demoDat
 import type { IndicatorResult } from '../orbit/engine'
 import { useI18n } from '../i18n/context'
 import { Sparkline } from './Sparkline'
+import { useContent } from '../i18n/content'
+import { reasonEs, symptomEs, valueEs } from '../i18n/dynamic'
 
 interface View {
   /** Today's value as text, or undefined when there is no reading. */
@@ -70,6 +72,7 @@ interface Props {
 /** Traffic-light card: color AND shape AND word, so it reads without color. */
 export function OrbitCard({ id, result, data, day, openWhy = false }: Props) {
   const { t, unit, lang } = useI18n()
+  const c = useContent()
   const [open, setOpen] = useState(openWhy)
   const ref = useRef<HTMLElement>(null)
   useEffect(() => {
@@ -91,20 +94,20 @@ export function OrbitCard({ id, result, data, day, openWhy = false }: Props) {
   return (
     <article ref={ref} className={`card color-${result.color}`}>
       <header className="card-head">
-        <h3>{def.label_en}</h3>
-        <span className="badge" aria-label={t('color.aria', { domain: def.label_en, color: colorWord })}>
+        <h3>{c(def.label_en)}</h3>
+        <span className="badge" aria-label={t('color.aria', { domain: c(def.label_en), color: colorWord })}>
           <span aria-hidden="true">{COLOR_SYMBOL[result.color]}</span> {colorWord}
         </span>
       </header>
 
       <p className={value && value.length > 9 ? 'value small' : 'value'}>
-        {value ?? '–'}
+        {value ? (def.id === 'symptoms' ? value.split(', ').map((x) => symptomEs(x, lang)).join(', ') : valueEs(value, lang)) : '–'}
         {value && view?.unit && <span className="unit"> {unit(view.unit)}</span>}
       </p>
       {base && view?.unit && base[1] > 0 && (
         <p className="delta">{t('card.usual', { value: `${view.usual?.(data) ?? base[0]} ${unit(view.unit)}` })}</p>
       )}
-      <p className="reason">{result.reason}</p>
+      <p className="reason">{reasonEs(result.reason, lang)}</p>
       {id === 'exercise' && today && typeof today.exercise_min === 'number' && (
         <div
           className="progress"
@@ -120,7 +123,7 @@ export function OrbitCard({ id, result, data, day, openWhy = false }: Props) {
           values={points}
           band={base && base[1] > 0 ? { mean: base[0], spread: base[1] * (view?.bandSd ?? 1) } : undefined}
           currentDay={day}
-          ariaLabel={t('card.trend', { label: def.label_en })}
+          ariaLabel={t('card.trend', { label: c(def.label_en) })}
         />
       )}
 
@@ -129,17 +132,17 @@ export function OrbitCard({ id, result, data, day, openWhy = false }: Props) {
       </button>
       {open && (
         <div className="details">
-          <p className="why" lang="en">{def.why_en}</p>
+          <p className="why">{c(def.why_en)}</p>
           <p>
-            <strong>{t('card.rule')}</strong> <span lang="en">{def.rule_en}</span>
+            <strong>{t('card.rule')}</strong> <span>{c(def.rule_en)}</span>
           </p>
           <p>
-            <strong>{t('card.action')}</strong> <span lang="en">{def.action_en}</span>
+            <strong>{t('card.action')}</strong> <span>{c(def.action_en)}</span>
           </p>
           <p>
             <strong>{t('card.risk')}</strong>{' '}
             <a href={def.hrp_url} target="_blank" rel="noreferrer">
-              {def.hrp_risk}
+              {c(def.hrp_risk)}
             </a>
           </p>
           <p>

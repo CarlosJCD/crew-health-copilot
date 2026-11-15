@@ -23,6 +23,7 @@ import { InfoTip } from '../components/InfoTip'
 import { PrivateNoteSheet, type Notes } from '../components/PrivateNote'
 import { Sheet } from '../components/Sheet'
 import { Play } from './Play'
+import { L } from '../i18n/content'
 
 interface Props {
   demo: LoadedDemo
@@ -47,7 +48,7 @@ const EMPTY: BoostDay = { chosen: [], helped: {} }
  * and how to do it appears once chosen (or under ⓘ). A person comes first on a red day.
  */
 export function Boost({ demo, day, log, onLogChange, care, notes, onNotesChange, boardsDone, onBoardDone }: Props) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { data } = demo
   const result = useMemo(() => evaluateDay(data, day), [data, day])
   const record = data.days.find((d) => d.day === day)
@@ -80,7 +81,7 @@ export function Boost({ demo, day, log, onLogChange, care, notes, onNotesChange,
         <Icon name="note" size={18} /> {notes[day] ? t('note.edit') : t('note.open')}
       </button>
     ) : c.id === 'earth_window' ? (
-      <ViewEarth title={c.title_en} />
+      <ViewEarth title={L(c.title_en, lang)} />
     ) : c.id === 'crew_game' ? (
       <button type="button" className="button wide" onClick={() => setGameOpen(true)}>
         <Icon name="stars" size={18} /> {t('game.open')}
@@ -135,7 +136,7 @@ export function Boost({ demo, day, log, onLogChange, care, notes, onNotesChange,
                 <span className="care-icon small">
                   <CareIcon card={CARDS[id]} size={18} />
                 </span>
-                <strong lang="en">{CARDS[id].title_en}</strong>
+                <strong>{L(CARDS[id].title_en, lang)}</strong>
                 <HelpChips value={yesterday.helped[id]} onRate={(o) => rate(id, o, yesterday, day - 1)} />
               </div>
             ) : null,
@@ -163,8 +164,8 @@ export function Boost({ demo, day, log, onLogChange, care, notes, onNotesChange,
             </span>{' '}
             {t('boost.safety')}
           </h2>
-          <p className="care-safety-q" lang="en">
-            {plan.safetyQuestion.text_en}
+          <p className="care-safety-q">
+            {L(plan.safetyQuestion.text_en, lang)}
           </p>
           <div className="care-yesno">
             <button type="button" className="button secondary" aria-pressed={askedYes} onClick={() => save({ ...today, safety: 'yes' })}>
@@ -219,8 +220,8 @@ export function Boost({ demo, day, log, onLogChange, care, notes, onNotesChange,
         </section>
       )}
 
-      <p className="fineprint care-disclaimer" lang="en">
-        {BOOST_DISCLAIMER}
+      <p className="fineprint care-disclaimer">
+        {L(BOOST_DISCLAIMER, lang)}
       </p>
 
       {noteOpen && <PrivateNoteSheet day={day} notes={notes} onChange={onNotesChange} onClose={() => setNoteOpen(false)} />}
@@ -252,7 +253,7 @@ function ChosenSlots({ ids, max }: { ids: string[]; max: number }) {
 
 /** The protective-factors tank in one line; the rest is under its "?". */
 function TankLine({ care }: { care: CareSummary }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const fill = care.level / TANK_SIZE
   return (
     <div className="care-tank-line">
@@ -266,9 +267,9 @@ function TankLine({ care }: { care: CareSummary }) {
           <span className="muted">{t('care.helpedShort')}</span>
           {care.helped.slice(0, 3).map((id) =>
             CARDS[id] ? (
-              <span key={id} className="care-icon tiny" title={CARDS[id].title_en}>
+              <span key={id} className="care-icon tiny" title={L(CARDS[id].title_en, lang)}>
                 <CareIcon card={CARDS[id]} size={14} />
-                <span className="sr-only">{CARDS[id].title_en}</span>
+                <span className="sr-only">{L(CARDS[id].title_en, lang)}</span>
               </span>
             ) : null,
           )}
@@ -283,7 +284,7 @@ function TankLine({ care }: { care: CareSummary }) {
             {care.days === 1 ? t('care.dayOne') : t('care.days', { n: care.days })}.{' '}
           </>
         )}{' '}
-        <span lang="en">{getIndicator('protective').why_en}</span>
+        <span>{L(getIndicator('protective').why_en, lang)}</span>
       </InfoTip>
     </div>
   )
@@ -301,12 +302,12 @@ function EscalateAction({ card }: { card: BoostCard }) {
 
 /** "Did it help?" as four small chips. */
 function HelpChips({ value, onRate }: { value?: string; onRate: (answer: string) => void }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   return (
     <div className="care-chips" role="group" aria-label={t('boost.didItHelp')}>
       {DISPLAY.did_it_help.options_en.map((o) => (
         <button key={o} type="button" className="care-chip" aria-pressed={value === o} onClick={() => onRate(o)}>
-          {o}
+          {L(o, lang)}
         </button>
       ))}
     </div>
@@ -332,7 +333,7 @@ interface TileProps {
  * fills when chosen; what to do shows once chosen, or under ⓘ together with why and the sources.
  */
 function CareTile({ card, mode, chosen = false, disabled = false, onToggle, helped, onRate, action, done = false }: TileProps) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [info, setInfo] = useState(false)
   const time = card.minutes > 0 ? t('boost.minutes', { n: card.minutes }) : t('boost.instant')
   const head = (
@@ -341,7 +342,7 @@ function CareTile({ card, mode, chosen = false, disabled = false, onToggle, help
         <CareIcon card={card} />
       </span>
       <span className="care-tile-text">
-        <strong lang="en">{card.title_en}</strong>
+        <strong>{L(card.title_en, lang)}</strong>
         {mode !== 'escalate' && (
           <span className="care-time">
             <Icon name="clock" size={14} /> {time}
@@ -377,7 +378,7 @@ function CareTile({ card, mode, chosen = false, disabled = false, onToggle, help
           type="button"
           className="icon-btn care-info"
           aria-expanded={info}
-          aria-label={t('care.info', { title: card.title_en })}
+          aria-label={t('care.info', { title: L(card.title_en, lang) })}
           onClick={() => setInfo((o) => !o)}
         >
           <Icon name="info" size={20} />
@@ -385,7 +386,7 @@ function CareTile({ card, mode, chosen = false, disabled = false, onToggle, help
       </div>
       {(showWhat || act) && (
         <div className="care-tile-body">
-          {showWhat && <p lang="en">{card.what_en}</p>}
+          {showWhat && <p>{L(card.what_en, lang)}</p>}
           {info && <CardWhy card={card} />}
           {act}
           {mode === 'pick' && chosen && onRate && (
