@@ -295,7 +295,7 @@ export function BodyMap(props: Props) {
             painted={strokes}
             onSaved={clearPaint}
             onDone={closePain}
-            brush={false}
+            figureColors={fig}
           />
         </Sheet>
       )}

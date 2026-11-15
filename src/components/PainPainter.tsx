@@ -1,17 +1,9 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import Body, { type ExtendedBodyPart } from 'react-muscle-highlighter'
-import { FIGURE, partKey } from '../orbit/display'
+import { FIGURE } from '../orbit/display'
 import type { DotHeat } from '../orbit/heat'
 import { BRUSH, DAB_SPACING, MARK_COLOR, MAX_DOTS, MAX_STROKES, toHerSide, toViewerSide, VIEW_PARTS, zoneOf, type BodySide, type BodyView, type BrushSize, type PaintStroke, type Slug } from '../orbit/pain'
 import { FIGURE_ASPECT, useFigure } from '../lib/figure'
-import { useI18n } from '../i18n/context'
-
-interface Props {
-  view: BodyView
-  size: BrushSize
-  strokes: PaintStroke[]
-  onChange: (strokes: PaintStroke[]) => void
-}
 
 const ALL_PARTS = new Set<string>([...VIEW_PARTS.front, ...VIEW_PARTS.back, 'hair'])
 const round = (x: number) => Math.round(x * 1000) / 1000
@@ -232,50 +224,6 @@ export function PaintSurface({ view, size, strokes, onChange, scale = 1.3, class
             />
           )),
         )}
-      </div>
-    </div>
-  )
-}
-
-/**
- * She is not sure what hurts: she paints the area with her finger or the mouse.
- * Keyboard path: choose a zone and paint it whole.
- */
-export function PainPainter({ view, size, strokes, onChange, brush = true }: Props & { brush?: boolean }) {
-  const { t } = useI18n()
-  const [picked, setZone] = useState<Slug>(VIEW_PARTS[view][0])
-  const zone = VIEW_PARTS[view].includes(picked) ? picked : VIEW_PARTS[view][0]
-  const paintWhole = () => {
-    if (strokes.length >= MAX_STROKES) return
-    onChange([...strokes, { id: `zone-${zone}-${strokes.length}`, view, size, dots: [], zones: [zone] }])
-  }
-
-  return (
-    <div className="pain-mode">
-      {brush && (
-        <>
-          <p className="muted">{t('pain.paintHint')}</p>
-          <PaintSurface
-            view={view}
-            size={size}
-            strokes={strokes}
-            onChange={onChange}
-            label={t('pain.figure', { view: t(view === 'front' ? 'pain.front' : 'pain.back') })}
-          />
-        </>
-      )}
-      <div className="actions">
-        <label htmlFor="pain-zone">{t('pain.zone')}</label>
-        <select id="pain-zone" value={zone} onChange={(e) => setZone(e.target.value as Slug)}>
-          {VIEW_PARTS[view].map((slug) => (
-            <option key={slug} value={slug}>
-              {t(partKey(slug))}
-            </option>
-          ))}
-        </select>
-        <button type="button" className="button secondary" onClick={paintWhole}>
-          {t('pain.paintZone')}
-        </button>
       </div>
     </div>
   )
